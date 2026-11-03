@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 VAR={ # key: (源图, 目标色相°, 饱和度倍数, 亮度倍数)
  "v_ms":("ms",265,.45,.9),"v_pp":("pp",26,.85,.62),"v_m3":("m3",100,.9,.9),"v_ck":("ck",352,1.0,.9),
- "v_m4":("m4",280,.85,.85),"v_xs":("xs",12,1.0,.95),"v_xg":("xg",178,.8,.85),"v_yjx":("yjx",318,.9,.9),"v_xc":("xc",24,.8,.6),"v_gold":("i5",46,1.35,1.08),"v_lava":("m4",6,2.6,.8),"v_pot":("pot",14,1.0,.55),"v_cup":("cup",28,2.5,.8)}
+ "v_m4":("m4",280,.85,.85),"v_xs":("xs",12,1.0,.95),"v_xg":("xg",178,.8,.85),"v_yjx":("yjx",318,.9,.9),"v_xc":("xc",24,.8,.6),"v_gold":("i5",46,1.35,1.08),"v_lava":("m4",6,2.6,.8),"v_pot":("pot",14,1.0,.55),"v_cup":("cup",28,2.5,.8),"v_bdragon":("bdragon",215,.6,.88),"v_brock":("brock",100,.7,.78),"v_bthunder":("bthunder",198,1.0,.95),"v_bfour":("bfour",345,.85,.9),"v_bfallen":("bfallen",272,.7,.9)}
 def rgb2hsv(a):
     r,g,b=a[...,0],a[...,1],a[...,2];mx=a.max(-1);mn=a.min(-1);d=mx-mn
     h=np.zeros_like(mx);m=d>1e-6
