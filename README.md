@@ -1,4 +1,4 @@
-# 奶蛙之塔 1.0
+# 奶蛙之塔 1.1
 
 用奶蛙家族做的卡牌爬塔游戏。在线玩：https://machinelearningexpertqihang.github.io/naiwa-tower/
 

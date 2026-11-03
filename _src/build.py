@@ -88,3 +88,11 @@ if "--nofont" not in sys.argv: build_font(out)
 for f in sorted(os.listdir(out)):
     p = os.path.join(out, f)
     if os.path.isfile(p): print(f"  {f:14s} {os.path.getsize(p)//1024:5d} KB")
+
+# cache-bust：给 index.html 里的文件加版本号
+if not dev:
+    import re as _re
+    ver=_re.search(r'const VER="([^"]+)"',open(os.path.join(SRC,"game.js")).read()).group(1)
+    ip=os.path.join(DIST,"index.html");h=open(ip).read()
+    h=_re.sub(r'(src|href)="([\w.]+\.(?:js|css))"',lambda m:f'{m.group(1)}="{m.group(2)}?v={ver}"',h)
+    open(ip,"w").write(h)
