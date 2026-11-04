@@ -6,7 +6,7 @@ SRC = os.path.join(ROOT, "src"); DIST = os.path.join(ROOT, "dist")
 FONTDIR = "/tmp/claude-0/-home-claude/e4bf23af-1bfe-54b2-8edd-5f9cf2c468ea/scratchpad/font/x/package/files"
 dev = "--dev" in sys.argv
 
-texts = "".join(open(os.path.join(SRC, f), encoding="utf8").read() for f in ["data.js", "game.js", "ui.js", "lines.js", "index.html"])
+texts = "".join(open(os.path.join(SRC, f), encoding="utf8").read() for f in ["data.js", "game.js", "ui.js", "lines.js", "toy.js", "index.html"])
 allimg = json.load(open(os.path.join(ROOT, "assets/_all.json")))
 keys = set(re.findall(r'img:"(\w+)"', texts)) | set(re.findall(r'IMG\("(\w+)"\)', texts)) | set(re.findall(r'\["(\w+)","[^"]*",', texts)) | set(re.findall(r'ic:"(\w+)"', texts))
 keys = sorted(k for k in keys if k in allimg or k.startswith("e_") or k.startswith("v_"))
@@ -76,7 +76,7 @@ def build_font(out):
 out = SRC if dev else DIST
 if not dev:
     shutil.rmtree(DIST, ignore_errors=True); os.makedirs(DIST)
-    for f in ["data.js", "game.js", "lines.js", "music.js", "ui.js", "style.css"]:
+    for f in ["data.js", "game.js", "lines.js", "toy.js", "music.js", "ui.js", "style.css"]:
         shutil.copy(os.path.join(SRC, f), DIST)
 names = write_imgs(out)
 html = open(os.path.join(SRC, "index.html"), encoding="utf8").read()
