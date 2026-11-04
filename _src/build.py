@@ -116,6 +116,7 @@ if not dev:
     for f in ["data.js", "game.js", "lines.js", "toy.js", "music.js", "ui.js", "style.css", "zanshang.jpg"]:
         shutil.copy(os.path.join(SRC, f), DIST)
     shutil.copytree(os.path.join(SRC, "bg"), os.path.join(DIST, "bg"))
+    if os.path.isdir(os.path.join(SRC, "sf")): shutil.copytree(os.path.join(SRC, "sf"), os.path.join(DIST, "sf"))
 names = write_imgs(out)
 html = open(os.path.join(SRC, "index.html"), encoding="utf8").read()
 tags = "".join(f'<script src="{n}"></script>' for n in names)
