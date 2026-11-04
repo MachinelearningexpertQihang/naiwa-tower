@@ -76,7 +76,7 @@ def build_font(out):
 out = SRC if dev else DIST
 if not dev:
     shutil.rmtree(DIST, ignore_errors=True); os.makedirs(DIST)
-    for f in ["data.js", "game.js", "lines.js", "toy.js", "music.js", "ui.js", "style.css"]:
+    for f in ["data.js", "game.js", "lines.js", "toy.js", "music.js", "ui.js", "style.css", "zanshang.jpg"]:
         shutil.copy(os.path.join(SRC, f), DIST)
 names = write_imgs(out)
 html = open(os.path.join(SRC, "index.html"), encoding="utf8").read()
