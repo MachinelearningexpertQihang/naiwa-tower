@@ -52,6 +52,21 @@ def write_imgs(out):
             f.write("window.__NWT_IMG=Object.assign(window.__NWT_IMG||{}," + json.dumps(c, separators=(",", ":")) + ");")
     return names
 
+def extra_font(fam,pattern,chars):
+    from fontTools.ttLib import TTFont
+    from fontTools import subset
+    remaining=set(chars);faces=[]
+    for fp in sorted(glob.glob(pattern),key=lambda p:(0 if "simplified" in p else 1,p)):
+        f=TTFont(fp);cmap=f.getBestCmap() or {}
+        here={c for c in remaining if ord(c) in cmap}
+        if not here: continue
+        remaining-=here
+        opt=subset.Options();opt.flavor="woff2";sub=subset.Subsetter(opt);sub.populate(unicodes=[ord(c) for c in here]);sub.subset(f)
+        buf=io.BytesIO();f.flavor="woff2";f.save(buf)
+        faces.append((buf.getvalue(),",".join("U+%X"%ord(c) for c in sorted(here))))
+    return "".join("@font-face{font-family:'%s';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n"%(fam,base64.b64encode(b).decode(),r) for b,r in faces)
+FS2="/tmp/claude-0/-home-claude/e4bf23af-1bfe-54b2-8edd-5f9cf2c468ea/scratchpad/fonts2/node_modules/@fontsource/"
+TITLE_TXT="奶蛙之塔壹零满月升起尖塔归来开始冒险继续重新卡牌首领图鉴成就音乐开关赞赏作者通关次记忆碎片云存档已开启正在连接登录后可层步第周目张泥沼回廊夜古堡冰封钟楼沸腾茶厂星空顶入口功夫骑士奶蛙0123456789/·，。！？「」"
 def build_font(out):
     from fontTools.ttLib import TTFont
     from fontTools import subset
@@ -70,6 +85,8 @@ def build_font(out):
         rng = ",".join("U+%X" % ord(c) for c in sorted(here))
         faces.append((buf.getvalue(), rng))
     css = "".join("@font-face{font-family:'ZCOOL KuaiLe';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n" % (base64.b64encode(b).decode(), r) for b, r in faces)
+    css += extra_font("Zhi Mang Xing", FS2+"zhi-mang-xing/files/*-400-normal.woff2", "奶蛙之塔")
+    css += extra_font("ZCOOL XiaoWei", FS2+"zcool-xiaowei/files/*-400-normal.woff2", TITLE_TXT)
     open(os.path.join(out, "font.css"), "w").write(css)
     print("font faces:", len(faces), "css KB:", len(css) // 1024, "missing:", "".join(sorted(remaining))[:80])
 
