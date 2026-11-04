@@ -80,7 +80,7 @@ def extra_font(fam,pattern,chars):
         opt=subset.Options();opt.flavor="woff2";sub=subset.Subsetter(opt);sub.populate(unicodes=[ord(c) for c in here]);sub.subset(f)
         buf=io.BytesIO();f.flavor="woff2";f.save(buf)
         faces.append((buf.getvalue(),",".join("U+%X"%ord(c) for c in sorted(here))))
-    return "".join("@font-face{font-family:'%s';font-style:normal;font-weight:%s;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n"%(fam,"600" if fam=="NW Serif" else "400",base64.b64encode(b).decode(),r) for b,r in faces)
+    return "".join("@font-face{font-family:'%s';font-style:normal;font-weight:%s;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n"%(fam,"600" if fam=="NW Serif" else ("900" if fam=="NW Black" else "400"),base64.b64encode(b).decode(),r) for b,r in faces)
 FS2="/tmp/claude-0/-home-claude/e4bf23af-1bfe-54b2-8edd-5f9cf2c468ea/scratchpad/fonts2/node_modules/@fontsource/"
 TITLE_TXT="奶蛙之塔壹零满月升起尖塔归来开始冒险继续重新卡牌首领图鉴成就音乐开关赞赏作者通关次记忆碎片云存档已开启正在连接登录后可层步第周目张泥沼回廊夜古堡冰封钟楼沸腾茶厂星空顶入口功夫骑士奶蛙0123456789/·，。！？「」"
 def build_font(out):
@@ -102,7 +102,7 @@ def build_font(out):
         faces.append((buf.getvalue(), rng))
     css = "".join("@font-face{font-family:'ZCOOL KuaiLe';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n" % (base64.b64encode(b).decode(), r) for b, r in faces)
     css += extra_font("Zhi Mang Xing", FS2+"zhi-mang-xing/files/*-400-normal.woff2", "奶蛙之塔登顶倒下了")
-    css2 = extra_font("ZCOOL XiaoWei", FS2+"zcool-xiaowei/files/*-400-normal.woff2", "".join(chars))
+    css2 = extra_font("NW Black", FS2+"noto-sans-sc/files/*-900-normal.woff2", "".join(chars))
     css3 = extra_font("NW Serif", FS2+"noto-serif-sc/files/*-600-normal.woff2", "".join(chars))
     open(os.path.join(out, "font.css"), "w").write(css)
     open(os.path.join(out, "font2.css"), "w").write(css2)
@@ -115,6 +115,7 @@ if not dev:
     shutil.rmtree(DIST, ignore_errors=True); os.makedirs(DIST)
     for f in ["data.js", "game.js", "lines.js", "toy.js", "music.js", "ui.js", "style.css", "zanshang.jpg"]:
         shutil.copy(os.path.join(SRC, f), DIST)
+    shutil.copytree(os.path.join(SRC, "bg"), os.path.join(DIST, "bg"))
 names = write_imgs(out)
 html = open(os.path.join(SRC, "index.html"), encoding="utf8").read()
 tags = "".join(f'<script src="{n}"></script>' for n in names)
