@@ -52,6 +52,19 @@ def write_imgs(out):
             f.write("window.__NWT_IMG=Object.assign(window.__NWT_IMG||{}," + json.dumps(c, separators=(",", ":")) + ");")
     return names
 
+def bad_glyphs(fp,chars):
+    """找出画成实心黑块的坏字形（比如小薇体的「回」），让它们退回别的字体"""
+    from fontTools.ttLib import TTFont
+    from PIL import Image,ImageDraw,ImageFont
+    f=TTFont(fp);f.flavor=None;buf=io.BytesIO();f.save(buf);buf.seek(0);ft=ImageFont.truetype(buf,64)
+    cmap=f.getBestCmap() or {};bad=set()
+    for c in chars:
+        if ord(c)<0x2E80 or ord(c) not in cmap: continue
+        im=Image.new("L",(80,80),0);ImageDraw.Draw(im).text((8,0),c,font=ft,fill=255);bb=im.getbbox()
+        if not bb: continue
+        cr=im.crop(bb);px=list(cr.getdata());fill=sum(1 for v in px if v>128)/len(px)
+        if fill>0.62 and cr.size[0]>30 and cr.size[1]>30: bad.add(c)
+    return bad
 def extra_font(fam,pattern,chars):
     from fontTools.ttLib import TTFont
     from fontTools import subset
@@ -59,12 +72,15 @@ def extra_font(fam,pattern,chars):
     for fp in sorted(glob.glob(pattern),key=lambda p:(0 if "simplified" in p else 1,p)):
         f=TTFont(fp);cmap=f.getBestCmap() or {}
         here={c for c in remaining if ord(c) in cmap}
+        if fam=="ZCOOL XiaoWei" and here:
+            bd=bad_glyphs(fp,here)
+            if bd: print("  坏字形跳过:", "".join(sorted(bd))); here-=bd; remaining-=bd
         if not here: continue
         remaining-=here
         opt=subset.Options();opt.flavor="woff2";sub=subset.Subsetter(opt);sub.populate(unicodes=[ord(c) for c in here]);sub.subset(f)
         buf=io.BytesIO();f.flavor="woff2";f.save(buf)
         faces.append((buf.getvalue(),",".join("U+%X"%ord(c) for c in sorted(here))))
-    return "".join("@font-face{font-family:'%s';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n"%(fam,base64.b64encode(b).decode(),r) for b,r in faces)
+    return "".join("@font-face{font-family:'%s';font-style:normal;font-weight:%s;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n"%(fam,"600" if fam=="NW Serif" else "400",base64.b64encode(b).decode(),r) for b,r in faces)
 FS2="/tmp/claude-0/-home-claude/e4bf23af-1bfe-54b2-8edd-5f9cf2c468ea/scratchpad/fonts2/node_modules/@fontsource/"
 TITLE_TXT="奶蛙之塔壹零满月升起尖塔归来开始冒险继续重新卡牌首领图鉴成就音乐开关赞赏作者通关次记忆碎片云存档已开启正在连接登录后可层步第周目张泥沼回廊夜古堡冰封钟楼沸腾茶厂星空顶入口功夫骑士奶蛙0123456789/·，。！？「」"
 def build_font(out):
@@ -85,9 +101,13 @@ def build_font(out):
         rng = ",".join("U+%X" % ord(c) for c in sorted(here))
         faces.append((buf.getvalue(), rng))
     css = "".join("@font-face{font-family:'ZCOOL KuaiLe';font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2');unicode-range:%s}\n" % (base64.b64encode(b).decode(), r) for b, r in faces)
-    css += extra_font("Zhi Mang Xing", FS2+"zhi-mang-xing/files/*-400-normal.woff2", "奶蛙之塔")
-    css += extra_font("ZCOOL XiaoWei", FS2+"zcool-xiaowei/files/*-400-normal.woff2", TITLE_TXT)
+    css += extra_font("Zhi Mang Xing", FS2+"zhi-mang-xing/files/*-400-normal.woff2", "奶蛙之塔登顶倒下了")
+    css2 = extra_font("ZCOOL XiaoWei", FS2+"zcool-xiaowei/files/*-400-normal.woff2", "".join(chars))
+    css3 = extra_font("NW Serif", FS2+"noto-serif-sc/files/*-600-normal.woff2", "".join(chars))
     open(os.path.join(out, "font.css"), "w").write(css)
+    open(os.path.join(out, "font2.css"), "w").write(css2)
+    open(os.path.join(out, "font3.css"), "w").write(css3)
+    print("font2 KB", len(css2)//1024, "font3 KB", len(css3)//1024)
     print("font faces:", len(faces), "css KB:", len(css) // 1024, "missing:", "".join(sorted(remaining))[:80])
 
 out = SRC if dev else DIST
