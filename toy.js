@@ -22,7 +22,7 @@ const NWB={t:0,
  soon(){if(!this.t)this.t=setTimeout(()=>this.save(),1500)},
  load(){return this.open().then(db=>new Promise(res=>{const tx=db.transaction("kv","readonly");const r=tx.objectStore("kv").get("s");r.onsuccess=()=>{res(r.result||null);db.close()};r.onerror=()=>{res(null);db.close()}})).catch(()=>null)},
  async restore(){const o=await TOY.timeout(this.load(),3000).catch(()=>null);if(!o||!o.m)return false;let bm=null;try{bm=JSON.parse(o.m)}catch(e){return false}
-  if(nwProg(bm)<=nwProg(M))return false;
+  if(nwProg(bm)<=nwProg(M)){try{if(o.s&&nwProg(bm)===nwProg(M)&&!localStorage.getItem("nwt-run")&&!localStorage.getItem("nwt-run-end")){const r=JSON.parse(o.s);if(r&&r.v===2){localStorage.setItem("nwt-run",o.s);return true}}}catch(e){}return false}
   Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,bm);try{localStorage.setItem("nwt-meta",o.m);if(o.s&&!localStorage.getItem("nwt-run"))localStorage.setItem("nwt-run",o.s)}catch(e){}
   return true}};
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch(e){}
@@ -30,7 +30,7 @@ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().ca
 /* ---------- 云存档 ---------- */
 const CLOUD={st:"off",dirty:false,busy:false,last:[],back:0,fail:0,lastUp:0,timer:0,tries:0,pend:null,
  has(){return !!(window.toy&&toy.getCloudStorage&&toy.setCloudStorage)},
- pack(){const s=JSON.stringify({v:1,t:Date.now(),m:M,s:S||null}).replace(/[\u007f-￿]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));const ch=[];for(let i=0;i<s.length;i+=1000)ch.push(s.slice(i,i+1000));return ch},
+ pack(){let run=(typeof S!=="undefined"&&S&&!S.noSave)?S:null;if(!run){try{run=loadRun()}catch(e){run=null}}const s=JSON.stringify({v:1,t:Date.now(),m:M,s:run||null}).replace(/[\u007f-￿]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));const ch=[];for(let i=0;i<s.length;i+=1000)ch.push(s.slice(i,i+1000));return ch},
  idle(){return typeof S==="undefined"||!S},
  async init(){if(this.st!=="off"&&this.st!=="retry")return;this.st="wait";
   try{if(await NWB.restore()&&this.idle()&&typeof titleScreen==="function"&&$("#title").classList.contains("on")){titleScreen();if(typeof toast==="function")toast("已从本机备份找回你的存档")}}catch(e){}
@@ -47,7 +47,7 @@ const CLOUD={st:"off",dirty:false,busy:false,last:[],back:0,fail:0,lastUp:0,time
    else if(o.s&&o.s.v===2&&this.idle()){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}
     if(!lr&&cp===lp||lr&&(o.s.ts||0)>(lr.ts||0)+3000){try{localStorage.setItem("nwt-run",JSON.stringify(o.s))}catch(e){}if($("#title").classList.contains("on"))titleScreen()}}}
   this.st="on";this.hot()},
- apply(o){Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,o.m);try{localStorage.setItem("nwt-meta",JSON.stringify(M));if(o.s&&o.s.v===2)localStorage.setItem("nwt-run",JSON.stringify(o.s));else localStorage.removeItem("nwt-run")}catch(e){}
+ apply(o){Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,o.m);try{localStorage.setItem("nwt-meta",JSON.stringify(M));if(o.s&&o.s.v===2){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}if(!lr||(o.s.ts||0)>=(lr.ts||0))localStorage.setItem("nwt-run",JSON.stringify(o.s))}}catch(e){}
   NWB.save();if(typeof titleScreen==="function"&&$("#title").classList.contains("on"))titleScreen();if(typeof toast==="function")toast("已从云端找回你的存档")},
  askLater(){const go=()=>{if(this.st!=="ask"||!this.pend)return;if(!this.idle()||!$("#title").classList.contains("on")||$("#ov").classList.contains("on")){setTimeout(go,1500);return}
    const o=this.pend;this.pend=null;this.apply(o);this.st="on";this.hot()};go()},
@@ -74,10 +74,11 @@ const GSTAT={detect(){return null},load(){return Promise.resolve(null)},add(){re
    board 1：爬塔积分；board 2：最痛一击（单次最高伤害） */
 const LB={cache:{},
  ok(){return !!(window.toy&&toy.getRankList&&toy.submitScore)},
- BOARDS:{1:{n:"爬塔积分",u:"分",d:"爬得越高、首领打得越多、难度越高，分越高"},2:{n:"最痛一击",u:"点",d:"一局里打出的单次最高伤害"}},
- score(win){if(!S)return 0;const fl=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;const mul={easy:.5,normal:1,hard:1.6}[S.diff||"normal"]||1;return Math.round((fl*10+(S.stats.endb||0)*50+(win?300:0))*mul+asc()*80)},
- submit(b,score){score=Math.floor(score||0);if(score<=0)return;M.lbBest=M.lbBest||{};if(score>(M.lbBest[b]||0)){M.lbBest[b]=score;saveMeta()}if(!this.ok())return;toy.submitScore({board:b,score}).then(()=>{for(const k in this.cache)if(k.indexOf(b+"|")===0)delete this.cache[k]}).catch(()=>{})},
- onRunEnd(win){try{this.submit(1,this.score(win));this.submit(2,(S&&S.stats&&S.stats.maxHit)||0)}catch(e){}},
+ BOARDS:{1:{n:"爬塔积分",u:"分",d:"爬得越高、首领打得越多、难度越高，分越高"},2:{n:"最痛一击",u:"点",d:"一局里打出的单次最高伤害"},3:{n:"真结局",u:"分",d:"只有走到真结局才会上榜：难度越高、周目越多、用的回合越少、最后剩的血越多，分越高"}},
+ score(win){if(!S)return 0;const fl=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;const mul={easy:.5,normal:1,hard:1.6}[S.diff||"normal"]||1;return Math.round((fl*10+(S.stats.endb||0)*50+(win?300:0)+(S.endKey==="true"?500:0))*mul+asc()*80)},
+ trueScore(){if(!S)return 0;const mul={easy:.5,normal:1,hard:1.6}[S.diff||"normal"]||1;return Math.round(1000*mul+asc()*150+Math.max(0,400-((S.stats&&S.stats.turns)||0))+Math.round(300*Math.max(0,S.hp)/Math.max(1,S.max)))},
+ submit(b,score){score=Math.floor(score||0);if(score<=0)return false;M.lbBest=M.lbBest||{};let rec=false;if(score>(M.lbBest[b]||0)){rec=true;M.lbBest[b]=score;saveMeta()}if(!this.ok())return rec;toy.submitScore({board:b,score}).then(()=>{for(const k in this.cache)if(k.indexOf(b+"|")===0)delete this.cache[k]}).catch(()=>{});return rec},
+ onRunEnd(win){try{const r=[];if(this.submit(1,this.score(win)))r.push("爬塔积分 "+this.score(win));const mh=(S&&S.stats&&S.stats.maxHit)||0;if(this.submit(2,mh))r.push("最痛一击 "+mh);if(S&&S.endKey==="true"){const t=this.trueScore();if(this.submit(3,t))r.push("真结局 "+t)}if(r.length)setTimeout(()=>{toast(`<b>新纪录！</b>${r.join("　")}`);sfx("relic")},1200)}catch(e){}},
  async get(b,per){const k=b+"|"+per,c=this.cache[k];if(c&&Date.now()-c.t<60000)return c;const o={t:Date.now(),list:[],me:null};
   try{const R=await Promise.all([TOY.timeout(toy.getRankList({board:b,period:per,limit:50}),8000).then(x=>x||[],()=>null),toy.getMyRank?TOY.timeout(toy.getMyRank({board:b,period:per}),8000).catch(()=>null):Promise.resolve(null)]);if(R[0]===null)o.err=1;else o.list=R[0];o.me=R[1]}catch(e){o.err=1}if(!o.err)this.cache[k]=o;return o}};
 function cleanName(s){return String(s||"奶蛙").replace(/[<>&"]/g,"").slice(0,12)}

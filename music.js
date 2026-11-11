@@ -3,30 +3,33 @@
 const A={ctx:null,music:true,sfx:true,step:0,next:0,trk:null,cur:null};
 try{const o=JSON.parse(localStorage.getItem("nwt-audio")||"{}");if(o.music===false)A.music=false;if(o.sfx===false)A.sfx=false}catch(e){}
 const mtof=m=>440*Math.pow(2,(m-69)/12);
-function audioUnlock(){if(A.ctx){if(A.ctx.state!=="running"&&!document.hidden)A.ctx.resume().catch(()=>{});return}
+/* 4.2：手机切到后台再回来，声音常常会「哑掉」（状态显示还在播放其实没声音）。回来后第一次点屏幕时，把整套声音重新建一遍 */
+function audioRebuild(){const old=A.ctx,cur=A.cur;A.ctx=null;try{old&&old.close&&old.close().catch(()=>{})}catch(e){}A.fxRev=null;try{if(typeof SX!=="undefined")SX.ok=0}catch(e){}audioUnlock();A.cur=cur;A.step=0;if(A.ctx)A.next=A.ctx.currentTime+.1}
+function audioUnlock(){if(A.ctx){if(document.hidden)return;if(A.wasBg){A.wasBg=0;const touch=("ontouchstart" in window)||navigator.maxTouchPoints>0;if(touch||A.ctx.state!=="running"){audioRebuild();return}}if(A.ctx.state!=="running"){A.ctx.resume().catch(()=>{});clearTimeout(A._chk);A._chk=setTimeout(()=>{if(A.ctx&&A.ctx.state!=="running"&&!document.hidden)A.wasBg=1},400)}return}
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const c=new AC;A.ctx=c;
  const comp=c.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;comp.connect(c.destination);
  A.out=c.createGain();A.out.gain.value=.9;A.out.connect(comp);
  A.fx=c.createGain();A.fx.gain.value=A.sfx?.6:0;A.fx.connect(A.out);
- A.bgm=c.createGain();A.bgm.gain.value=A.music?.22:0;A.bgm.connect(A.out);
+ A.bgmVol=.24;A.bgm=c.createGain();A.bgm.gain.value=A.music?A.bgmVol:0;A.bgm.connect(A.out);
  // 简单混响：两条反馈延迟
  A.rev=c.createGain();A.rev.gain.value=.22;const d1=c.createDelay(),d2=c.createDelay(),f1=c.createGain(),f2=c.createGain(),lp=c.createBiquadFilter();
  d1.delayTime.value=.137;d2.delayTime.value=.211;f1.gain.value=.38;f2.gain.value=.33;lp.type="lowpass";lp.frequency.value=2600;
  A.rev.connect(lp);lp.connect(d1);lp.connect(d2);d1.connect(f1);f1.connect(d1);d2.connect(f2);f2.connect(d2);d1.connect(A.bgm);d2.connect(A.bgm);
  const b=c.createBuffer(1,c.sampleRate,c.sampleRate),dd=b.getChannelData(0);for(let i=0;i<dd.length;i++)dd[i]=Math.random()*2-1;A.noise=b;
  if(c.resume)c.resume().catch(()=>{});A.next=c.currentTime+.1;if(!A.timer)A.timer=setInterval(sched,25);loadSF()}
-document.addEventListener("visibilitychange",()=>{if(!A.ctx)return;if(document.hidden)A.ctx.suspend&&A.ctx.suspend().catch(()=>{});else{A.ctx.resume().catch(()=>{});A.next=Math.max(A.next,A.ctx.currentTime+.05)}});
+document.addEventListener("visibilitychange",()=>{if(!A.ctx)return;if(document.hidden){A.hidAt=Date.now();A.ctx.suspend&&A.ctx.suspend().catch(()=>{})}else{if(Date.now()-(A.hidAt||0)>800)A.wasBg=1;A.ctx.resume().catch(()=>{});A.next=Math.max(A.next,A.ctx.currentTime+.05)}});
+addEventListener("pageshow",e=>{if(e.persisted&&A.ctx)A.wasBg=1});
 ["pointerdown","touchend","click","keydown"].forEach(ev=>addEventListener(ev,audioUnlock,true));
-function audioSave(){try{localStorage.setItem("nwt-audio",JSON.stringify({music:A.music,sfx:A.sfx}))}catch(e){}if(A.bgm)A.bgm.gain.value=A.music?.22:0;if(A.fx)A.fx.gain.value=A.sfx?.6:0}
+function audioSave(){try{localStorage.setItem("nwt-audio",JSON.stringify({music:A.music,sfx:A.sfx}))}catch(e){}if(A.bgm)A.bgm.gain.value=A.music?(A.bgmVol||.24):0;if(A.fx)A.fx.gain.value=A.sfx?.6:0}
 
 /* ---- 真实乐器采样（FluidR3 GM 音色库，Frank Wen，CC BY 3.0） ---- */
 const SF={};let SF_N=4,SF_LOADING=0;
 function loadSF(){if(SF_LOADING||!A.ctx)return;SF_LOADING=1;for(let i=0;i<SF_N;i++){const sc=document.createElement("script");sc.src="sf/sf"+i+".js?v="+(typeof VER!=="undefined"?VER:"1");sc.onload=()=>decodeSF();document.head.appendChild(sc)}}
 function decodeSF(){const W=window.__NWT_SF||{};for(const inst in W){if(SF[inst])continue;SF[inst]={keys:[],buf:{}};const notes=W[inst];for(const m in notes){const bin=atob(notes[m]);const arr=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)arr[j]=bin.charCodeAt(j);
   const done=b=>{SF[inst].buf[m]=b;SF[inst].keys=Object.keys(SF[inst].buf).map(Number).sort((a,b)=>a-b)};try{const p=A.ctx.decodeAudioData(arr.buffer,done,()=>{});if(p&&p.then)p.then(done).catch(()=>{})}catch(e){}}delete W[inst]}}
-function samp(inst,m,t,dur,vol,wet){const I=SF[inst];if(!I||!I.keys.length||!A.ctx)return false;let k=I.keys[0];for(const x of I.keys)if(Math.abs(x-m)<Math.abs(k-m))k=x;const b=I.buf[k];if(!b)return false;
+function samp(inst,m,t,dur,vol,wet,dest){const I=SF[inst];if(!I||!I.keys.length||!A.ctx)return false;let k=I.keys[0];for(const x of I.keys)if(Math.abs(x-m)<Math.abs(k-m))k=x;const b=I.buf[k];if(!b)return false;
  const c=A.ctx,src=c.createBufferSource(),g=c.createGain();src.buffer=b;src.playbackRate.value=Math.pow(2,(m-k)/12);const end=Math.min(t+Math.max(.08,dur),t+b.duration/src.playbackRate.value);
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.006);g.gain.setValueAtTime(vol,Math.max(t+.01,end-.12));g.gain.linearRampToValueAtTime(0,end+.02);src.connect(g);g.connect(A.bgm);if(wet&&A.rev){const w=c.createGain();w.gain.value=wet;g.connect(w);w.connect(A.rev)}src.start(t);src.stop(end+.05);return true}
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.006);g.gain.setValueAtTime(vol,Math.max(t+.01,end-.12));g.gain.linearRampToValueAtTime(0,end+.02);src.connect(g);g.connect(dest||A.bgm);const rv=dest?A.fxRev:A.rev;if(wet&&rv){const w=c.createGain();w.gain.value=wet;g.connect(w);w.connect(rv)}src.start(t);src.stop(end+.05);return true}
 /* ---- 基础发声 ---- */
 function tone(o){const c=A.ctx;if(!c)return;const t=o.t||c.currentTime,dur=o.dur||.15;
  const os=c.createOscillator(),g=c.createGain();os.type=o.type||"sine";os.frequency.setValueAtTime(o.f,t);if(o.f2)os.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
@@ -134,6 +137,27 @@ const TR={
   mel:[74,-1,-1,0,77,-1,76,0, 74,-1,72,0,69,-1,-1,0, 70,-1,72,0,74,-1,77,0, 76,-1,-1,-1,0,0,0,0, 81,-1,79,0,77,-1,76,0, 74,-1,76,0,77,-1,-1,0, 79,-1,77,0,76,-1,74,0, 73,-1,-1,-1,0,0,0,0]},
 };
 Object.assign(TR,TR2);
+/* ---- 4.0 新曲 ---- */
+Object.assign(TR,{
+ // 梦境层「隔着水的回忆」：慢华尔兹，钢片琴 + 竖琴，全音阶带一点飘
+ dream:{bpm:84,sw:0,lead:"celesta",bass:"soft",dr:"waltz",pad:.06,arp:1,bell:1,ch:[[52,"M7"],[54,"M"],[52,"M7"],[54,"M"],[49,"m7"],[54,"sus"],[52,"M7"],[47,"7"]],
+  mel:[76,-1,-1,80,-1,83,82,-1, -1,80,-1,78,76,-1,-1,0, 78,-1,-1,82,-1,85,83,-1, -1,82,80,-1,78,-1,-1,0, 76,-1,80,83,-1,88,87,-1, 85,-1,83,-1,80,-1,78,-1, 76,-1,78,80,-1,82,83,-1, 80,-1,-1,-1,-1,-1,0,0]},
+ // 最终之地「紫色裂隙」：低音管风琴 + 定音鼓，减和弦
+ fin:{bpm:104,sw:0,lead:"organ",bass:"heavy",dr:"doom",pad:.06,ch:[[45,"m"],[46,"M"],[45,"m"],[44,"M"],[45,"m"],[41,"M"],[43,"m"],[44,"7"]],
+  mel:[69,0,72,0,75,-1,74,0, 70,-1,-1,0,69,0,0,0, 69,0,72,0,77,-1,76,72, 68,-1,-1,-1,0,0,0,0, 81,-1,80,0,77,-1,76,0, 74,-1,72,0,70,-1,69,0, 72,0,75,0,79,-1,77,75, 76,-1,-1,-1,80,-1,-1,0]},
+ // 魔椅之战「你自己的声音」：极慢的心跳低音 + 管风琴，越打越快（rage）
+ chair:{bpm:88,sw:0,lead:"organ",bass:"heavy",dr:"doom",pad:.08,bell:1,ch:[[48,"m"],[48,"m"],[51,"M"],[50,"m"],[48,"m"],[44,"M"],[46,"M"],[43,"7"]],
+  mel:[60,-1,-1,-1,63,-1,62,-1, 60,-1,-1,-1,0,0,0,0, 67,-1,-1,-1,68,-1,67,-1, 65,-1,63,-1,62,-1,0,0, 72,-1,-1,0,71,-1,-1,0, 68,-1,-1,0,67,-1,65,-1, 63,-1,62,-1,60,-1,59,-1, 60,-1,-1,-1,-1,-1,-1,0]},
+ // 回忆关「旧照片」：八音盒 + 弦乐长音，像老唱片
+ memo:{bpm:76,sw:.12,lead:"box",bass:"soft",dr:"none",pad:.05,arp:1,ch:[[53,"M"],[50,"m"],[46,"M"],[48,"7"]],
+  mel:[77,-1,76,77,81,-1,-1,0, 79,-1,77,76,74,-1,-1,0, 72,-1,74,76,77,-1,79,0, 76,-1,-1,-1,0,0,0,0, 81,-1,79,81,84,-1,-1,0, 82,-1,81,79,77,-1,76,0, 74,-1,76,77,79,-1,76,0, 77,-1,-1,-1,0,0,0,0]},
+ // 隐藏首领「铁皮之心」：机械感的方波琶音 + 工厂鼓
+ proto:{bpm:132,sw:0,lead:"synth",bass:"drive",dr:"factory",pad:.03,ch:[[50,"m"],[50,"m"],[46,"M"],[48,"M"]],
+  mel:[74,77,81,77,74,77,81,77, 74,77,81,86,84,81,77,74, 70,74,77,74,70,74,77,74, 72,76,79,84,83,79,76,72, 74,0,74,0,77,0,81,0, 82,-1,81,-1,79,-1,77,-1, 74,77,81,86,84,81,79,77, 76,-1,-1,-1,72,-1,-1,0]},
+ // 谢幕「泉水回来了」：大调，竖琴 + 长笛，慢慢长大
+ credits:{bpm:80,sw:.08,lead:"flute",bass:"soft",dr:"none",pad:.06,arp:1,bell:1,ch:[[48,"M"],[43,"M"],[45,"m"],[41,"M"],[48,"M"],[43,"M"],[41,"M"],[43,"sus"]],
+  mel:[72,-1,-1,76,79,-1,-1,0, 79,-1,77,76,74,-1,-1,0, 76,-1,-1,72,69,-1,72,0, 77,-1,-1,-1,0,0,0,0, 84,-1,-1,83,81,-1,79,0, 76,-1,77,79,81,-1,-1,0, 77,-1,76,74,72,-1,74,0, 72,-1,-1,-1,-1,-1,0,0]}});
+
 const ORCH={
  title:{lead:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp"},
  map:{lead:"kalimba",bass:"acoustic_bass",arp:"acoustic_guitar_nylon",perc:"wood"},
@@ -152,7 +176,15 @@ const ORCH={
  battle3:{lead:"trumpet",dbl:"acoustic_grand_piano",bass:"acoustic_bass",stab:"acoustic_grand_piano",perc:"taiko"},
  map4:{lead:"flute",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1},
  battle4:{lead:"french_horn",dbl:"trumpet",bass:"cello",pad:"string_ensemble_1",stab:"string_ensemble_1",perc:"timp"}};
+Object.assign(ORCH,{
+ dream:{lead:"celesta",dbl:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1},
+ fin:{lead:"church_organ",dbl:"french_horn",bass:"cello",pad:"string_ensemble_1",perc:"timp",bells:1},
+ chair:{lead:"church_organ",dbl:"cello",bass:"cello",pad:"string_ensemble_1",perc:"timp",bells:1},
+ memo:{lead:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp"},
+ proto:{lead:"marimba",dbl:"pizzicato_strings",bass:"acoustic_bass",stab:"string_ensemble_1",perc:"taiko"},
+ credits:{lead:"flute",dbl:"orchestral_harp",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1}});
 for(const k in ORCH)if(TR[k])TR[k].s=ORCH[k];
+const TVOL={"title":1.36,"map":1.38,"battle":0.99,"elite":1.07,"boss":1.02,"final":0.94,"shop":1.45,"rest":1.43,"event":1.23,"map1":1.38,"battle1":0.98,"map2":1.35,"battle2":1.15,"map3":1.0,"battle3":1.23,"map4":1.08,"battle4":1.14,"dream":1.12,"fin":0.91,"chair":0.91,"memo":1.38,"proto":1.1,"credits":1.1};
 function harmUnder(m,chord){let best=null;for(const c of chord)for(const o of [12,24,36]){const n=c+o;if(n<m-2&&n>=m-9&&(best===null||n>best))best=n}return best}
 function sched(h=.15){const c=A.ctx;if(!c)return;if(A.next<c.currentTime-.2)A.next=c.currentTime+.05;
  while(A.next<c.currentTime+h){const T=TR[A.cur];const q=60/(T?T.bpm*(A.rage?1.18:1):100)/2;
@@ -172,4 +204,11 @@ function sched(h=.15){const c=A.ctx;if(!c)return;if(A.next<c.currentTime-.2)A.ne
    if(T.bell&&e===0&&bar%2===0)INST.bell(r+24,t,q)}
   A.next+=q;A.step++}}
 function musicRage(on){A.rage=on?1:0}
-function playMusic(n){const map={swing:"map",tense:"battle",space:"event",country:"shop",home:"rest"};n=map[n]||n;const act=(typeof S!=="undefined"&&S&&S.act)||0;if((n==="map"||n==="battle")&&act&&TR[n+act])n=n+act;if(A.cur===n)return;A.rage=0;A.cur=n;A.step=0;if(A.ctx)A.next=A.ctx.currentTime+.08}
+function playMusic(n){const map={swing:"map",tense:"battle",space:"event",country:"shop",home:"rest"};n=map[n]||n;const act=(typeof S!=="undefined"&&S&&S.act)||0;
+ if(typeof S!=="undefined"&&S){if(S.fin&&(n==="map"||n==="battle"||n==="elite"||n==="rest"))n="fin";else if(S.dream&&(n==="map"||n==="battle"||n==="elite"||n==="shop"||n==="event"))n="dream"}
+ if((n==="map"||n==="battle")&&act&&TR[n+act])n=n+act;if(A.cur===n)return;
+ const nv=.24*(TVOL[n]||1);A.bgmVol=nv;const go=()=>{A.rage=0;A.cur=n;A.step=0;if(A.ctx)A.next=A.ctx.currentTime+.08};
+ const c=A.ctx;if(!c||!A.bgm||!A.music||!A.cur){if(A.bgm&&A.music)A.bgm.gain.value=nv;go();return}
+ /* 换曲：旧曲 0.35 秒淡出，新曲 0.6 秒淡入 */
+ const g=A.bgm.gain,t=c.currentTime,v=nv;try{g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(0,t+.35);g.linearRampToValueAtTime(v,t+.95)}catch(e){}
+ clearTimeout(A._sw);A.cur=null;A._sw=setTimeout(go,340)}
