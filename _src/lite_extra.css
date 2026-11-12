@@ -1,0 +1,19 @@
+html.lite .holo,html.lite .tGlare,html.lite .tFoil,html.lite .tSpark,html.lite .gpSheen{display:none!important}
+html.lite .camp2 .cf{mix-blend-mode:normal;filter:none}
+html.lite .gpSky i{animation:none}
+html.lite .gpSky i:nth-child(n+15){display:none}
+html.lite .gpStage,html.lite .gpCard{perspective:none}
+html.lite .gpPack{animation:none;transition:opacity .4s}
+html.lite .gpMoon,html.lite .gpBack i{box-shadow:none}
+html.lite .gpBack{box-shadow:0 0 0 3px #0d1b3e!important}
+html.lite .gpSlit{box-shadow:none}
+html.lite .gpBurst{display:none}
+html.lite .gpFlip,html.lite .gpCard.open .gpFlip{transform-style:flat;transition:none;transform:none}
+html.lite .gpBack{transform:none}
+html.lite .gpBack,html.lite .gpFront{backface-visibility:visible;-webkit-backface-visibility:visible}
+html.lite .gpCard.open .gpFront{animation:gpLiteIn .22s ease-out}
+@keyframes gpLiteIn{from{transform:scale(.86);opacity:.3}to{transform:none;opacity:1}}
+html.lite .gpS{animation:none}
+html.lite .gpCard:not(.open) .gpFront{visibility:hidden}
+html.lite .gpCard.open .gpBack{visibility:hidden}
+html.lite .gpCard:not(.top):not(.gone) .gpFront{display:none}

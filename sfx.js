@@ -38,9 +38,9 @@ function thump(f=140,f2=60,dur=.1,vol=.16,dt=0){if(!_ok())return;tone({type:"sin
 function smack(vol=.4,rate=1,dt=0,P){if(!_ok())return;sxPlay("place",vol,rate,dt,P)}
 function crack(vol=.14,dt=0,f=2200){if(!_ok())return;noise({t:_t()+dt,dur:.035,vol,filt:"bandpass",f,f2:f*.6,q:.8})}
 /* ---------- 打中敌人：K 出手方式，o:{d 伤害,crit 暴击} ---------- */
-function hitSound(K,big,o){if(!A.ctx||!A.sfx)return;sxLoad();o=o||{};const d=o.d==null?(big?20:9):o.d;const L=d<6&&!big,X=d>=40;const P={pan:.22,wet:big?.18:0};const v=L?.75:1;
+function hitSound(K,big,o){if(!A.ctx||!A.sfx)return;sxLoad();o=o||{};const d=o.d==null?(big?20:9):o.d;const L=d<6&&!big,X=d>=30;const P={pan:.22,wet:big?.18:0};const v=L?.88:1;const HR=(typeof S!=="undefined"&&S&&S.hero)||"naiwa";
  const KF=K==="fist"&&typeof S!=="undefined"&&S&&S.hero==="kungfu";
- if(K==="fist"){if(L&&KF){sxPlay("punch",.7,.95,0,P);sxPlay("thud",.45,.85,0,P);thump(140,60,.12,.14)}else if(L){sxPlay("tick",.55,1.1,0,P);sxPlay("thud",.3,1.1,0,P)}else if(!big){sxPlay("punch",.75,KF?.9:1,0,P);smack(.4,KF?.85:1,0,P);thump(KF?125:150,KF?50:70,KF?.16:.09,KF?.2:.12);if(KF)sxPlay("punchH",.5,.9,.006,P)}else{sxPlay("punchH",.8,.96,0,P);sxPlay("punch",.55,.86,.008,P);smack(.55,.8,0,P);crack(.2);thump(125,45,.2,.26)}}
+ if(K==="fist"){if(L&&KF){sxPlay("punch",.7,.95,0,P);sxPlay("thud",.45,.85,0,P);thump(140,60,.12,.14)}else if(L){sxPlay("tick",.55,1.1,0,P);sxPlay("thud",.42,1.05,0,P);if(HR==="naiwa")thump(170,90,.08,.1)}else if(!big){sxPlay("punch",.75,KF?.9:1,0,P);smack(.4,KF?.85:1,0,P);thump(KF?125:150,KF?50:70,KF?.16:.09,KF?.2:.12);if(KF)sxPlay("punchH",.5,.9,.006,P)}else{sxPlay("punchH",.8,.96,0,P);sxPlay("punch",.55,.86,.008,P);smack(.55,.8,0,P);crack(.2);thump(125,45,.2,.26)}}
  else if(K==="blade"){if(!big){sxPlay("slash",.8*v,1.05,0,P);sxPlay("blade",.5*v,1,.015,P);ring(2300,.12,.035,.02)}else{sxPlay("slash",.95,.9,0,P);sxPlay("clank",.6,.85,.03,P);sxPlay("blade",.6,.85,.02,P);ring(1800,.22,.05,.03);thump(110,50,.18,.22,.03)}}
  else if(K==="claw"){sxPlay("slash",.62*v,1.35,0,P);sxPlay("slash",.5*v,1.52,.045,P);sxPlay("hit",.5*v,1.15,.03,P);if(big){sxPlay("punch",.5,.9,.03,P);thump(130,55,.16,.2,.03)}}
  else if(K==="fire"){sxPlay("boomx",(big?.7:.5)*v,big?1:1.25,0,P);sxPlay("firew",.3*v,1.2,.02,P);crackle(big?7:4,.09*v);crack(.12*v,0,1500)}
@@ -50,7 +50,7 @@ function hitSound(K,big,o){if(!A.ctx||!A.sfx)return;sxLoad();o=o||{};const d=o.d
  else if(K==="earth"){sxPlay("rock",.5*v,.9,0,P);sxPlay("knock",.7*v,.7,0,P);crack(.2*v,0,900);crackle(big?6:3,.07);if(big){sxPlay("punchH",.55,.7,.01,P);thump(80,40,.22,.22)}}
  else if(K==="star"){if(!mel("celesta",[91,95,98],.03,.55,{wet:.5}))sxPlay("gem",.5,1.5);sxPlay("tick",.5*v,1.3,0,P);if(big)sxPlay("punch",.45,1.1,.01,P)}
  else{sxPlay("tick",.5,1.1+Math.random()*.1,0,P);sxPlay("thud",.28,1.1,0,P)}
- if(X||(big&&(K==="fire"||K==="thunder"||K==="earth")))sxPlay("sub",X?.5:.35,1,.01);
+ if(K==="fist"&&HR==="naiwa"&&!L){sxPlay("thud",.5,.78,.01,P);thump(105,48,.2,.2,.01)}if(K==="blade"&&d>=14&&!big){sxPlay("clank",.4,.95,.02,P);thump(120,55,.14,.16,.02)}if(K==="claw"&&d>=14&&!big){sxPlay("punch",.4,1,.03,P);thump(135,60,.12,.14,.03)}if(X||(big&&(K==="fire"||K==="thunder"||K==="earth")))sxPlay("sub",X?.55:.35,1,.01);
  if(o.crit){sxPlay("crit",.55,1.15,.012,P);crack(.2,0,4000);duck(.75,200)}else if(X)duck(.7,260)}
 /* 被护盾挡住 */
 function blockSound(enemySide){if(!_ok())return;sxPlay("clank",.7,1.05+Math.random()*.1,0,{pan:enemySide?.22:-.22});ring(1500,.1,.04)}

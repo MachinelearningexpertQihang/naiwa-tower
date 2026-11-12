@@ -1043,7 +1043,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 4.5";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 4.11";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -2671,3 +2671,312 @@ img{-webkit-user-drag:none;pointer-events:none}
 .yard .yNode p{font-size:11.5px;line-height:1.35;margin:2px 0}
 .yard .yNode .uiBtns{margin-top:auto}
 .yard .yNode .uiBuy,.yard .yNode .uiTog{padding:2px 4px}
+/* 4.6 奶蛙池规则：点「奶蛙池」三个字弹出 */
+#pool .plbl{cursor:pointer}
+#pool .plbl .pq{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:4px;border-radius:50%;background:#fff;color:#0d0d0d;font:900 13px/1 'NW Black',sans-serif;text-decoration:none;vertical-align:middle}
+#poolRuleBox{position:absolute;left:50%;top:150px;transform:translateX(-50%);z-index:80;width:640px;padding:18px 24px 16px;background:#0d0d0d;color:#fff;border:4px solid #fff;box-shadow:10px 10px 0 #e5191c;font:400 17px/1.6 var(--body,sans-serif)}
+#poolRuleBox h4{margin:0 0 8px;font:900 24px 'NW Black',sans-serif;color:#ffd84a}
+#poolRuleBox p{margin:0 0 8px}
+#poolRuleBox .btn{display:block;margin:6px auto 0}
+.prule{white-space:nowrap}
+#bag{top:292px!important;left:12px!important}
+/* 4.6 奶蛙池动画：老奶蛙不再每次都弹一下；消掉的炸开，剩下的滑过去靠拢 */
+#pool .slots{position:relative}
+.tok.old{animation:none}
+.tok.old.hot{animation:hotWig .5s ease-in-out infinite alternate!important}
+.tok.popOut{position:absolute;top:0;pointer-events:none;animation:tokPop .4s ease-out forwards;z-index:3}
+@keyframes tokPop{0%{transform:scale(1);opacity:1}40%{transform:scale(1.35);opacity:1;filter:brightness(1.8)}100%{transform:scale(.2);opacity:0}}
+#poolRuleBox{top:80px}
+.prDemo{display:flex;flex-direction:column;align-items:center;gap:8px;margin:4px 0 12px;padding:12px 0 10px;background:#1c1c24;border:2px solid #ffffff30}
+.prSl{position:relative;width:392px;height:52px}
+.prSl .tok{width:48px;height:48px}
+.prCap{font:900 16px 'NW Black',sans-serif;color:#ffd84a;min-height:22px}
+.fnum.pblk{font-size:52px!important;transform:translateX(-50%)}
+/* 4.6 休息点：点长老聊天 */
+#rest .restScene .rsElder{cursor:pointer;pointer-events:auto}
+#rest .restScene .rsElder:active{transform:scale(.96)}
+#rest .restScene{position:absolute}
+.elderSay{position:absolute;right:-250px;top:-10px;width:280px;padding:10px 14px;background:#fff;color:#0d0d0d;border:3px solid #0d0d0d;box-shadow:6px 6px 0 #e5191c;font:700 16px/1.5 var(--body,sans-serif);transform:skewX(-4deg)}
+.elderSay::before{content:"";position:absolute;left:-16px;top:30px;border:8px solid transparent;border-right-color:#0d0d0d}
+.elderSay.pop{animation:mgIn .3s cubic-bezier(.3,1.6,.5,1)}
+/* 4.6 篝火重画：多层火舌 + 交叉木柴 + 火星；长老放大 */
+#rest .camp2{width:170px!important;height:200px!important;position:relative}
+.camp2 .cGlow{position:absolute;left:50%;bottom:-6px;width:300px;height:120px;margin-left:-150px;border-radius:50%;background:radial-gradient(ellipse at 50% 60%,rgba(255,170,60,.55),rgba(255,110,30,.18) 45%,transparent 70%);animation:cGlow 1.6s ease-in-out infinite alternate}
+.camp2 .cLog{position:absolute;left:50%;bottom:10px;width:130px;height:22px;margin-left:-65px;border-radius:11px;background:linear-gradient(#7a4422,#4a2610);box-shadow:inset 0 3px 0 rgba(255,190,120,.25),0 2px 0 #1a0c08}
+.camp2 .cLog.l1{transform:rotate(14deg)}.camp2 .cLog.l2{transform:rotate(-14deg)}
+.camp2 .cLog::after{content:"";position:absolute;right:4px;top:4px;width:14px;height:14px;border-radius:50%;background:radial-gradient(#d9a26a 30%,#8a5a30 32% 50%,#d9a26a 52%)}
+.camp2 .cStone{position:absolute;left:50%;bottom:0;width:160px;height:18px;margin-left:-80px;border-radius:50%;background:radial-gradient(ellipse,#3a3a44 40%,#22222a 70%);opacity:.85}
+.camp2 .cf{position:absolute;left:50%;bottom:26px;border-radius:50% 0 50% 50%;transform-origin:50% 100%;mix-blend-mode:screen;filter:blur(.4px)}
+.camp2 .f1{width:84px;height:84px;margin-left:-42px;background:radial-gradient(circle at 35% 65%,#ffdd66,#ff8a1f 50%,#e8360f 85%);transform:rotate(-45deg);animation:cf1 .9s ease-in-out infinite alternate;box-shadow:0 0 40px 10px rgba(255,120,30,.6)}
+.camp2 .f2{width:56px;height:56px;margin-left:-46px;bottom:30px;background:radial-gradient(circle at 35% 65%,#ffe680,#ff7a1a 60%,#d8300c);transform:rotate(-60deg);animation:cf2 .7s ease-in-out infinite alternate}
+.camp2 .f3{width:56px;height:56px;margin-left:-6px;bottom:30px;background:radial-gradient(circle at 35% 65%,#ffe680,#ff7a1a 60%,#d8300c);transform:rotate(-30deg);animation:cf3 .8s ease-in-out infinite alternate}
+.camp2 .f4{width:48px;height:48px;margin-left:-24px;bottom:42px;background:radial-gradient(circle at 35% 65%,#fffbe0,#ffe066 55%,#ffa62e);transform:rotate(-45deg);animation:cf4 .5s ease-in-out infinite alternate}
+.camp2 .f5{width:24px;height:24px;margin-left:-12px;bottom:50px;background:radial-gradient(circle at 40% 60%,#fff,#fff3b0);transform:rotate(-45deg);animation:cf4 .4s ease-in-out infinite alternate-reverse}
+@keyframes cf1{0%{transform:rotate(-45deg) scale(1,1)}100%{transform:rotate(-41deg) scale(1.05,1.14) translateY(-4px)}}
+@keyframes cf2{0%{transform:rotate(-62deg) scale(.95)}100%{transform:rotate(-54deg) scale(1.08) translateY(-6px)}}
+@keyframes cf3{0%{transform:rotate(-28deg) scale(1)}100%{transform:rotate(-36deg) scale(1.1) translateY(-5px)}}
+@keyframes cf4{0%{transform:rotate(-45deg) scale(.92)}100%{transform:rotate(-45deg) scale(1.1) translateY(-6px)}}
+@keyframes cGlow{0%{opacity:.75;transform:scale(.96)}100%{opacity:1;transform:scale(1.04)}}
+.camp2 .cEm{position:absolute;left:50%;bottom:90px;width:5px;height:5px;border-radius:50%;background:#ffe08a;box-shadow:0 0 8px 2px #ff8a2e;opacity:0;animation:cEm 2.4s ease-out infinite}
+.camp2 .e1{margin-left:-18px}.camp2 .e2{margin-left:10px;animation-delay:.4s}.camp2 .e3{margin-left:-4px;animation-delay:.8s}.camp2 .e4{margin-left:22px;animation-delay:1.2s}.camp2 .e5{margin-left:-28px;animation-delay:1.6s}.camp2 .e6{margin-left:4px;animation-delay:2s;width:3px;height:3px}
+@keyframes cEm{0%{opacity:0;transform:translate(0,0)}15%{opacity:1}100%{opacity:0;transform:translate(14px,-120px)}}
+#rest .restScene .rsElder{width:250px!important;height:270px!important}
+#rest .restScene{align-items:flex-end!important}
+@media (prefers-reduced-motion:reduce){.camp2 .cf,.camp2 .cEm,.camp2 .cGlow{animation:none!important}}
+#rest .restScene{top:150px!important}
+#rest .restScene .rsElder{width:235px!important;height:255px!important}
+#rest .camp2{height:180px!important}
+#rest .restScene{top:168px!important}
+/* 4.6 遗物上限 */
+#relicSwap{position:fixed;inset:0;z-index:300;background:rgba(10,8,20,.82);display:flex;align-items:center;justify-content:center}
+#relicSwap .rsBox{width:min(92vw,760px);max-height:90vh;overflow:auto;background:#0d0d0d;color:#fff;border:4px solid #fff;box-shadow:10px 10px 0 #e5191c;padding:18px 22px;text-align:center}
+#relicSwap h4{margin:0 0 6px;font:900 26px 'NW Black',sans-serif;color:#ffd84a}
+#relicSwap .rsNew{margin:4px 0;font-size:17px}#relicSwap .rsTip{margin:4px 0 12px;font-size:14px;opacity:.8}
+#relicSwap .rsList{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+#relicSwap .rsIt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;background:#1c1c24;border:2px solid #ffffff40;color:#fff;cursor:pointer}
+#relicSwap .rsIt:hover{border-color:#ffd84a}#relicSwap .rsIt .rl{width:54px;height:54px}#relicSwap .rsIt .rl img{width:100%;height:100%;object-fit:contain}
+#relicSwap .rsIt small{font-size:12px;line-height:1.35;opacity:.8}
+/* 4.6 信箱能滑动 */
+.mlList{max-height:470px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding-right:6px}
+.letter .ltBody{-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.en .body img{object-position:50% 100%}
+/* ===== 4.7 出手动作：每个主角一套身体动作（只动 transform，不带滤镜，手机上不掉帧） ===== */
+#player.atkNaiwa .body{animation:atkNaiwa .46s cubic-bezier(.3,1.3,.5,1)!important}
+@keyframes atkNaiwa{0%{transform:none}18%{transform:translateX(-16px) scale(1.1,.9)}46%{transform:translateX(calc(104px*var(--ak,1))) scale(.9,1.1) rotate(6deg)}62%{transform:translateX(calc(96px*var(--ak,1))) scale(1.14,.88)}100%{transform:none}}
+#player.atkKungfu .body{animation:atkKungfu .3s cubic-bezier(.2,.9,.3,1)!important}
+@keyframes atkKungfu{0%{transform:none}18%{transform:translateX(-8px) skewX(9deg)}46%{transform:translateX(calc(128px*var(--ak,1))) skewX(-11deg) scale(1.04)}64%{transform:translateX(calc(118px*var(--ak,1))) skewX(-4deg)}100%{transform:none}}
+#player.atkKnight .body{animation:atkKnight .5s cubic-bezier(.3,1.2,.5,1)!important}
+@keyframes atkKnight{0%{transform:none}26%{transform:translateX(-24px) rotate(-9deg)}52%{transform:translateX(calc(82px*var(--ak,1))) rotate(13deg) scale(1.06)}70%{transform:translateX(calc(76px*var(--ak,1))) rotate(9deg)}100%{transform:none}}
+#player.atkVamp .body{animation:atkVamp .44s cubic-bezier(.3,1.1,.5,1)!important}
+@keyframes atkVamp{0%{transform:none}30%{transform:translate(52px,-48px) rotate(-11deg) scale(.95)}56%{transform:translate(calc(118px*var(--ak,1)),8px) rotate(11deg) scale(1.06)}100%{transform:none}}
+.castA .body{animation:castA47 .5s ease-out!important}
+@keyframes castA47{0%{transform:none}30%{transform:translateY(-22px) rotate(-5deg) scale(1.05)}58%{transform:translateY(-17px) rotate(4deg) scale(1.03)}100%{transform:none}}
+#player.sklA .body{animation:sklA .36s ease-out!important}
+@keyframes sklA{0%{transform:none}35%{transform:translateY(6px) scale(1.08,.92)}65%{transform:translateY(-10px) scale(.97,1.05)}100%{transform:none}}
+#player.powA .body{animation:powA .5s ease-out!important}
+@keyframes powA{0%{transform:none}40%{transform:translateY(-14px) scale(1.12)}70%{transform:translateY(-10px) scale(1.08)}100%{transform:none}}
+.lungeR .body{animation:lungeR47 .38s cubic-bezier(.3,1.4,.5,1)!important}
+@keyframes lungeR47{0%{transform:none}35%{transform:translateX(110px) rotate(8deg) scale(1.05)}100%{transform:none}}
+/* 4.7 挨打闪白：滤镜只在开头一小段保持不变，后面直接去掉（以前每一帧都在变，最费性能） */
+@keyframes hitA4{0%,20%{filter:brightness(4) saturate(0)}20.1%,100%{filter:none}0%{transform:translateX(0) scale(1)}10%{transform:translateX(34px) scale(.9,1.08) rotate(7deg)}22%{transform:translateX(30px) scale(.92,1.06) rotate(6deg)}45%{transform:translateX(-8px) scale(1.04,.96) rotate(-2deg)}100%{transform:none}}
+@keyframes hitB4{0%,24%{filter:brightness(5) saturate(0)}24.1%,100%{filter:none}0%{transform:none}12%{transform:translateX(60px) scale(.82,1.16) rotate(12deg)}28%{transform:translateX(52px) scale(.86,1.12) rotate(10deg)}55%{transform:translateX(-10px) scale(1.05,.95) rotate(-3deg)}100%{transform:none}}
+/* 4.8 木桩练习 */
+.dummyBtn{position:absolute;right:22px;top:186px;z-index:3;padding:6px 16px;font:900 17px 'NW Black',sans-serif;color:#fff;background:#0d0d0d;border:3px solid #fff;box-shadow:5px 5px 0 #e5191c;transform:skewX(-8deg);cursor:pointer}
+.dmBox{position:absolute;inset:18px 26px;display:flex;flex-direction:column;gap:8px;color:#fff}
+.dmBox .mgHead{text-align:center}
+.dmRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dmRow>b{font:900 18px 'NW Black',sans-serif;width:44px}
+.dmH{display:flex;align-items:center;gap:4px;padding:2px 10px 2px 2px;background:#1c1c24;border:2px solid #ffffff40;color:#fff;font:700 15px var(--body,sans-serif);cursor:pointer}.dmH img{width:34px;height:34px;object-fit:contain}
+.dmH.on,.dmA.on,.dmT.on{border-color:#ffd84a;background:#3a2a00}
+.dmA,.dmT{padding:5px 12px;background:#1c1c24;border:2px solid #ffffff40;color:#fff;font:700 14px var(--body,sans-serif);cursor:pointer}
+.dmCols{flex:1;min-height:0;display:flex;gap:12px}
+.dmDeck{width:250px;display:flex;flex-direction:column;gap:4px;background:#14141c;border:2px solid #ffffff30;padding:8px}.dmDeck small{opacity:.7}
+.dmList{flex:1;overflow:auto;display:flex;flex-direction:column;gap:3px;touch-action:pan-y}
+.dmC{text-align:left;padding:4px 8px;background:#22222c;border:0;color:#fff;font:700 14px var(--body,sans-serif);cursor:pointer}.dmC:hover{background:#5a1a1a}
+.dmPool{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}.dmTabs{display:flex;gap:6px;align-items:center}.dmTabs small{opacity:.7;margin-left:6px}
+.dmCards{flex:1;overflow:auto;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;touch-action:pan-y}
+.dmPick{zoom:.62;cursor:pointer}
+.dmBox .ovFoot{position:static!important;display:flex;justify-content:center;gap:14px}
+#dmHud{position:absolute;left:50%;top:150px;transform:translateX(-50%);z-index:20;display:flex;align-items:center;gap:14px;padding:6px 14px;background:#0d0d0dee;color:#fff;border:3px solid #fff;box-shadow:6px 6px 0 #e5191c;font:700 15px var(--body,sans-serif);white-space:nowrap}
+#dmHud b{font:900 16px 'NW Black',sans-serif;color:#ffd84a}#dmHud em{font-style:normal;color:#ffd84a;font-size:18px}
+.eCnt.brkC{background:#ffd84a!important;color:#0d0d0d!important}
+.dmBox .mgHead{position:static!important;transform:none!important;margin:0 0 4px!important}
+.dummyBtn{top:214px!important}#dmHud{top:204px!important}
+#title .dummyGb{display:block;width:100%;margin-top:10px}
+/* 4.8 主页改成淡蓝星夜 */
+#title{--p5r:#5aa8ff}
+#title .p5rays{opacity:.55}
+.dummyGb .tgt{display:inline-block;width:22px;height:22px;margin-right:6px;vertical-align:-4px}
+
+/* 4.9 首领机制提示、路遇格、冻住/青蛙的牌、主页蓝色平台 */
+.eCnt.bmC{background:#2a1f4a!important;color:#ffd84a!important;border:1px solid #ffd84a}
+.mn.storyN{box-shadow:0 0 0 4px #fff,0 0 0 8px #5aa8ff,0 0 18px 6px rgba(90,168,255,.7)!important}
+.card.frzC{filter:grayscale(.4) brightness(.85);outline:4px solid #9fe0ff}
+.card.frzC::after{content:"冻住";position:absolute;left:50%;top:40%;transform:translateX(-50%) rotate(-8deg);padding:2px 10px;background:#9fe0ff;color:#0d2a4a;font:900 20px 'NW Black',sans-serif;z-index:5}
+#title .tfloor{background:#1e4f8f!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #5aa8ff!important}
+#title .plat::before{background:#2a5fa8!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #5aa8ff!important}
+/* ===================== 4.10 抽卡包 ===================== */
+#gacha{position:absolute;inset:0;z-index:90;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#3f7fc8 0%,#1c3f7c 45%,#0b1a3a 100%);color:#fff;user-select:none;-webkit-user-select:none;touch-action:none}
+.gpSky i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.7;animation:gpTw 2.4s ease-in-out infinite}
+@keyframes gpTw{50%{opacity:.15;transform:scale(.6)}}
+.gpX{position:absolute;right:22px;top:18px;z-index:5;width:46px;height:46px;border:3px solid #fff;background:#0d0d0d;color:#fff;font:900 26px/1 sans-serif;box-shadow:4px 4px 0 #5aa8ff;cursor:pointer}
+.gpInfo{position:absolute;left:24px;top:20px;z-index:4;display:flex;gap:10px;font:900 16px 'NW Black',sans-serif}
+.gpInfo b,.gpInfo span{padding:5px 12px;background:#0d0d0d;border:2px solid #fff;transform:skewX(-8deg)}
+.gpInfo span{color:#ffd84a}
+.gpStage{position:absolute;left:0;right:0;top:44px;bottom:96px;display:flex;align-items:center;justify-content:center;perspective:1100px}
+.gpFoot{position:absolute;left:0;right:0;bottom:16px;z-index:4;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.gpN{font:900 22px 'NW Black',sans-serif;text-shadow:0 2px 0 #0d0d0d}.gpN em{font-style:normal;color:#ffd84a;font-size:28px;padding:0 4px}
+.gpFoot small{font:700 14px var(--body,sans-serif);opacity:.85}
+.gpBtns{display:flex;gap:14px}
+/* 卡包本体 */
+.gpPack{--rx:0deg;--ry:0deg;position:relative;width:292px;height:456px;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .18s ease-out,opacity .4s;cursor:pointer;animation:gpFloat 3.2s ease-in-out infinite;filter:drop-shadow(0 26px 30px rgba(0,0,0,.55))}
+@keyframes gpFloat{50%{translate:0 -10px}}
+.gpPack.empty{opacity:.45;cursor:default;animation:none}
+.tearMode .gpPack{animation:none;scale:1.12;cursor:grab}
+.gpPack.spent{opacity:0;translate:0 240px;pointer-events:none;transition:translate .45s ease-in,opacity .45s}
+.gpTop{position:absolute;left:0;right:0;top:0;height:58px;z-index:3;display:flex;align-items:flex-end;justify-content:center;padding-bottom:9px;background:linear-gradient(100deg,#b9c6e8 0%,#f4f7ff 22%,#8fa3d8 48%,#eef2ff 70%,#9fb0e0 100%);clip-path:polygon(0 12%,4% 0,8% 12%,12% 0,16% 12%,20% 0,24% 12%,28% 0,32% 12%,36% 0,40% 12%,44% 0,48% 12%,52% 0,56% 12%,60% 0,64% 12%,68% 0,72% 12%,76% 0,80% 12%,84% 0,88% 12%,92% 0,96% 12%,100% 0,100% 100%,0 100%)}
+.gpTop span{font:900 13px/1 'NW Black',sans-serif;letter-spacing:5px;color:#27407e}
+.gpSeam{position:absolute;left:0;right:0;top:56px;height:6px;z-index:4;background:repeating-linear-gradient(90deg,#27407e 0 8px,transparent 8px 14px);opacity:.75}
+.gpSlit{position:absolute;left:0;top:-3px;height:12px;width:0;background:linear-gradient(90deg,#fff,#ffe9a0);box-shadow:0 0 18px 6px rgba(255,240,180,.9);border-radius:6px}
+.gpArrow{display:none;position:absolute;left:6px;top:-22px;font:900 30px/1 sans-serif;color:#ffd84a;text-decoration:none;text-shadow:0 2px 0 #0d0d0d;animation:gpArr 1.2s ease-in-out infinite}
+.tearMode .gpArrow{display:block}
+@keyframes gpArr{0%{transform:translateX(0);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(230px);opacity:0}}
+.gpBody{position:absolute;left:0;right:0;top:58px;bottom:0;overflow:hidden;border-radius:0 0 10px 10px;background:linear-gradient(180deg,#16306c 0%,#2f66b8 55%,#7fc0ff 100%);box-shadow:inset 0 0 0 5px #dfe7ff,inset 0 0 0 8px #27407e}
+.gpMoon{position:absolute;right:22px;top:26px;width:120px;height:120px;border-radius:50%;background:#fff6dc;box-shadow:0 0 40px 10px rgba(255,246,220,.45)}
+.gpMoon::after{content:"";position:absolute;left:-26px;top:-12px;width:112px;height:112px;border-radius:50%;background:#1f4690}
+.gpTower{position:absolute;left:34px;bottom:0;width:70px;height:250px;background:#0d1b3e;clip-path:polygon(38% 0,62% 0,70% 14%,64% 16%,72% 100%,28% 100%,36% 16%,30% 14%)}
+.gpArt{position:absolute;right:6px;bottom:70px;width:200px;height:230px;object-fit:contain;filter:drop-shadow(5px 6px 0 rgba(13,27,62,.7))}
+.gpLogo{position:absolute;left:0;right:0;bottom:30px;text-align:center;font:400 46px/1 'Zhi Mang Xing','NW Black',cursive;color:#fff;-webkit-text-stroke:5px #0d1b3e;paint-order:stroke;text-shadow:4px 4px 0 #ffd84a}
+.gpSub{position:absolute;left:0;right:0;bottom:10px;text-align:center;font:900 13px/1 'NW Black',sans-serif;letter-spacing:4px;color:#dfe7ff}
+.gpSheen{position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 46%,transparent 60%);background-size:260% 100%;animation:gpSheen 3s ease-in-out infinite;mix-blend-mode:screen;pointer-events:none}
+@keyframes gpSheen{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
+.gpFlash{position:absolute;inset:0;z-index:20;background:#fff;animation:gpFl .55s ease-out forwards;pointer-events:none}
+@keyframes gpFl{0%{opacity:.95}100%{opacity:0}}
+/* 抽出来的 5 张牌 */
+.gpCards{position:absolute;left:50%;top:50%;width:246px;height:346px;margin:-173px 0 0 -123px;cursor:pointer}
+.gpCard{position:absolute;inset:0;transform:translateY(420px) rotate(calc((var(--i) - 2)*-3deg));opacity:0;transition:transform .5s cubic-bezier(.2,1.2,.4,1),opacity .3s;perspective:1000px}
+.gpCards.in .gpCard{opacity:1;transform:translate(calc(var(--i)*5px),calc(var(--i)*-5px)) rotate(calc(var(--i)*1.2deg))}
+.gpCards.in .gpCard.top{transform:none}
+.gpCards.in .gpCard.gone{transform:translateX(-640px) rotate(-22deg);opacity:0;pointer-events:none}
+.gpFlip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,1.3,.5,1);transform:rotateY(180deg)}
+.gpCard.open .gpFlip{transform:rotateY(0)}
+.gpBack,.gpFront{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.gpBack{transform:rotateY(180deg);border-radius:16px;border:8px solid #eef2ff;background:radial-gradient(circle at 50% 42%,#3f7fc8,#16306c 70%);box-shadow:0 0 0 3px #0d1b3e,0 14px 30px rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+.gpBack i{position:absolute;left:50%;top:30%;width:86px;height:86px;margin-left:-43px;border-radius:50%;background:#fff6dc;box-shadow:0 0 30px 8px rgba(255,246,220,.5)}
+.gpBack i::after{content:"";position:absolute;left:-20px;top:-9px;width:80px;height:80px;border-radius:50%;background:#2a5aa8}
+.gpBack b{position:absolute;bottom:34px;font:400 34px/1 'Zhi Mang Xing','NW Black',cursive;color:#fff;-webkit-text-stroke:4px #0d1b3e;paint-order:stroke}
+.gpFront .tcg{position:absolute;left:0;top:0;zoom:.64}
+.gpCard.r-R .gpBack,.gpCard.r-X .gpBack{border-color:#8fd0ff}.gpCard.r-E .gpBack{border-color:#c9a2ff;box-shadow:0 0 0 3px #0d1b3e,0 0 26px 6px rgba(185,140,255,.7)}.gpCard.r-L .gpBack,.gpCard.r-Q .gpBack{border-color:#ffd84a;box-shadow:0 0 0 3px #0d1b3e,0 0 30px 8px rgba(255,210,63,.8)}
+.gpNew,.gpDup,.gpSh{position:absolute;z-index:6;padding:3px 10px;font:900 15px/1 'NW Black',sans-serif;font-style:normal;transform:rotate(-8deg)}
+.gpNew{left:-8px;top:-8px;background:#e5191c;color:#fff;border:2px solid #fff;box-shadow:3px 3px 0 #0d0d0d}
+.gpDup{left:-6px;top:-6px;background:#3a4460;color:#cfd8f0;border:2px solid #cfd8f0;font-size:12px}
+.gpSh{right:-6px;top:-6px;background:#9fe8ff;color:#0d2a4a;border:2px solid #fff;transform:rotate(8deg)}
+.gpBurst{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;border-radius:50%;pointer-events:none;box-shadow:0 0 0 0 var(--c),0 0 60px 30px var(--c);animation:gpBurst .9s ease-out forwards;z-index:-1}
+@keyframes gpBurst{0%{transform:scale(1);opacity:1}100%{transform:scale(34);opacity:0}}
+.gpSum{display:flex;gap:16px;align-items:center;justify-content:center}
+.gpS{position:relative;width:184px;height:259px;cursor:pointer;animation:gpSIn .45s cubic-bezier(.2,1.3,.4,1) backwards;animation-delay:calc(var(--i)*70ms)}
+.gpS .tcg{position:absolute;left:0;top:0;zoom:.48}
+@keyframes gpSIn{from{transform:translateY(60px) scale(.8);opacity:0}}
+#title .packGb{position:relative;margin-top:10px}
+#title .packGb .dot{position:absolute;right:-6px;top:-6px;width:14px;height:14px;border-radius:50%;background:#e5191c;border:2px solid #fff}
+#title .packGb+.dummyGb{margin-top:10px}
+.gpPack{filter:none}
+.gpBody{box-shadow:inset 0 0 0 5px #dfe7ff,inset 0 0 0 8px #27407e,0 26px 34px rgba(0,0,0,.5)}
+
+#title .subX{display:flex;gap:14px 40px;margin:12px 0 0 6px;flex-wrap:wrap}
+#title .subX .gbtn{margin-top:0!important;white-space:nowrap;width:auto!important;display:flex!important}
+#title .subX .gbtn b{white-space:nowrap}
+/* 4.11 主页：六个小按钮排成三列 */
+#title .tmenu .sub{grid-template-columns:repeat(3,max-content)!important}
+#title .tmenu .sub .gbtn{position:relative}
+html{background:radial-gradient(ellipse at 50% 40%,#1b2f5e 0%,#0f1b3c 55%,#0a1128 100%)}
+body{background:transparent!important}
+#title .tmenu .sub .gbtn b{white-space:nowrap}
+#title .tmenu .sub .gbtn{flex-wrap:nowrap}
+#title .tmenu .sub .gbtn svg.tgt{width:24px;height:24px;flex:none}
+#title .tmenu .sub .packGb,#title .tmenu .sub .dummyGb{margin-top:0!important;width:auto!important;display:flex!important}
+/* ==LITE-AUTO== */
+html.lite #mapSvg path.next{animation:none!important}
+html.lite .card.r-L .cf{animation:none!important}
+html.lite .en.tg .body img{animation:none!important}
+html.lite .wx-rain,html.lite .wx-storm{animation:none!important}
+html.lite .wx-snow{animation:none!important}
+html.lite .wx-wind{animation:none!important}
+html.lite .card.gold .cf{animation:none!important}
+html.lite .card.shiny .cf{animation:none!important}
+html.lite .card.shiny .in::after{animation:none!important}
+html.lite .gbtn::after{animation:none!important}
+html.lite .thero img,html.lite .telder img{filter:none!important}
+html.lite .intent.chg{animation:none!important}
+html.lite .intent.ult{animation:none!important}
+html.lite .eCnt{animation:none!important}
+html.lite .en.bossEn .body img{filter:none!important}
+html.lite .en.finalEn .body img{filter:none!important}
+html.lite #title .thero img,html.lite #title .telder img{filter:none!important}
+html.lite .winMoon{animation:none!important}
+html.lite .winHero img{filter:none!important}
+html.lite #title .thero img,html.lite #title .tknight img{filter:none!important}
+html.lite #title .logo h1 span.rn{filter:none!important}
+html.lite #title .logo h1 .rn1{filter:none!important}
+html.lite #title .logo h1 .rn2{filter:none!important}
+html.lite #title .logo h1 span.rn0{filter:none!important}
+html.lite #title .logo h1 span.rn1{filter:none!important}
+html.lite #title .logo h1 span.rn2{filter:none!important}
+html.lite #title .logo h1 span.rn3{filter:none!important}
+html.lite .skyCol{filter:none!important}
+html.lite #mapSvg path{filter:none!important}
+html.lite #mapSvg path.done{filter:none!important}
+html.lite #map.ma4 #mapSvg path{filter:none!important}
+html.lite .isePeek{animation:none!important}
+html.lite .isePeek img{filter:none!important}
+html.lite #title .tmage img{filter:none!important}
+html.lite #hand .card.willtri .cf{animation:none!important}
+html.lite .trElder img{filter:none!important}
+html.lite .en.killable .hpbar{animation:none!important}
+html.lite .en.killable .body img{animation:none!important}
+html.lite .fgSmith{filter:none!important}
+html.lite .flyGet.fg-R{filter:none!important}
+html.lite .flyGet.fg-E{filter:none!important}
+html.lite .flyGet.fg-L{filter:none!important}
+html.lite #title .tkungfu img{filter:none!important}
+html.lite .evPic img{filter:none!important}
+html.lite .catchLn .ico,html.lite .catchLn svg{filter:none!important}
+html.lite .netFx .netIn{filter:none!important}
+html.lite .perk .pArt img{filter:none!important}
+html.lite .perk .pLv i.nx{animation:none!important}
+html.lite .catchBtn{filter:none!important}
+html.lite .catchBtn:hover{filter:none!important}
+html.lite .netFx .netIn img{filter:none!important}
+html.lite #title .tsub .ribbon{filter:none!important}
+html.lite #title .gbtn:not(.sm){filter:none!important}
+html.lite #title .gbtn:not(.sm):hover{filter:none!important}
+html.lite .triBan.chain.lv4 b,html.lite .triBan.chain.lv5 b,html.lite .triBan.chain.lv6 b{animation:none!important}
+html.lite #comboCt.c3 b{animation:none!important}
+html.lite #rest .restScene img{filter:none!important}
+html.lite .upT .upIc{filter:none!important}
+html.lite #rest .rUp .rArt img.rFrog{filter:none!important}
+html.lite #rest .rUp .rBadge{filter:none!important}
+html.lite .hpbar.low i{animation:none!important}
+html.lite #player.vform .body img{filter:none!important}
+html.lite .pkCard .holo{animation:none!important}
+html.lite #title #tCodex{animation:none!important}
+html.lite .slashArc{filter:none!important}
+html.lite .slashArc.heavy{filter:none!important}
+html.lite .runeC{filter:none!important}
+html.lite .mn img.badge{filter:none!important}
+html.lite .hxBolt svg{filter:none!important}
+html.lite .hxStar i{filter:none!important}
+html.lite .st[data-st].full{animation:none!important}
+html.lite .qSS{animation:none!important}
+html.lite .mn.hidR{animation:none!important}
+html.lite .mn.t-t.gold{animation:none!important}
+html.lite .chestBig.t2 .ico{filter:none!important}
+html.lite .en.tg .body img{filter:none!important}
+html.lite .tArt img{filter:none!important}
+html.lite #title .tvamp img{filter:none!important}
+html.lite #title .gbtn.hasFrog .tbFrog{filter:none!important}
+html.lite #title .tZhiFrog{filter:none!important}
+html.lite #title .tWaFrog{filter:none!important}
+html.lite .en.goldf .body img{animation:none!important}
+html.lite .en.killable .body img{filter:none!important}
+html.lite .gpPack{filter:none!important}
+html.lite .gpArt{filter:none!important}
+html.lite .gpSheen{animation:none!important}
+html.lite .holo,html.lite .tGlare,html.lite .tFoil,html.lite .tSpark,html.lite .gpSheen{display:none!important}
+html.lite .camp2 .cf{mix-blend-mode:normal;filter:none}
+html.lite .gpSky i{animation:none}
+html.lite .gpSky i:nth-child(n+15){display:none}
+html.lite .gpStage,html.lite .gpCard{perspective:none}
+html.lite .gpPack{animation:none;transition:opacity .4s}
+html.lite .gpMoon,html.lite .gpBack i{box-shadow:none}
+html.lite .gpBack{box-shadow:0 0 0 3px #0d1b3e!important}
+html.lite .gpSlit{box-shadow:none}
+html.lite .gpBurst{display:none}
+html.lite .gpFlip,html.lite .gpCard.open .gpFlip{transform-style:flat;transition:none;transform:none}
+html.lite .gpBack{transform:none}
+html.lite .gpBack,html.lite .gpFront{backface-visibility:visible;-webkit-backface-visibility:visible}
+html.lite .gpCard.open .gpFront{animation:gpLiteIn .22s ease-out}
+@keyframes gpLiteIn{from{transform:scale(.86);opacity:.3}to{transform:none;opacity:1}}
+html.lite .gpS{animation:none}
+html.lite .gpCard:not(.open) .gpFront{visibility:hidden}
+html.lite .gpCard.open .gpBack{visibility:hidden}
+html.lite .gpCard:not(.top):not(.gone) .gpFront{display:none}
