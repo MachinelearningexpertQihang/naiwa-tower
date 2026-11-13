@@ -160,7 +160,7 @@ n_bellyflop:{n:"肚皮砸",cost:1,type:"atk",r:"C",fam:"frog",img:"nw",tgt:1,her
 n_thick:{n:"更厚的肚皮",cost:1,type:"skl",r:"C",fam:"frog",img:"nw",hero:"naiwa",d:u=>`获得 ${U(u,9,12)} 护盾`,fx:(B,u)=>{B.block(U(u,9,12))}},
 n_burp:{n:"打嗝",cost:1,type:"atk",r:"C",fam:"frog",img:"nw",hero:"naiwa",d:u=>`对所有敌人造成 ${U(u,4,6)} 伤害，全体虚弱 1`,fx:(B,u)=>{B.hitAll(U(u,4,6));B.alive().forEach(e=>B.apply(e,"weak",1))}},
 n_nap:{n:"睡一觉",cost:1,type:"skl",r:"R",fam:"frog",img:"nw",hero:"naiwa",exh:1,d:u=>`回复 ${U(u,8,11)} 生命。消耗`,fx:(B,u)=>{B.heal(U(u,8,11))}},
-n_snack:{n:"偷吃零食",cost:0,type:"skl",exhU:1,r:"C",fam:"frog",img:"nw",hero:"naiwa",d:u=>`回复 2 生命，抽 ${U(u,1,2)} 张${U(u,"。消耗","")}`,fx:(B,u)=>{B.heal(2);B.draw(U(u,1,2))}},
+n_snack:{n:"偷吃零食",cost:0,type:"skl",exhU:1,r:"C",fam:"frog",img:"nw",hero:"naiwa",d:u=>`回复 ${U(u,2,4)} 生命，抽 1 张${U(u,"。消耗","")}`,fx:(B,u)=>{B.heal(U(u,2,4));B.draw(1)}},
 n_bounce:{n:"肚皮反弹",cost:2,type:"pow",r:"R",fam:"frog",img:"nw",hero:"naiwa",d:u=>`每回合开始获得 ${U(u,5,7)} 护盾`,fx:(B,u)=>{PW(B,"shield",U(u,5,7))}},
 n_roll:{n:"打滚",cost:1,type:"atk",r:"R",fam:"frog",img:"nw",tgt:1,hero:"naiwa",d:u=>`造成 ${U(u,6,8)} 伤害，获得 ${U(u,6,8)} 护盾`,fx:(B,u,t)=>{B.hit(t,U(u,6,8));B.block(U(u,6,8))}},
 n_hug:{n:"熊抱",cost:2,type:"atk",r:"E",fam:"frog",img:"nw",tgt:1,hero:"naiwa",d:u=>`造成 ${U(u,22,28)} 伤害，给它虚弱 2`,fx:(B,u,t)=>{B.hit(t,U(u,22,28));B.apply(t,"weak",2)}},
@@ -260,7 +260,7 @@ fist:{n:"拳拳到奶",cost:1,type:"atk",r:"C",fam:"frog",img:"n3",tgt:1,d:u=>`�
 palm:{n:"连环掌",cost:1,type:"atk",r:"C",fam:"frog",img:"i4",tgt:1,d:u=>`造成 4 伤害 ${U(u,2,3)} 次`,fx:(B,u,t)=>B.hit(t,4,U(u,2,3))},
 breath:{n:"呼吸法",cost:0,type:"skl",r:"C",fam:"frog",img:"fj",d:u=>`下一张攻击牌伤害 +${U(u,4,6)}`,fx:(B,u)=>{B.p.nextAtk+=U(u,4,6)}},
 sit:{n:"打坐",cost:1,type:"skl",r:"C",fam:"frog",img:"i5",d:u=>`获得 ${U(u,6,8)} 护盾，抽 1 张`,fx:(B,u)=>{B.block(U(u,6,8));B.draw(1)}},
-flow:{n:"顺势",cost:0,type:"skl",exhU:1,r:"C",fam:"frog",img:"m5",d:u=>`抽 ${U(u,2,3)} 张，然后弃 1 张${U(u,"。消耗","")}`,fx:(B,u)=>{B.draw(U(u,2,3));B.chooseDiscard(1)}},
+flow:{n:"顺势",cost:0,type:"skl",exhU:1,r:"C",fam:"frog",img:"m5",d:u=>`抽 ${u?3:2} 张，然后弃 1 张${U(u,"。消耗","")}`,fx:(B,u)=>{B.draw(u?3:2);B.chooseDiscard(1)}},
 still:{n:"静水",cost:0,type:"skl",r:"C",fam:"frog",img:"c2",exh:1,d:u=>`获得 ${U(u,1,2)} 点奶力。消耗`,fx:(B,u)=>B.gainEnergy(U(u,1,2))},
 charge:{n:"蓄力",cost:1,type:"skl",r:"C",fam:"frog",img:"m2",d:u=>`本回合力气 +${U(u,2,3)}`,fx:(B,u)=>{B.p.tstr+=U(u,2,3);B.fxBuff(B.p)}},
 borrow:{n:"借力",cost:1,type:"skl",r:"C",fam:"horse",img:"hr",d:u=>`获得 5 护盾。本回合每打出一张攻击牌，再 +${U(u,2,3)} 护盾`,fx:(B,u)=>{B.block(5);B.p.borrow+=U(u,2,3)}},
@@ -876,7 +876,7 @@ const ACH=[
 {id:"demon",n:"塔顶不能没有人",d:"打倒奶蛙大魔王",ic:"skull"},
 {id:"allboss",n:"首领图鉴",d:"打败全部 21 个首领",ic:"skull"},
 {id:"guard",n:"守关人",d:"打败第一个守关首领",ic:"shield"},
-{id:"chain4",n:"连锁反应",d:"一次触发 4 连锁",ic:"boom"},
+{id:"chain4",n:"连锁反应",d:"一次触发 4 连锁",ic:"boom"},{id:"arena",n:"斗兽场之王",d:"在斗兽场连胜四场",ic:"boom"},{id:"backdoor",n:"传送带停了",d:"在奶茶厂后门一次打倒 12 只",ic:"boom"},
 {id:"chain6",n:"停不下来",d:"一次触发 6 连锁",ic:"boom"},
 {id:"hit50",n:"一拳 50",d:"一下打出 50 点以上伤害",ic:"sword"},
 {id:"hit100",n:"一拳 100",d:"一下打出 100 点以上伤害",ic:"sword"},
@@ -1329,5 +1329,4 @@ e_smash:{n:"摔蛋",cost:1,type:"atk",r:"R",fam:"chick",img:"egt",tgt:1,d:u=>`�
 /* 4.10 把 4.6 以后新加的牌补进奖励池和图鉴（之前漏了） */
 POOL_HERO.push("v_bleed","k_point","k_legs","k_redirect","k_qi","k_shadowhand","k_neigong","kn_wall","kn_ram","kn_hold","kn_slam","kn_ironwall","kn_paladin","e_twin","e_piggy","e_mystery","e_incubate","e_shellguard","e_smash","qz_bellyslam","qz_flood","qz_onefinger","qz_thousand","qz_shieldsword","qz_fortress","qz_timestop","qz_storm","qz_bloodrite","qz_feast");
 /* 4.11 粉丝建议的牌：自强不息 */
-Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:1,type:"atk",r:"R",fam:"frog",img:"nw",tgt:1,d:u=>`造成 ${U(u,7,10)} 伤害。这场战斗里每打出一次，它的伤害 +3。生命低于一半时，再获得 1 力气`,fx:(B,u,t,c)=>{B.gr=B.gr||{};const k=c?c.k:0;const g=B.gr[k]||0;B.hit(t,U(u,7,10)+g);if(PREV)return;B.gr[k]=g+3;if(S.hp<S.max/2){B.p.str=(B.p.str||0)+1;B.fxBuff&&B.fxBuff(B.p)}}}});
-POOL_HERO.push("n_selfstr");
+Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:0,type:"skl",r:"S",fam:"none",img:"nw",exh:1,noUp:1,d:u=>`获得 1 点奶力。消耗`,fx:(B,u)=>{B.gainEnergy(1)}}});

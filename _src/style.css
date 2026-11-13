@@ -1043,7 +1043,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 5.0";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 5.1";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -2890,6 +2890,15 @@ body{background:transparent!important}
 #pool .tok:not(.empty),.prSl .tok{background:var(--fc)!important;border:4px solid #0d0d0d!important;box-shadow:inset 0 0 0 3px rgba(255,255,255,.75)!important}
 #pool .tok.hot{box-shadow:inset 0 0 0 3px rgba(255,255,255,.75),0 0 0 3px #ffd200,0 0 12px 3px rgba(255,210,0,.8)!important}
 #pool .tok.mudt{background:#8a6038!important}
+/* 5.0 主页回到红色；打过真结局的人是炫彩版 */
+#title{--p5r:#e5191c}
+#title .p5rays{opacity:1}
+#title .tfloor{background:var(--p5k)!important;box-shadow:0 -4px 0 var(--p5w),10px 10px 0 var(--p5r)!important}
+#title .plat::before{background:var(--p5k)!important;box-shadow:0 0 0 4px var(--p5w),8px 8px 0 4px var(--p5r)!important}
+#title.rb{--p5r:#ff4f8b}
+#title.rb .tfloor{background:linear-gradient(90deg,#ff4f8b,#ff9a3c,#ffe14d,#4fe0a0,#4fb6ff,#9b6bff)!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #0d0d0d!important}
+#title.rb .plat::before{background:linear-gradient(90deg,#ff4f8b,#ffe14d,#4fb6ff,#9b6bff)!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #0d0d0d!important}
+#title.rb .gbtn:not(.sm){filter:drop-shadow(6px 6px 0 #9b6bff)}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}
@@ -2977,6 +2986,7 @@ html.lite .en.killable .body img{filter:none!important}
 html.lite .gpPack{filter:none!important}
 html.lite .gpArt{filter:none!important}
 html.lite .gpSheen{animation:none!important}
+html.lite #title.rb .gbtn:not(.sm){filter:none!important}
 html.lite .holo,html.lite .tGlare,html.lite .tFoil,html.lite .tSpark,html.lite .gpSheen{display:none!important}
 html.lite .camp2 .cf{mix-blend-mode:normal;filter:none}
 html.lite .gpSky i{animation:none}
