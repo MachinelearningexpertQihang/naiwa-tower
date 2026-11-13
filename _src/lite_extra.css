@@ -17,3 +17,8 @@ html.lite .gpS{animation:none}
 html.lite .gpCard:not(.open) .gpFront{visibility:hidden}
 html.lite .gpCard.open .gpBack{visibility:hidden}
 html.lite .gpCard:not(.top):not(.gone) .gpFront{display:none}
+html.lite .en.hit .body img,html.lite .en.bossEn.hit .body img{animation:hitL .4s!important;filter:none!important}
+html.lite .en.hitBig .body img{animation:hitLB .55s cubic-bezier(.2,.8,.3,1)!important;filter:none!important}
+@keyframes hitL{0%{transform:none;opacity:.45}10%{transform:translateX(30px) scale(.92,1.06) rotate(6deg);opacity:.7}30%{transform:translateX(14px) rotate(3deg);opacity:1}100%{transform:none;opacity:1}}
+@keyframes hitLB{0%{transform:none;opacity:.35}12%{transform:translateX(56px) scale(.84,1.14) rotate(11deg);opacity:.6}35%{transform:translateX(26px) rotate(5deg);opacity:1}100%{transform:none;opacity:1}}
+html.lite .fnum{-webkit-text-stroke-width:6px}

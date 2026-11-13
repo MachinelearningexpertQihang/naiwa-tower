@@ -1043,7 +1043,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 5.1";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 5.3";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -1679,7 +1679,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 @keyframes hitBig{0%{filter:brightness(4) saturate(0);transform:none}10%{filter:brightness(4) saturate(0);transform:translateX(46px) scale(.84,1.14) rotate(10deg)}35%{filter:brightness(1.3);transform:translateX(26px) scale(1.06,.95) rotate(4deg)}60%{transform:translateX(-6px) scale(.98,1.02) rotate(-2deg)}100%{filter:none;transform:none}}
 .hit .plat,.hitBig .plat{animation:platSq .3s}
 @keyframes platSq{30%{transform:scaleX(1.12) scaleY(.85)}}
-#arena.hitstop *{animation-play-state:paused!important}
+#arena.hitstop .en .body,#arena.hitstop #player .body{animation-play-state:paused!important}
 .impRing{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:5px solid var(--ic);box-shadow:0 0 14px var(--ic);pointer-events:none;z-index:9;animation:impR .42s ease-out forwards}
 .impRing.big{border-width:8px}
 @keyframes impR{from{transform:scale(.4);opacity:1}to{transform:scale(4.2);opacity:0}}
@@ -2899,6 +2899,25 @@ body{background:transparent!important}
 #title.rb .tfloor{background:linear-gradient(90deg,#ff4f8b,#ff9a3c,#ffe14d,#4fe0a0,#4fb6ff,#9b6bff)!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #0d0d0d!important}
 #title.rb .plat::before{background:linear-gradient(90deg,#ff4f8b,#ffe14d,#4fb6ff,#9b6bff)!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #0d0d0d!important}
 #title.rb .gbtn:not(.sm){filter:drop-shadow(6px 6px 0 #9b6bff)}
+/* 5.1 骨堆：不再把主教压扁，换成一堆骨头 */
+.en.bonePile .body img{opacity:0!important;transform:none!important}
+.en.bonePile .body{position:relative}
+.en.bonePile .body::after{content:"";position:absolute;left:4%;right:4%;bottom:0;height:72%;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20240%20160%27%3E%3Cline%20x1%3D%2730%27%20y1%3D%27140%27%20x2%3D%27150%27%20y2%3D%27118%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%2718%27%20stroke-linecap%3D%27round%27/%3E%3Cg%20fill%3D%27%23ece6d8%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%274%27%3E%3Ccircle%20cx%3D%2731%27%20cy%3D%27146%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%2729%27%20cy%3D%27134%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%27151%27%20cy%3D%27124%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%27149%27%20cy%3D%27112%27%20r%3D%2710%27/%3E%3C/g%3E%3Cline%20x1%3D%2730%27%20y1%3D%27140%27%20x2%3D%27150%27%20y2%3D%27118%27%20stroke%3D%27%23ece6d8%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27/%3E%3Cline%20x1%3D%2790%27%20y1%3D%27148%27%20x2%3D%27214%27%20y2%3D%27128%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%2718%27%20stroke-linecap%3D%27round%27/%3E%3Cg%20fill%3D%27%23ece6d8%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%274%27%3E%3Ccircle%20cx%3D%2791%27%20cy%3D%27154%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%2789%27%20cy%3D%27142%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%27215%27%20cy%3D%27134%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%27213%27%20cy%3D%27122%27%20r%3D%2710%27/%3E%3C/g%3E%3Cline%20x1%3D%2790%27%20y1%3D%27148%27%20x2%3D%27214%27%20y2%3D%27128%27%20stroke%3D%27%23ece6d8%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27/%3E%3Cline%20x1%3D%2752%27%20y1%3D%27112%27%20x2%3D%27186%27%20y2%3D%27142%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%2718%27%20stroke-linecap%3D%27round%27/%3E%3Cg%20fill%3D%27%23ece6d8%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%274%27%3E%3Ccircle%20cx%3D%2751%27%20cy%3D%27118%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%2753%27%20cy%3D%27106%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%27185%27%20cy%3D%27148%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%27187%27%20cy%3D%27136%27%20r%3D%2710%27/%3E%3C/g%3E%3Cline%20x1%3D%2752%27%20y1%3D%27112%27%20x2%3D%27186%27%20y2%3D%27142%27%20stroke%3D%27%23ece6d8%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27/%3E%3Cline%20x1%3D%2720%27%20y1%3D%27104%27%20x2%3D%2796%27%20y2%3D%27132%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%2718%27%20stroke-linecap%3D%27round%27/%3E%3Cg%20fill%3D%27%23ece6d8%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%274%27%3E%3Ccircle%20cx%3D%2718%27%20cy%3D%27110%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2798%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%2794%27%20cy%3D%27138%27%20r%3D%2710%27/%3E%3Ccircle%20cx%3D%2798%27%20cy%3D%27126%27%20r%3D%2710%27/%3E%3C/g%3E%3Cline%20x1%3D%2720%27%20y1%3D%27104%27%20x2%3D%2796%27%20y2%3D%27132%27%20stroke%3D%27%23ece6d8%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27/%3E%3Cpath%20d%3D%27M96%2074%20q24%20-44%2054%200%20q9%2026%20-7%2038%20l-4%2014%20h-32%20l-4%20-14%20q-16%20-12%20-7%20-38z%27%20fill%3D%27%23ece6d8%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%275%27/%3E%3Ccircle%20cx%3D%27110%27%20cy%3D%2788%27%20r%3D%278%27%20fill%3D%27%237a3cff%27/%3E%3Ccircle%20cx%3D%27136%27%20cy%3D%2788%27%20r%3D%278%27%20fill%3D%27%237a3cff%27/%3E%3Cpath%20d%3D%27M116%20114%20v8%20M124%20114%20v8%20M132%20114%20v8%27%20stroke%3D%27%233a3540%27%20stroke-width%3D%273%27/%3E%3C/svg%3E") center bottom/contain no-repeat;pointer-events:none}
+/* 5.2 状态再多也不把主角往上顶：状态栏只占一行的位置，多出来的往下排 */
+#player .sts{height:34px;flex:none;align-content:flex-start;position:relative;z-index:6}
+.fnum.me{animation-duration:1.8s!important}
+.pSlash{position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;pointer-events:none;z-index:9}
+.pSlash i{position:absolute;left:10%;top:48%;width:80%;height:9px;border-radius:5px;background:linear-gradient(90deg,transparent,#fff 30%,#ff3b3b 70%,transparent);transform:rotate(-35deg) scaleX(0);transform-origin:0 50%;animation:pSl .32s ease-out forwards}
+.pSlash i:nth-child(2){top:34%;animation-delay:.05s}.pSlash i:nth-child(3){top:62%;animation-delay:.1s}
+.pSlash.big i{height:14px}
+@keyframes pSl{0%{transform:rotate(-35deg) scaleX(0);opacity:1}60%{transform:rotate(-35deg) scaleX(1);opacity:1}100%{transform:rotate(-35deg) scaleX(1);opacity:0}}
+.mn.t-K img.gBeat{width:118px;height:118px;object-fit:contain;margin-top:-16px;filter:grayscale(1) brightness(.85)!important;opacity:.85}
+/* 5.3 主页：星空淡紫（打过真结局的还是彩色） */
+#title:not(.rb){--p5r:#a98bff}
+#title:not(.rb) .p5rays{opacity:.55}
+#title:not(.rb) .tfloor{background:#3b2a78!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #a98bff!important}
+#title:not(.rb) .plat::before{background:#5b45a8!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #a98bff!important}
+.flipX{display:inline-block;transform:scaleX(-1);line-height:0}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}
@@ -3006,3 +3025,8 @@ html.lite .gpS{animation:none}
 html.lite .gpCard:not(.open) .gpFront{visibility:hidden}
 html.lite .gpCard.open .gpBack{visibility:hidden}
 html.lite .gpCard:not(.top):not(.gone) .gpFront{display:none}
+html.lite .en.hit .body img,html.lite .en.bossEn.hit .body img{animation:hitL .4s!important;filter:none!important}
+html.lite .en.hitBig .body img{animation:hitLB .55s cubic-bezier(.2,.8,.3,1)!important;filter:none!important}
+@keyframes hitL{0%{transform:none;opacity:.45}10%{transform:translateX(30px) scale(.92,1.06) rotate(6deg);opacity:.7}30%{transform:translateX(14px) rotate(3deg);opacity:1}100%{transform:none;opacity:1}}
+@keyframes hitLB{0%{transform:none;opacity:.35}12%{transform:translateX(56px) scale(.84,1.14) rotate(11deg);opacity:.6}35%{transform:translateX(26px) rotate(5deg);opacity:1}100%{transform:none;opacity:1}}
+html.lite .fnum{-webkit-text-stroke-width:6px}

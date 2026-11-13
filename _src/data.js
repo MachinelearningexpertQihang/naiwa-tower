@@ -166,16 +166,16 @@ n_roll:{n:"打滚",cost:1,type:"atk",r:"R",fam:"frog",img:"nw",tgt:1,hero:"naiwa
 n_hug:{n:"熊抱",cost:2,type:"atk",r:"E",fam:"frog",img:"nw",tgt:1,hero:"naiwa",d:u=>`造成 ${U(u,22,28)} 伤害，给它虚弱 2`,fx:(B,u,t)=>{B.hit(t,U(u,22,28));B.apply(t,"weak",2)}},
 n_stubborn:{n:"赖着不走",cost:1,type:"skl",r:"R",fam:"frog",img:"nw",hero:"naiwa",exh:1,d:u=>`获得 ${U(u,14,18)} 护盾。消耗`,fx:(B,u)=>{B.block(U(u,14,18))}},
 n_homesick:{n:"想家",cost:2,type:"skl",r:"E",fam:"frog",img:"nw",hero:"naiwa",exh:1,d:u=>`回复 ${U(u,16,22)} 生命，抽 2 张。消耗`,fx:(B,u)=>{B.heal(U(u,16,22));B.draw(2)}},
-k_jab:{n:"快拳",cost:0,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,2,3)} 伤害 2 次`,fx:(B,u,t)=>{B.hit(t,U(u,2,3),2)}},
-k_combo:{n:"连环拳",cost:1,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,4,5)} 伤害，次数 = 连击数 +1（最多 5 次）`,fx:(B,u,t)=>{B.hit(t,U(u,4,5),Math.min(5,(B.combo||0)+1))}},
-k_palm:{n:"推掌",cost:1,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,9,12)} 伤害。连击 ≥2 时抽 1 张`,fx:(B,u,t)=>{B.hit(t,U(u,9,12));if((B.combo||0)>=2)B.draw(1)}},
-k_crane:{n:"鹤立",cost:1,type:"skl",r:"C",fam:"frog",img:"n1",hero:"kungfu",d:u=>`获得 ${U(u,7,10)} 护盾，本回合力气 +1`,fx:(B,u)=>{B.block(U(u,7,10));B.p.tstr=(B.p.tstr||0)+1}},
-k_tiger:{n:"虎爪",cost:1,type:"atk",r:"R",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,10,13)} 伤害，给它易伤 1`,fx:(B,u,t)=>{B.hit(t,U(u,10,13));B.apply(t,"vuln",1)}},
-k_flow:{n:"行云流水",cost:1,type:"skl",r:"R",fam:"frog",img:"n1",hero:"kungfu",d:u=>`抽 ${U(u,2,3)} 张，获得 3 护盾`,fx:(B,u)=>{B.draw(U(u,2,3));B.block(3)}},
-k_hundred:{n:"百裂拳",cost:2,type:"atk",r:"E",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,2,3)} 伤害 10 次`,fx:(B,u,t)=>{B.hit(t,U(u,2,3),10)}},
-k_focus:{n:"气沉丹田",cost:1,type:"pow",r:"R",fam:"frog",img:"n1",hero:"kungfu",d:u=>`每回合开始，本回合力气 +${U(u,1,2)}`,fx:(B,u)=>{PW(B,"tstr",U(u,1,2))}},
-k_dragon:{n:"龙爪手",cost:2,type:"atk",r:"E",fam:"frog",img:"n1",hero:"kungfu",d:u=>`对所有敌人造成 ${U(u,10,14)} 伤害。连击 ≥3 时再来一次`,fx:(B,u)=>{B.hitAll(U(u,10,14));if((B.combo||0)>=3)B.hitAll(U(u,10,14))}},
-k_breath:{n:"调息",cost:0,type:"skl",r:"C",fam:"frog",img:"n1",hero:"kungfu",d:u=>`获得 1 点奶力，失去 ${U(u,3,2)} 生命`,fx:(B,u)=>{B.gainEnergy(1);B.selfDamage(U(u,3,2))}},
+k_jab:{n:"快拳",cost:0,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,2,3)} 伤害 2 次`,fx:(B,u,t)=>{B.hit(t,U(u,2,3),2)}},
+k_combo:{n:"连环拳",cost:1,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,4,5)} 伤害，次数 = 连击数 +1（最多 5 次）`,fx:(B,u,t)=>{B.hit(t,U(u,4,5),Math.min(5,(B.combo||0)+1))}},
+k_palm:{n:"推掌",cost:1,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,9,12)} 伤害。连击 ≥2 时抽 1 张`,fx:(B,u,t)=>{B.hit(t,U(u,9,12));if((B.combo||0)>=2)B.draw(1)}},
+k_crane:{n:"鹤立",cost:1,type:"skl",r:"C",fam:"kungfu",img:"n1",hero:"kungfu",d:u=>`获得 ${U(u,7,10)} 护盾，本回合力气 +1`,fx:(B,u)=>{B.block(U(u,7,10));B.p.tstr=(B.p.tstr||0)+1}},
+k_tiger:{n:"虎爪",cost:1,type:"atk",r:"R",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,10,13)} 伤害，给它易伤 1`,fx:(B,u,t)=>{B.hit(t,U(u,10,13));B.apply(t,"vuln",1)}},
+k_flow:{n:"行云流水",cost:1,type:"skl",r:"R",fam:"kungfu",img:"n1",hero:"kungfu",d:u=>`抽 ${U(u,2,3)} 张，获得 3 护盾`,fx:(B,u)=>{B.draw(U(u,2,3));B.block(3)}},
+k_hundred:{n:"百裂拳",cost:2,type:"atk",r:"E",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,2,3)} 伤害 10 次`,fx:(B,u,t)=>{B.hit(t,U(u,2,3),10)}},
+k_focus:{n:"气沉丹田",cost:1,type:"pow",r:"R",fam:"kungfu",img:"n1",hero:"kungfu",d:u=>`每回合开始，本回合力气 +${U(u,1,2)}`,fx:(B,u)=>{PW(B,"tstr",U(u,1,2))}},
+k_dragon:{n:"龙爪手",cost:2,type:"atk",r:"E",fam:"kungfu",img:"n1",hero:"kungfu",d:u=>`对所有敌人造成 ${U(u,10,14)} 伤害。连击 ≥3 时再来一次`,fx:(B,u)=>{B.hitAll(U(u,10,14));if((B.combo||0)>=3)B.hitAll(U(u,10,14))}},
+k_breath:{n:"调息",cost:0,type:"skl",r:"C",fam:"kungfu",img:"n1",hero:"kungfu",d:u=>`获得 1 点奶力，失去 ${U(u,3,2)} 生命`,fx:(B,u)=>{B.gainEnergy(1);B.selfDamage(U(u,3,2))}},
 /* ---- 3.0 补充：奶马 ---- */
 h_canter:{n:"碎步冲",cost:0,type:"atk",r:"C",fam:"horse",img:"hrl",d:u=>`对随机敌人造成 ${U(u,4,6)} 伤害`,fx:(B,u)=>{const al=B.alive();if(al.length)B.hit(pick(al),U(u,4,6))}},
 h_relay:{n:"传棒",cost:1,type:"skl",r:"C",fam:"horse",img:"hrg",d:u=>`抽 ${U(u,2,3)} 张。本回合打过奶马牌的话，再抽 1 张`,fx:(B,u)=>{B.draw(U(u,2,3)+((B.horseN||0)>1?1:0))}},
@@ -694,6 +694,9 @@ net:{n:"大网兜",img:"cks",r:"R",d:"每场战斗可以多抓 1 只敌人"},
 pondstone:{n:"池塘石",img:"c3",r:"C",d:"奶蛙池多 1 格"},
 moonmirror:{n:"月光镜",img:"nx",r:"E",d:"每层都当作满月（三连只需要 2 个）"},
 pup:{n:"奶狗陪伴",img:"dg",r:"R",d:"每场战斗第一回合，奶狗对随机敌人造成 6 伤害"},
+cotton:{n:"厚棉袄",img:"egx",r:"R",d:"每次受到敌人攻击，伤害 -1"},
+softpad:{n:"软垫子",img:"ctm",r:"R",d:"每场战斗第一次生命掉到一半以下后，这场战斗受到的敌人伤害 -15%"},
+herb:{n:"解毒草",img:"sna",r:"C",d:"每回合开始，清掉自己身上 1 层负面状态"},
 };
 const RELIC_POOL=Object.keys(RELICS).filter(k=>RELICS[k].r!=="S"&&k!=="pup");
 
@@ -1068,7 +1071,7 @@ const MEMO={
  kungfu:{foe:"memo_master",t:"回忆 · 拜师第一天",
   pre:[["m6","师父","站好。拳要收得回来，才叫拳。"],["n1","功夫奶蛙","师父，我能打赢您吗？"],["m6","师父","打赢我？先打中我再说。来，出三拳，一拳比一拳快。"]],
   post:[["m6","师父","……不错。连着出拳的时候，你的心是静的。"],["n1","功夫奶蛙","师父，您的梦想——打败大魔王——我会替您完成的。"],["m6","师父","傻孩子。我的梦想，是你回来吃晚饭。"]],
-  mech:"你是功夫奶蛙：这回合打出的攻击牌越多，「连击」越高。很多功夫牌写着「连击 ≥2 / ≥3 时」，先垫便宜的拳，再出大招。"},
+  mech:"你是功夫奶蛙：这回合打出的攻击牌越多，「连击」越高。很多功夫牌写着「连击 ≥2 / ≥3 时」，先垫便宜的拳，再出大招。从第 2 张攻击牌起，每张还会给敌人叠 1 层内伤。"},
  knight:{foe:"memo_gate",t:"回忆 · 村口的大门",
   pre:[["e_nw","村口的奶蛙","你那把剑，又小又破，守得住什么呀？"],["n1","骑士奶蛙","守得住这扇门。"],["e_nw","村口的奶蛙","那你守给我看看。我要进去咯！"]],
   post:[["e_nw","村口的奶蛙","哎哟哟……好好好，进不去，进不去。"],["n1","骑士奶蛙","剑小，盾大就行。"],["m6","奶蛙长老","（远处鼓掌）好一个守门人。"]],
@@ -1112,12 +1115,12 @@ n_onecut:{n:"一肚子气",cost:2,type:"atk",r:"E",fam:"none",img:"nw",tgt:1,her
 n_hotbelly:{n:"热肚皮",cost:1,type:"pow",r:"R",fam:"none",img:"nw",hero:"naiwa",d:u=>`每回合开始，所有敌人烫伤 ${U(u,2,3)}`,fx:(B,u)=>{PW(B,"hotbelly",U(u,2,3))}},
 n_ember:{n:"火星子",cost:0,type:"atk",r:"C",fam:"frog",img:"nw",tgt:1,hero:"naiwa",d:u=>`造成 ${U(u,4,6)} 伤害；目标有烫伤，再烫伤 2`,fx:(B,u,t)=>{const had=t.burn>0;B.hit(t,U(u,4,6));if(had&&t.hp>0)B.apply(t,"burn",2)}},
 /* 功夫奶蛙：内伤 / 破甲 / 连击 / 闪避 / 敏捷 */
-k_wingchun:{n:"咏春",cost:1,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,3,4)} 伤害 3 次，每次内伤 +1`,fx:(B,u,t)=>{for(let i=0;i<3;i++){if(t.hp<=0)break;B.hit(t,U(u,3,4));if(t.hp>0)t.inj=Math.min(10,(t.inj||0)+1)}B.statFx(t,"inj",3)}},
+k_wingchun:{n:"咏春",cost:1,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,3,4)} 伤害 3 次，每次内伤 +1`,fx:(B,u,t)=>{for(let i=0;i<3;i++){if(t.hp<=0)break;B.hit(t,U(u,3,4));if(t.hp>0)t.inj=Math.min(10,(t.inj||0)+1)}B.statFx(t,"inj",3)}},
 k_shoryu:{n:"升龙拳",cost:2,type:"atk",r:"R",fam:"none",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,14,18)} 伤害，破甲 2。连击 ≥3 时伤害翻倍`,fx:(B,u,t)=>{B.hit(t,U(u,14,18)*((B.combo||0)>=3?2:1));if(t.hp>0)B.apply(t,"brk",2)}},
 k_ironshirt:{n:"铁布衫",cost:1,type:"skl",r:"C",fam:"none",img:"n1",hero:"kungfu",d:u=>`敏捷 +${U(u,2,3)}`,fx:(B,u)=>{B.apply(B.p,"dex",U(u,2,3))}},
 k_afterimage:{n:"残影步",cost:1,type:"skl",r:"R",fam:"none",img:"n1",hero:"kungfu",d:u=>`获得 ${U(u,2,3)} 层闪避，抽 1 张`,fx:(B,u)=>{B.apply(B.p,"evade",U(u,2,3));B.draw(1)}},
 k_inchpunch:{n:"寸劲",cost:1,type:"atk",r:"R",fam:"none",img:"n1",tgt:1,hero:"kungfu",d:u=>`引爆内伤：造成 内伤×${U(u,3,4)} 的伤害，内伤清零`,fx:(B,u,t)=>{const n=t.inj||0;t.inj=0;B.hit(t,n*U(u,3,4),1,1)}},
-k_cranebeak:{n:"鹤嘴",cost:1,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,5,7)} 伤害，破甲 1，敏捷 +1`,fx:(B,u,t)=>{B.hit(t,U(u,5,7));if(t.hp>0)B.apply(t,"brk",1);B.p.dex+=1}},
+k_cranebeak:{n:"鹤嘴",cost:1,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,5,7)} 伤害，破甲 1，敏捷 +1`,fx:(B,u,t)=>{B.hit(t,U(u,5,7));if(t.hp>0)B.apply(t,"brk",1);B.p.dex+=1}},
 k_dragontail:{n:"神龙摆尾",cost:2,type:"atk",r:"E",fam:"none",img:"n1",hero:"kungfu",d:u=>`对所有敌人造成 ${U(u,15,20)} 伤害，每个敌人内伤 +2`,fx:(B,u)=>{B.alive().forEach(e=>{B.hit(e,U(u,15,20));if(e.hp>0)e.inj=Math.min(10,(e.inj||0)+2)})}},
 k_softhard:{n:"以柔克刚",cost:1,type:"pow",r:"E",fam:"none",img:"n1",hero:"kungfu",d:u=>`每次闪开攻击，对攻击者造成 ${U(u,8,11)} 伤害，内伤 +2`,fx:(B,u)=>{PW(B,"flow",U(u,8,11))}},
 /* 骑士：荆棘 / 反伤 / 真伤 */
@@ -1265,11 +1268,11 @@ var JNAME=["","通往古堡的交叉路口","通往冰原的小径","通往奶�
 
 /* 4.6 功夫、骑士新专属牌 */
 Object.assign(CARDS,{
-k_point:{n:"点穴",cost:0,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,3,4)} 伤害，内伤 +2`,fx:(B,u,t)=>{B.hit(t,U(u,3,4));if(t.hp>0)B.apply(t,"inj",2)}},
-k_legs:{n:"连环腿",cost:1,type:"atk",r:"C",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,3,4)} 伤害 3 次。连击 ≥2 时再打 1 次`,fx:(B,u,t)=>{B.hit(t,U(u,3,4),(B.combo||0)>=2?4:3)}},
+k_point:{n:"点穴",cost:0,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,3,4)} 伤害，内伤 +2`,fx:(B,u,t)=>{B.hit(t,U(u,3,4));if(t.hp>0)B.apply(t,"inj",2)}},
+k_legs:{n:"连环腿",cost:1,type:"atk",r:"C",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 ${U(u,3,4)} 伤害 3 次。连击 ≥2 时再打 1 次`,fx:(B,u,t)=>{B.hit(t,U(u,3,4),(B.combo||0)>=2?4:3)}},
 k_redirect:{n:"借力打力",cost:1,type:"skl",r:"R",fam:"none",img:"n1",hero:"kungfu",d:u=>`获得 ${U(u,6,9)} 护盾。到你下回合前，每闪开一次攻击，对攻击者造成 8 伤害`,fx:(B,u)=>{B.block(U(u,6,9));B.p.redirect=8}},
 k_qi:{n:"气贯全身",cost:1,type:"skl",r:"R",fam:"none",img:"n1",hero:"kungfu",d:u=>`所有敌人内伤 +${U(u,2,3)}，抽 1 张`,fx:(B,u)=>{B.alive().forEach(e=>B.apply(e,"inj",U(u,2,3)));B.draw(1)}},
-k_shadowhand:{n:"无影手",cost:2,type:"atk",r:"E",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 2 伤害 ${U(u,6,8)} 次`,fx:(B,u,t)=>{B.hit(t,2,U(u,6,8))}},
+k_shadowhand:{n:"无影手",cost:2,type:"atk",r:"E",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`造成 2 伤害 ${U(u,6,8)} 次`,fx:(B,u,t)=>{B.hit(t,2,U(u,6,8))}},
 k_neigong:{n:"内功心法",cost:1,type:"pow",r:"E",fam:"none",img:"n1",hero:"kungfu",d:u=>`每回合开始，随机一个敌人内伤 +${U(u,2,3)}`,fx:(B,u)=>{PW(B,"neigong",U(u,2,3))}},
 kn_wall:{n:"盾墙",cost:1,type:"skl",r:"C",fam:"knight",img:"kn",hero:"knight",d:u=>`获得 ${U(u,8,11)} 护盾。下回合开始时护盾不会掉`,fx:(B,u)=>{B.block(U(u,8,11));B.p.keepBlk=1}},
 kn_ram:{n:"冲撞",cost:1,type:"atk",r:"C",fam:"knight",img:"kn",tgt:1,hero:"knight",d:u=>`造成 6 + 护盾 ${U(u,30,40)}% 的伤害`,fx:(B,u,t)=>{B.hit(t,6+Math.floor(B.p.block*U(u,30,40)/100))}},
@@ -1297,7 +1300,7 @@ qz_bats:{n:"蝙蝠群",img:"v_vamp",r:"Q",hero:"vamp",d:"吸血鬼奇招：每�
 Object.assign(CARDS,{
 qz_bellyslam:{n:"肚皮弹",cost:2,type:"atk",r:"Q",fam:"frog",img:"nw",tgt:1,hero:"naiwa",d:u=>`造成和你护盾一样多的伤害${u?"，再加 8":""}`,fx:(B,u,t)=>{B.hit(t,B.p.block+(u?8:0))}},
 qz_flood:{n:"泉涌",cost:1,type:"skl",r:"Q",fam:"frog",img:"nw",hero:"naiwa",d:u=>`池子里每有 1 只奶蛙：获得 ${U(u,3,4)} 护盾，并对随机敌人造成 3 伤害`,fx:(B,u)=>{const n=B.pool.filter(x=>x.f!=="mud").length;B.block(n*U(u,3,4));for(let i=0;i<n;i++){const t=pick(B.alive());if(t)B.hit(t,3,1,1)}}},
-qz_onefinger:{n:"一指禅",cost:1,type:"atk",r:"Q",fam:"frog",img:"n1",tgt:1,hero:"kungfu",d:u=>`这回合已经打出 4 张攻击牌时，造成 ${U(u,50,65)} 伤害；否则只造成 5`,fx:(B,u,t)=>{B.hit(t,(B.combo||0)>=4?U(u,50,65):5)}},
+qz_onefinger:{n:"一指禅",cost:1,type:"atk",r:"Q",fam:"kungfu",img:"n1",tgt:1,hero:"kungfu",d:u=>`这回合已经打出 4 张攻击牌时，造成 ${U(u,50,65)} 伤害；否则只造成 5`,fx:(B,u,t)=>{B.hit(t,(B.combo||0)>=4?U(u,50,65):5)}},
 qz_thousand:{n:"千手",cost:2,type:"atk",r:"Q",fam:"none",img:"n1",tgt:1,hero:"kungfu",d:u=>`这回合每打出过 1 张牌，就打 2 下，每下 ${U(u,3,4)} 伤害（最多 20 下）`,fx:(B,u,t)=>{B.hit(t,U(u,3,4),Math.min(20,2*Math.max(1,B.played||1)))}},
 qz_shieldsword:{n:"以盾为剑",cost:2,type:"atk",r:"Q",fam:"knight",img:"kn",tgt:1,hero:"knight",d:u=>`造成和你护盾一样多的伤害${u?" ×1.3":""}，护盾不会消失`,fx:(B,u,t)=>{B.hit(t,Math.floor(B.p.block*(u?1.3:1)))}},
 qz_fortress:{n:"坚不可摧",cost:2,type:"pow",r:"Q",fam:"knight",img:"kn",hero:"knight",d:u=>`这场战斗护盾不再减半${u?"，获得 10 护盾":""}`,fx:(B,u)=>{B.p.pw.iron=1;if(u)B.block(10)}},
@@ -1314,7 +1317,7 @@ frogged:{n:"青蛙",cost:-2,type:"skl",r:"T",fam:"none",img:"i5",noUp:1,d:u=>`�
 /* 4.9 同行者的遗物（剧情给，不进随机池） */
 Object.assign(RELICS,{
 comp_amulet:{n:"兄弟护符",img:"hr",r:"Q",d:"小火兄弟送的：受到致命伤时留住 1 点生命（一局一次）"},
-comp_dice:{n:"幸运骰子",img:"ct",r:"Q",d:"阿蓝送的：每场战斗多 10 金币"},
+comp_dice:{n:"幸运骰子",img:"ct",r:"Q",d:"阿蓝送的：每场战斗多 10 金币"},comp_bento:{n:"长老的饭盒",img:"msx",r:"Q",d:"豆子托你送的：每场首领战开始时回复 12 生命"},
 comp_sword:{n:"老铁的佩剑",img:"dgt",r:"Q",d:"老铁留下的：每场战斗开始力气 +1"},
 comp_doll:{n:"小七的布娃娃",img:"i5",r:"Q",d:"小七托你拿着：每场战斗开始回复 5 生命"}});
 /* 4.9 更多奶蛋牌 */
@@ -1329,4 +1332,13 @@ e_smash:{n:"摔蛋",cost:1,type:"atk",r:"R",fam:"chick",img:"egt",tgt:1,d:u=>`�
 /* 4.10 把 4.6 以后新加的牌补进奖励池和图鉴（之前漏了） */
 POOL_HERO.push("v_bleed","k_point","k_legs","k_redirect","k_qi","k_shadowhand","k_neigong","kn_wall","kn_ram","kn_hold","kn_slam","kn_ironwall","kn_paladin","e_twin","e_piggy","e_mystery","e_incubate","e_shellguard","e_smash","qz_bellyslam","qz_flood","qz_onefinger","qz_thousand","qz_shieldsword","qz_fortress","qz_timestop","qz_storm","qz_bloodrite","qz_feast");
 /* 4.11 粉丝建议的牌：自强不息 */
-Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:0,type:"skl",r:"S",fam:"none",img:"nw",exh:1,noUp:1,d:u=>`获得 1 点奶力。消耗`,fx:(B,u)=>{B.gainEnergy(1)}}});
+Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:0,type:"skl",r:"S",fam:"none",img:"nw",exh:1,d:u=>`获得 ${u?2:1} 点奶力。消耗`,fx:(B,u)=>{B.gainEnergy(u?2:1)}}});
+/* 5.2 沼泽之王回来了，做第一层的精英；伙伴卡来源补齐 */
+ENEMY.swampking={n:"沼泽之王",img:"e_xsk",pd:"往你的池子里丢泥巴，把同家族隔开。干脆利落地赢下他（生命不低于一半），他会记住你",hp:[96,104],h:260,elite:1,ai:(e,t)=>[{k:"atk",v:8,pool:{t:"junk",n:2}},{k:"atk",v:13},{k:"def",v:10,s2:"str",v2:2},{k:"atk",v:7,x:2}][t%4]};
+try{ENCS[0].elite.push(["swampking"]);ENCS[2].elite.push(["icefrog"])}catch(e){}
+/* 5.2 吸血鬼多一点保命的牌：减伤和虚弱 */
+Object.assign(CARDS,{
+ v_startle:{n:"惊扰",cost:1,type:"atk",r:"C",fam:"blood",img:"v_vamp",tgt:1,hero:"vamp",ls:1,d:u=>`造成 ${U(u,5,7)} 伤害，虚弱 ${U(u,2,3)}，吸血`,fx:(B,u,t)=>{B.hit(t,U(u,5,7));if(t.hp>0)B.apply(t,"weak",U(u,2,3))}},
+ v_wingcover:{n:"蝠翼遮蔽",cost:1,type:"skl",r:"R",fam:"none",img:"v_vamp",hero:"vamp",d:u=>`到你下回合前，每次受到的攻击伤害 -${U(u,4,6)}，抽 1 张`,fx:(B,u)=>{B.p.shroud=(B.p.shroud||0)+U(u,4,6);B.draw(1)}},
+ v_nightfog:{n:"夜雾",cost:1,type:"skl",r:"R",fam:"none",img:"v_vamp",hero:"vamp",d:u=>`所有敌人虚弱 ${U(u,2,3)}；到你下回合前，每次受到的攻击伤害 -3`,fx:(B,u)=>{B.alive().forEach(e=>B.apply(e,"weak",U(u,2,3)));B.p.shroud=(B.p.shroud||0)+3}}});
+POOL_HERO.push("v_startle","v_wingcover","v_nightfog");

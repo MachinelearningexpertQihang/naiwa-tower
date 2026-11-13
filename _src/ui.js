@@ -148,6 +148,31 @@ function p5TitleSVGBlue(){
  <g fill="#ffd84a"><rect x="808" y="460" width="8" height="14"/><rect x="806" y="560" width="8" height="14"/></g>
  <path d="M380 720 L1280 560 L1280 720 Z" fill="#0d0d0d"/>
  ${shards}</svg>`}
+function p5TitleSVGPurple(){
+ let rays="";for(let i=0;i<18;i++){const a0=i*20,a1=a0+9;const r=1600,cx=980,cy=300;const p=(a)=>`${cx+r*Math.cos(a*Math.PI/180)} ${cy+r*Math.sin(a*Math.PI/180)}`;rays+=`<path d="M${cx} ${cy} L${p(a0)} L${p(a1)} Z"/>`}
+ let shards="";[[120,90,40],[300,620,-20],[1180,120,30],[620,40,10],[860,660,-35],[40,420,60]].forEach(([x,y,r],i)=>shards+=`<path transform="translate(${x} ${y}) rotate(${r})" d="M0 0 L${60+i*10} -8 L${46+i*8} 14 Z" fill="${i%2?"#fff":"#0d0d0d"}" class="tw" style="animation-delay:${i*.5}s"/>`);
+ return `<svg class="scene p5Scene" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs>
+ <pattern id="p5dot" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="4" cy="4" r="2.6" fill="#0d0d0d"/></pattern>
+ <pattern id="p5dotW" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3" cy="3" r="1.8" fill="#fff" opacity=".18"/></pattern>
+ <linearGradient id="p5fade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity="1"/><stop offset=".55" stop-color="#000" stop-opacity="0"/></linearGradient>
+ <mask id="p5m"><rect width="1280" height="720" fill="url(#p5fade)"/></mask></defs>
+ <linearGradient id="nsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a5c"/><stop offset=".55" stop-color="#8a6fd0"/><stop offset="1" stop-color="#e2d4ff"/></linearGradient><rect width="1280" height="720" fill="url(#nsky)"/>
+ <g fill="#5b45a8" class="p5rays" style="transform-origin:945px 215px">${rays}</g>${(()=>{let st="";for(let i=0;i<90;i++){const x=(i*137)%1280,y=(i*263)%560,r=(i%5===0)?2.4:(i%3?1.1:1.6);st+=`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" class="tw" opacity="${.45+(i%4)*.15}" style="animation-delay:${(i%9)*.4}s"/>`}return st})()}
+ <rect width="1280" height="720" fill="url(#p5dot)" opacity=".22" mask="url(#p5m)"/>
+ <radialGradient id="p5moonGl" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><linearGradient id="p5moonFill" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#fff6ea"/><stop offset="1" stop-color="#f1e9ff"/></linearGradient><pattern id="p5moonDot" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3" cy="3" r="2.2" fill="#c4a8ff"/></pattern><clipPath id="p5moonC"><circle cx="945" cy="215" r="185"/></clipPath>
+ <circle cx="945" cy="215" r="300" fill="url(#p5moonGl)"/>
+ <circle cx="945" cy="215" r="228" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="80 14 6 14" opacity=".9" class="p5ring"/>
+ <circle cx="945" cy="215" r="250" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-dasharray="4 18" opacity=".55" class="p5ring2"/>
+ <circle cx="945" cy="215" r="185" fill="url(#p5moonFill)"/>
+ <g clip-path="url(#p5moonC)"><circle cx="966" cy="196" r="190" fill="url(#p5moonDot)" opacity=".55"/><circle cx="986" cy="180" r="181" fill="#c4a8ff"/><path d="M776 130 Q764 262 856 352" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".9"/></g>
+ <path d="M720 74 Q722.88 87.12 736 90 Q722.88 92.88 720 106 Q717.12 92.88 704 90 Q717.12 87.12 720 74Z" fill="#fff" opacity="0.95" class="tw" style="animation-delay:0.0s"/><path d="M1180 318 Q1182.16 327.84 1192 330 Q1182.16 332.16 1180 342 Q1177.84 332.16 1168 330 Q1177.84 327.84 1180 318Z" fill="#fff" opacity="0.85" class="tw" style="animation-delay:0.0s"/><path d="M760 321 Q761.62 328.38 769 330 Q761.62 331.62 760 339 Q758.38 331.62 751 330 Q758.38 328.38 760 321Z" fill="#fff" opacity="0.8" class="tw" style="animation-delay:0.0s"/><path d="M1120 50 Q1121.8 58.2 1130 60 Q1121.8 61.8 1120 70 Q1118.2 61.8 1110 60 Q1118.2 58.2 1120 50Z" fill="#fff" opacity="0.8" class="tw" style="animation-delay:0.0s"/>
+ <path d="M0 0 H560 L380 720 H0 Z" fill="#0d0d0d"/>
+ <path d="M560 0 L590 0 L410 720 L380 720 Z" fill="#fff"/>
+ <rect x="0" y="0" width="580" height="720" fill="url(#p5dotW)"/>
+ <g fill="#0d0d0d"><path d="M770 720 L800 430 L790 430 L812 360 L834 430 L824 430 L854 720 Z"/><path d="M752 720 L790 520 L834 520 L872 720 Z"/></g>
+ <g fill="#ffd84a"><rect x="808" y="460" width="8" height="14"/><rect x="806" y="560" width="8" height="14"/></g>
+ <path d="M380 720 L1280 560 L1280 720 Z" fill="#0d0d0d"/>
+ ${shards}</svg>`}
 function p5TitleSVGRainbow(){
  let rays="";for(let i=0;i<18;i++){const a0=i*20,a1=a0+9;const r=1600,cx=980,cy=300;const p=(a)=>`${cx+r*Math.cos(a*Math.PI/180)} ${cy+r*Math.sin(a*Math.PI/180)}`;rays+=`<path d="M${cx} ${cy} L${p(a0)} L${p(a1)} Z"/>`}
  let shards="";[[120,90,40],[300,620,-20],[1180,120,30],[620,40,10],[860,660,-35],[40,420,60]].forEach(([x,y,r],i)=>shards+=`<path transform="translate(${x} ${y}) rotate(${r})" d="M0 0 L${60+i*10} -8 L${46+i*8} 14 Z" fill="${i%2?"#fff":"#0d0d0d"}" class="tw" style="animation-delay:${i*.5}s"/>`);
@@ -173,7 +198,7 @@ function p5TitleSVGRainbow(){
  <g fill="#ffd84a"><rect x="808" y="460" width="8" height="14"/><rect x="806" y="560" width="8" height="14"/></g>
  <path d="M380 720 L1280 560 L1280 720 Z" fill="#0d0d0d"/>
  ${shards}</svg>`}
-function p5TitleSVG(){try{if(typeof M!=="undefined"&&M&&(M.trueEnds||[]).length)return p5TitleSVGRainbow()}catch(e){}return p5TitleSVGRed()}
+function p5TitleSVG(){try{if(typeof M!=="undefined"&&M&&(M.trueEnds||[]).length)return p5TitleSVGRainbow()}catch(e){}return p5TitleSVGPurple()}
 function sceneSVG(kind,moon){if(kind==="title")return p5TitleSVG();const P=PAL[kind]||PAL.swamp,I=INK;
  const mx={factory:1060,pipes:220,bossfac:640,snowfield:1000,belltower:220,bellE:1060,bossice:640,demon:640,castle:1040,gate:200,boss1:1030,cosmos:980,summit:640,boss2:640,swamp:1040,reed:640,ruin:300,elite:1000,boss:640,title:760,rest:1060,event:980,shop:1100}[kind]||1000,mr={bossfac:120,bossice:120,demon:150,boss:96,title:84,reed:84,boss1:110,boss2:120,summit:70}[kind]||56,my={bossfac:170,bossice:170,demon:190,boss:150,reed:200,boss1:140,boss2:170}[kind]||118;
  let stars="";for(let i=0;i<56;i++){const x=(i*277)%1280,y=(i*131)%340,r=i%7===0?2.4:1.2;stars+=`<circle class="${i%3?"":"tw"}" style="animation-delay:${i%5*.6}s" cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${.35+(i%4)*.18}"/>`}

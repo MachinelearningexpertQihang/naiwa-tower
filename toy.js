@@ -47,7 +47,7 @@ const CLOUD={st:"off",dirty:false,busy:false,last:[],back:0,fail:0,lastUp:0,time
    else if(o.s&&o.s.v===2&&this.idle()){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}
     if(!lr&&cp===lp||lr&&(o.s.ts||0)>(lr.ts||0)+3000){try{localStorage.setItem("nwt-run",JSON.stringify(o.s))}catch(e){}if($("#title").classList.contains("on"))titleScreen()}}}
   this.st="on";this.hot()},
- apply(o){Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,o.m);try{localStorage.setItem("nwt-meta",JSON.stringify(M));if(o.s&&o.s.v===2){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}if(!lr||(o.s.ts||0)>=(lr.ts||0))localStorage.setItem("nwt-run",JSON.stringify(o.s))}}catch(e){}
+ apply(o){const old=JSON.parse(JSON.stringify(M));Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,nwMergeMeta(o.m,old));try{localStorage.setItem("nwt-meta",JSON.stringify(M));if(o.s&&o.s.v===2){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}if(!lr||(o.s.ts||0)>=(lr.ts||0))localStorage.setItem("nwt-run",JSON.stringify(o.s))}}catch(e){}
   NWB.save();if(typeof titleScreen==="function"&&$("#title").classList.contains("on"))titleScreen();if(typeof toast==="function")toast("已从云端找回你的存档")},
  askLater(){const go=()=>{if(this.st!=="ask"||!this.pend)return;if(!this.idle()||!$("#title").classList.contains("on")||$("#ov").classList.contains("on")){setTimeout(go,1500);return}
    const o=this.pend;this.pend=null;this.apply(o);this.st="on";this.hot()};go()},
@@ -91,3 +91,11 @@ async function rankScreen(){let b=1,per="week";
   el.innerHTML=o.list.map((r,i)=>{const nm=cleanName(r.nickname),a=r.avatar?(String(r.avatar).indexOf("//")===0?"https:"+r.avatar:r.avatar):"";return`<div class="lbRow ${i<3?"top"+(i+1):""}"><b class="lbR">${r.rank||i+1}</b><span class="lbAv">${a?`<img referrerpolicy="no-referrer" src="${a.replace(/"/g,"")}" onerror="this.remove()">`:nm.slice(0,1)}</span><span class="lbN">${nm}</span><b class="lbS">${r.score} <small>${B0.u}</small></b></div>`}).join("");
   const me=$("#ov .lbMe");if(me&&o.me&&o.me.ranked)me.innerHTML+=`　全服第 <b>${o.me.rank}</b> 名`};
  draw()}
+/* 5.2 云存档合并：熟练度、首领记录、收集这类只增不减的东西取两边较大的，不会被另一台设备的旧进度盖掉 */
+function nwMergeMeta(a,b){const m=JSON.parse(JSON.stringify(a||{}));if(!b)return m;
+ ["runs","wins","deaths","kills","shardsAll","playMs","best","palN"].forEach(k=>{if(typeof b[k]==="number")m[k]=Math.max(m[k]||0,b[k])});
+ const maxMap=k=>{if(b[k]&&typeof b[k]==="object"){m[k]=m[k]||{};for(const x in b[k]){const v=b[k][x];if(typeof v==="number")m[k][x]=Math.max(m[k][x]||0,v);else if(!(x in m[k]))m[k][x]=v}}};
+ ["mast","got","ach","pals","up","seen"].forEach(maxMap);
+ if(b.boss){m.boss=m.boss||{};for(const x in b.boss){const r=m.boss[x]=m.boss[x]||{},o=b.boss[x]||{};for(const y in o){if(typeof o[y]==="number")r[y]=Math.max(r[y]||0,o[y]);else if(!(y in r))r[y]=o[y]}}}
+ if(Array.isArray(b.trueEnds)){const L=m.trueEnds=Array.isArray(m.trueEnds)?m.trueEnds:[];b.trueEnds.forEach(e=>{if(!L.some(x=>x&&e&&x.t===e.t))L.push(e)})}
+ return m}
