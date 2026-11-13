@@ -2886,6 +2886,10 @@ body{background:transparent!important}
 #pool .pauto:not(.on){background:#ffd200;color:#0d0d0d;border-color:#0d0d0d}
 #pool .phot.gtip{background:#fff}
 .prArrow{position:absolute;top:-16px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #ffd200;transform:translateX(-3px)}
+/* 5.0 池里每个家族用自己的颜色，手动摆的时候一眼分清 */
+#pool .tok:not(.empty),.prSl .tok{background:var(--fc)!important;border:4px solid #0d0d0d!important;box-shadow:inset 0 0 0 3px rgba(255,255,255,.75)!important}
+#pool .tok.hot{box-shadow:inset 0 0 0 3px rgba(255,255,255,.75),0 0 0 3px #ffd200,0 0 12px 3px rgba(255,210,0,.8)!important}
+#pool .tok.mudt{background:#8a6038!important}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}
