@@ -1043,7 +1043,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 4.11";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 5.0";left:auto;right:-90px;top:-10px;writing-mode:horizontal-tb;font:900 18px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:6px 10px;border-radius:0;box-shadow:4px 4px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -2874,6 +2874,18 @@ body{background:transparent!important}
 #title .tmenu .sub .gbtn{flex-wrap:nowrap}
 #title .tmenu .sub .gbtn svg.tgt{width:24px;height:24px;flex:none}
 #title .tmenu .sub .packGb,#title .tmenu .sub .dummyGb{margin-top:0!important;width:auto!important;display:flex!important}
+/* 5.0 奶蛙池手动摆放 */
+#pool .slots{align-items:center}
+#pool .pcur{position:relative;width:0;margin:0 -3px;align-self:stretch}
+#pool .pcur::before{content:"";position:absolute;left:-2px;top:-2px;bottom:-2px;width:4px;border-radius:2px;background:#ffd200;box-shadow:0 0 0 2px #0d0d0d}
+#pool .pcur::after{content:"";position:absolute;left:-9px;top:-17px;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #ffd200}
+#pool .tok.ghost{opacity:.45;outline:3px dashed #fff;outline-offset:-3px}
+#pool .tok.ghost.gk{opacity:.75;outline-color:#ffd200}
+#pool .tok[data-i],#pool .tok[data-e]{cursor:pointer}
+#pool .pauto{flex:none;margin-left:2px;padding:4px 10px;border:2px solid #fff;background:#0d0d0d;color:#fff;font:900 15px/1 'NW Black',sans-serif;cursor:pointer}
+#pool .pauto:not(.on){background:#ffd200;color:#0d0d0d;border-color:#0d0d0d}
+#pool .phot.gtip{background:#fff}
+.prArrow{position:absolute;top:-16px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #ffd200;transform:translateX(-3px)}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}
