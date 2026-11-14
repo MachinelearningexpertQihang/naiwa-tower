@@ -1020,24 +1020,24 @@ an_draw:{n:"摸暗器",cost:0,type:"skl",r:"C",fam:"none",img:"sn",d:u=>`得到 
 an_rain:{n:"暗器雨",cost:1,type:"skl",r:"R",fam:"none",img:"sn",d:u=>`得到 ${U(u,2,3)} 张随机暗器牌`,fx:(B,u)=>{for(let i=0;i<U(u,2,3);i++)B.gainAnqi()}},
 an_master:{n:"暗器大师",cost:1,type:"pow",r:"E",fam:"none",img:"sn",d:u=>`每回合开始得到 1 张暗器牌${u?"，打出暗器时抽 1 张（每回合一次）":""}`,fx:(B,u)=>{PW(B,"anqi",1);if(u)PW(B,"anqiDraw",1)}},
 an_snake:{n:"奶蛇吐信",cost:1,type:"atk",r:"C",fam:"none",img:"sn",tgt:1,d:u=>`造成 ${U(u,7,10)} 伤害，得到 1 张随机暗器牌`,fx:(B,u,t)=>{B.hit(t,U(u,7,10));B.gainAnqi()}},
-egg_lay:{n:"奶蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egl",d:u=>`在场上下 1 枚蛋，2 回合后孵化：随机敌人 ${U(u,9,12)} 伤害，你得 ${U(u,5,7)} 护盾`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,9,12),b:U(u,5,7)})}},
-egg_nest:{n:"一窝蛋",cost:2,type:"skl",r:"R",fam:"chick",img:"eg",d:u=>`下 ${U(u,3,4)} 枚蛋，2 回合后一起孵化，每只小鸡啄随机敌人 7 下`,fx:(B,u)=>{for(let i=0;i<U(u,3,4);i++)B.layEgg({t:2,d:7,b:0})}},
-egg_gold:{n:"金蛋",cost:2,type:"skl",r:"E",fam:"chick",img:"egj",exh:1,d:u=>`下 1 枚金蛋，3 回合后孵化：所有敌人 ${U(u,18,24)} 伤害，奶力 +1。消耗`,fx:(B,u)=>{B.layEgg({t:3,d:U(u,18,24),all:1,e:1,gold:1})}},
+egg_lay:{n:"奶蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egl",d:u=>`在场上下 1 枚蛋，2 回合后孵化：随机敌人 ${U(u,12,16)} 伤害，你得 ${U(u,6,8)} 护盾`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,12,16),b:U(u,6,8)})}},
+egg_nest:{n:"一窝蛋",cost:2,type:"skl",r:"R",fam:"chick",img:"eg",d:u=>`下 ${U(u,3,4)} 枚蛋，2 回合后一起孵化，每只小鸡啄随机敌人一口，9 伤害`,fx:(B,u)=>{for(let i=0;i<U(u,3,4);i++)B.layEgg({t:2,d:9,b:0})}},
+egg_gold:{n:"金蛋",cost:2,type:"skl",r:"E",fam:"chick",img:"egj",exh:1,d:u=>`下 1 枚金蛋，2 回合后孵化：所有敌人 ${U(u,18,24)} 伤害，奶力 +1。消耗`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,18,24),all:1,e:1,gold:1})}},
 egg_warm:{n:"催孵",cost:0,type:"skl",r:"C",fam:"chick",img:"egl",d:u=>`场上所有蛋提前 1 回合孵化，获得 ${U(u,3,5)} 护盾`,fx:(B,u)=>{B.block(U(u,3,5));B.warmEggs()}},
-egg_fire:{n:"火焰蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egx",d:u=>`下 1 枚蛋，2 回合后孵化：所有敌人 ${U(u,6,9)} 伤害，烫伤 2`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,6,9),all:1,st:"burn",sv:2})}},
-egg_ice:{n:"冰蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egn",d:u=>`下 1 枚蛋，2 回合后孵化：随机敌人 ${U(u,8,11)} 伤害，虚弱 2`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,8,11),st:"weak",sv:2})}},
+egg_fire:{n:"火焰蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egx",d:u=>`下 1 枚蛋，2 回合后孵化：所有敌人 ${U(u,8,11)} 伤害，烫伤 3`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,8,11),all:1,st:"burn",sv:3})}},
+egg_ice:{n:"冰蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egn",d:u=>`下 1 枚蛋，2 回合后孵化：随机敌人 ${U(u,11,14)} 伤害，虚弱 2`,fx:(B,u)=>{B.layEgg({t:2,d:U(u,11,14),st:"weak",sv:2})}},
 egg_heal:{n:"暖蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egq",d:u=>`下 1 枚蛋，2 回合后孵化：回复 ${U(u,6,9)} 生命，抽 1 张`,fx:(B,u)=>{B.layEgg({t:2,d:0,h:U(u,6,9),dr:1})}},
 egg_shell:{n:"蛋壳盾",cost:0,type:"skl",r:"C",fam:"chick",img:"ega",d:u=>`获得 ${U(u,2,3)} 护盾。场上每有 1 枚蛋，再 +${U(u,3,4)}`,fx:(B,u)=>{B.block(U(u,2,3)+U(u,3,4)*((B.eggs||[]).length))}},
 egg_rainbow:{n:"彩虹蛋",cost:1,type:"skl",r:"R",fam:"chick",img:"egh",d:u=>`下 1 枚蛋，2 回合后孵化：池里加 1 只彩虹奶蛙，抽 ${U(u,1,2)} 张`,fx:(B,u)=>{B.layEgg({t:2,d:0,any:1,dr:U(u,1,2)})}},
 egg_crack:{n:"破壳",cost:1,type:"skl",r:"R",fam:"chick",img:"egs",d:u=>`场上所有蛋立刻孵化${u?"，抽 1 张":""}`,fx:(B,u)=>{if(PREV)return;(B.eggs||[]).forEach(e=>{e.t=1;delete e.nw});if(u)B.draw(1);setTimeout(()=>{try{hatchEggs()}catch(e){}},260)}},
 egg_mom:{n:"抱窝",cost:1,type:"pow",r:"R",fam:"chick",img:"egar",d:u=>`每回合开始下 1 枚蛋，下回合孵化：小鸡啄随机敌人 ${U(u,6,8)} 下`,fx:(B,u)=>{PW(B,"eggturn",U(u,6,8))}},
-egg_giant:{n:"巨蛋",cost:2,type:"skl",r:"E",fam:"chick",img:"egy",exh:1,d:u=>`下 1 枚巨蛋，4 回合后孵化：所有敌人 ${U(u,34,44)} 伤害。消耗`,fx:(B,u)=>{B.layEgg({t:4,d:U(u,34,44),all:1,gold:1})}},
+egg_giant:{n:"巨蛋",cost:2,type:"skl",r:"E",fam:"chick",img:"egy",exh:1,d:u=>`下 1 枚巨蛋，3 回合后孵化：所有敌人 ${U(u,40,50)} 伤害。消耗`,fx:(B,u)=>{B.layEgg({t:3,d:U(u,40,50),all:1,gold:1})}},
 dog_guard:{n:"奶狗看门",cost:1,type:"pow",r:"R",fam:"none",img:"dgcc",d:u=>`这场战斗里，池子每消除一次，奶狗扑上去咬随机敌人 ${U(u,5,7)} 伤害`,fx:(B,u)=>{PW(B,"dogbite",U(u,5,7))}},
 dog_rush:{n:"奶狗冲锋",cost:1,type:"atk",r:"C",fam:"none",img:"dg",tgt:1,d:u=>`造成 ${U(u,7,9)} 伤害。本回合消除过，再咬 2 下（每下 ${U(u,3,4)}）`,fx:(B,u,t)=>{B.hit(t,U(u,7,9));if((B.elimTurn||0)>0)B.hit(t,U(u,3,4),2)}}
 });
 POOL_HERO.push("an_draw","an_rain","an_master","an_snake","egg_lay","egg_nest","egg_gold","egg_warm","egg_fire","egg_ice","egg_heal","egg_shell","egg_rainbow","egg_crack","egg_mom","egg_giant","dog_guard","dog_rush");
 KW_ADD.暗器="手牌下面的暗器袋，最多装 3 个，点一下就扔，不花奶力。袋里 3 个一样的会自动一起引爆，威力翻好几倍。每个主角都有自己擅长的暗器，扔起来更疼。";
-KW_ADD.蛋="下在场上的蛋会倒数，数到 0 就孵化。";
+KW_ADD.蛋="下在场上的蛋会倒数，数到 0 就孵化。每孵出 1 枚，你获得 2 护盾。战斗结束时还没孵的蛋，每枚回复 3 生命。";
 const ANQI={
  bomb:{n:"奶茶炸弹",c:"#ff7a3a",d:"所有敌人 6 伤害",fav:"naiwa"},
  caltrop:{n:"铁蒺藜",c:"#9aa6b8",d:"获得 6 护盾和 2 层荆棘",fav:"knight"},
@@ -1327,10 +1327,16 @@ e_piggy:{n:"金蛋存钱罐",cost:1,type:"skl",r:"R",fam:"chick",img:"egt",d:u=>
 e_mystery:{n:"惊喜蛋",cost:0,type:"skl",r:"C",fam:"chick",img:"egt",d:u=>`下一颗惊喜蛋（${U(u,2,1)} 回合后孵化）：随机造成 12 伤害、回复 8 生命、获得 2 奶力或抽 2 张`,fx:(B,u)=>{B.layEgg({t:U(u,2,1),d:0,b:0,rnd:1,any:0})}},
 e_incubate:{n:"孵蛋灯",cost:1,type:"skl",r:"C",fam:"chick",img:"egt",d:u=>`场上所有的蛋少等 1 回合，抽 ${U(u,1,2)} 张`,fx:(B,u)=>{B.warmEggs();B.draw(U(u,1,2))}},
 e_shellguard:{n:"蛋壳盾",cost:1,type:"skl",r:"C",fam:"chick",img:"egt",d:u=>`获得 5 护盾，场上每有 1 颗蛋再加 ${U(u,4,5)}`,fx:(B,u)=>{B.block(5+(B.eggs||[]).length*U(u,4,5))}},
-e_smash:{n:"摔蛋",cost:1,type:"atk",r:"R",fam:"chick",img:"egt",tgt:1,d:u=>`造成 ${U(u,5,8)} 伤害，然后场上所有的蛋马上孵化`,fx:(B,u,t)=>{B.hit(t,U(u,5,8));(B.eggs||[]).forEach(e=>{e.t=1;delete e.nw});B.after.push(async()=>hatchEggs())}}});
+e_smash:{n:"摔蛋",cost:1,type:"atk",r:"R",fam:"chick",img:"egt",tgt:1,d:u=>`造成 ${U(u,5,8)} 伤害，然后场上所有的蛋马上孵化`,fx:(B,u,t)=>{B.hit(t,U(u,5,8));(B.eggs||[]).forEach(e=>{e.t=1;delete e.nw});B.after.push(async()=>hatchEggs())}},
+e_roll:{n:"滚蛋",cost:1,type:"atk",r:"C",fam:"chick",img:"egs",tgt:1,d:u=>`造成 ${U(u,6,8)} 伤害，场上每有 1 枚蛋，再多 ${U(u,3,4)}`,fx:(B,u,t)=>{B.hit(t,U(u,6,8)+U(u,3,4)*((B.eggs||[]).length))}},
+e_soft:{n:"软壳蛋",cost:0,type:"skl",r:"C",fam:"chick",img:"egq",d:u=>`下 1 枚蛋，1 回合后孵化：随机敌人 ${U(u,5,7)} 伤害`,fx:(B,u)=>{B.layEgg({t:1,d:U(u,5,7),b:0})}},
+e_stink:{n:"臭蛋",cost:1,type:"skl",r:"C",fam:"chick",img:"egn",d:u=>`下 1 枚蛋，1 回合后孵化：所有敌人易伤 2${u?"，虚弱 1":""}`,fx:(B,u)=>{B.layEgg({t:1,d:0,all:1,st:"vuln",sv:2,st2:u?"weak":0})}},
+e_soup:{n:"蛋花汤",cost:1,type:"skl",r:"C",fam:"chick",img:"egy",d:u=>`回复 ${U(u,4,6)} 生命。场上每有 1 枚蛋，抽 1 张（最多 3 张）`,fx:(B,u)=>{B.heal(U(u,4,6));const n=Math.min(3,(B.eggs||[]).length);if(n)B.draw(n)}},
+e_hen:{n:"老母鸡",cost:1,type:"pow",r:"R",fam:"chick",img:"egh",d:u=>`每孵出 1 枚蛋，母鸡再啄随机敌人 ${U(u,4,6)} 伤害`,fx:(B,u)=>{PW(B,"henpeck",U(u,4,6))}},
+e_copy:{n:"鸡生蛋",cost:2,cu:1,type:"skl",r:"R",fam:"chick",img:"ega",exh:1,d:u=>`场上每枚蛋，再下 1 枚一模一样的（最多 6 枚）。消耗`,fx:(B,u)=>{if(PREV)return;const cur=(B.eggs||[]).slice();cur.forEach(e=>{const c={...e};delete c.nw;B.layEgg(c)})}}});
 
 /* 4.10 把 4.6 以后新加的牌补进奖励池和图鉴（之前漏了） */
-POOL_HERO.push("v_bleed","k_point","k_legs","k_redirect","k_qi","k_shadowhand","k_neigong","kn_wall","kn_ram","kn_hold","kn_slam","kn_ironwall","kn_paladin","e_twin","e_piggy","e_mystery","e_incubate","e_shellguard","e_smash","qz_bellyslam","qz_flood","qz_onefinger","qz_thousand","qz_shieldsword","qz_fortress","qz_timestop","qz_storm","qz_bloodrite","qz_feast");
+POOL_HERO.push("e_roll","e_soft","e_stink","e_soup","e_hen","e_copy","v_bleed","k_point","k_legs","k_redirect","k_qi","k_shadowhand","k_neigong","kn_wall","kn_ram","kn_hold","kn_slam","kn_ironwall","kn_paladin","e_twin","e_piggy","e_mystery","e_incubate","e_shellguard","e_smash","qz_bellyslam","qz_flood","qz_onefinger","qz_thousand","qz_shieldsword","qz_fortress","qz_timestop","qz_storm","qz_bloodrite","qz_feast");
 /* 4.11 粉丝建议的牌：自强不息 */
 Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:0,type:"skl",r:"S",fam:"none",img:"nw",exh:1,d:u=>`获得 ${u?2:1} 点奶力。消耗`,fx:(B,u)=>{B.gainEnergy(u?2:1)}}});
 /* 5.2 沼泽之王回来了，做第一层的精英；伙伴卡来源补齐 */
