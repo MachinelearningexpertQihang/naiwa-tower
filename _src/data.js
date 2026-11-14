@@ -1338,7 +1338,7 @@ e_copy:{n:"鸡生蛋",cost:2,cu:1,type:"skl",r:"R",fam:"chick",img:"ega",exh:1,d
 /* 4.10 把 4.6 以后新加的牌补进奖励池和图鉴（之前漏了） */
 POOL_HERO.push("e_roll","e_soft","e_stink","e_soup","e_hen","e_copy","v_bleed","k_point","k_legs","k_redirect","k_qi","k_shadowhand","k_neigong","kn_wall","kn_ram","kn_hold","kn_slam","kn_ironwall","kn_paladin","e_twin","e_piggy","e_mystery","e_incubate","e_shellguard","e_smash","qz_bellyslam","qz_flood","qz_onefinger","qz_thousand","qz_shieldsword","qz_fortress","qz_timestop","qz_storm","qz_bloodrite","qz_feast");
 /* 4.11 粉丝建议的牌：自强不息 */
-Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:0,type:"skl",r:"S",fam:"none",img:"nw",exh:1,d:u=>`获得 ${u?2:1} 点奶力。消耗`,fx:(B,u)=>{B.gainEnergy(u?2:1)}}});
+Object.assign(CARDS,{n_selfstr:{n:"自强不息",cost:0,type:"skl",r:"S",fam:"none",img:"nw",exh:1,d:u=>`获得 1 点奶力。消耗`,fx:(B,u)=>{B.gainEnergy(1)}}});
 /* 5.2 沼泽之王回来了，做第一层的精英；伙伴卡来源补齐 */
 ENEMY.swampking={n:"沼泽之王",img:"e_xsk",pd:"往你的池子里丢泥巴，把同家族隔开。干脆利落地赢下他（生命不低于一半），他会记住你",hp:[96,104],h:260,elite:1,ai:(e,t)=>[{k:"atk",v:8,pool:{t:"junk",n:2}},{k:"atk",v:13},{k:"def",v:10,s2:"str",v2:2},{k:"atk",v:7,x:2}][t%4]};
 try{ENCS[0].elite.push(["swampking"]);ENCS[2].elite.push(["icefrog"])}catch(e){}
