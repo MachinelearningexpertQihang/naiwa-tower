@@ -2930,9 +2930,9 @@ body{background:transparent!important}
 .mn.visited{filter:saturate(.55) brightness(.92)}
 .mn.visited.cur{filter:none}
 .mn .hbd .ico{width:18px;height:18px}
-#map #mapSvg path.done{stroke:#ff3b3e!important;stroke-dasharray:none!important;stroke-width:7!important;opacity:1!important}
+#map #mapSvg path.done{stroke:#f6ecd6!important;stroke-dasharray:none!important;stroke-width:5!important;opacity:.95!important}
 #map #mapSvg path.next{stroke:#fff!important;stroke-dasharray:2 12!important;stroke-width:6!important;opacity:1!important}
-#map.ma1 #mapSvg path.done{stroke:#fff!important}
+
 .shopRow2 .shopItem .lbl{color:#1a1010!important;text-shadow:none!important;font-weight:800;font-size:14px;max-width:96px;line-height:1.15;text-align:center}
 /* 5.4 场上的蛋：大一点，像一窝 */
 #player .eggs{bottom:-10px;gap:0;align-items:flex-end}
@@ -2957,7 +2957,7 @@ body{background:transparent!important}
 .mn.hidR{animation:none!important;box-shadow:0 0 0 3px #fff,0 0 0 6px #9a4ad8,4px 4px 0 6px #0d0d0d!important}
 .mn.t-t.gold{box-shadow:0 0 0 3px #fff3a0,0 0 0 6px #c8901e,4px 4px 0 6px #0d0d0d!important}
 .mn.t-t.gold::after{display:none}
-.mn.visited::after{inset:-11px;border:3px solid #e5191c;border-right-color:#e5191c;border-radius:47% 53% 44% 56%/55% 45% 52% 48%;transform:rotate(-20deg);opacity:.9}
+.mn.visited::after{display:none!important}
 .mn.visited.cur::after{display:none}
 #map #mapSvg path:not(.done):not(.next){stroke-dasharray:11 7 3 7;stroke-width:4}
 .skyRope{position:absolute;left:96px;right:70px;top:98px;height:14px;border-top:2px solid rgba(246,236,214,.75);border-radius:50%/0 0 100% 100%;pointer-events:none;z-index:2}
