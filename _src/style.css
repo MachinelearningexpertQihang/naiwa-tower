@@ -2930,7 +2930,7 @@ body{background:transparent!important}
 .mn.visited{filter:saturate(.55) brightness(.92)}
 .mn.visited.cur{filter:none}
 .mn .hbd .ico{width:18px;height:18px}
-#map #mapSvg path.done{stroke:#f6ecd6!important;stroke-dasharray:none!important;stroke-width:5!important;opacity:.95!important}
+#map #mapSvg path.done{stroke:#e8837a!important;stroke-dasharray:none!important;stroke-width:5!important;opacity:.7!important}
 #map #mapSvg path.next{stroke:#fff!important;stroke-dasharray:2 12!important;stroke-width:6!important;opacity:1!important}
 
 .shopRow2 .shopItem .lbl{color:#1a1010!important;text-shadow:none!important;font-weight:800;font-size:14px;max-width:96px;line-height:1.15;text-align:center}
