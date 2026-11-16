@@ -17,13 +17,13 @@ const TOY={ok:false,
 function nwProg(m){if(!m)return 0;const n=o=>o&&typeof o==="object"?Object.keys(o).length:0;let p=(m.runs||0)*10+(m.deaths||0)*10+(m.wins||0)*50+n(m.got)*2+n(m.ach)*5+n(m.boss)*5+(m.shardsAll||0)+(m.kills||0)/10;try{Object.values(m.mast||{}).forEach(v=>p+=(+v||0)/5)}catch(e){}return Math.round(p)}
 const NWB={t:0,
  open(){return new Promise((res,rej)=>{try{const r=indexedDB.open("nwt-backup",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}})},
- save(){clearTimeout(this.t);this.t=0;let m=null,s=null;try{m=localStorage.getItem("nwt-meta");s=localStorage.getItem("nwt-run")}catch(e){}if(!m)return;
+ save(){clearTimeout(this.t);this.t=0;let m=null,s=null;try{m=JSON.stringify(M)}catch(e){}try{s=(typeof S!=="undefined"&&S&&!S.noSave)?JSON.stringify(S):(typeof S!=="undefined"&&!S?null:localStorage.getItem("nwt-run"))}catch(e){s=null}if(!m)try{m=localStorage.getItem("nwt-meta")}catch(e){}if(!m)return;
   this.open().then(db=>{const tx=db.transaction("kv","readwrite");tx.objectStore("kv").put({t:Date.now(),m,s},"s");tx.oncomplete=tx.onerror=()=>db.close()}).catch(()=>{})},
  soon(){if(!this.t)this.t=setTimeout(()=>this.save(),1500)},
  load(){return this.open().then(db=>new Promise(res=>{const tx=db.transaction("kv","readonly");const r=tx.objectStore("kv").get("s");r.onsuccess=()=>{res(r.result||null);db.close()};r.onerror=()=>{res(null);db.close()}})).catch(()=>null)},
  async restore(){const o=await TOY.timeout(this.load(),3000).catch(()=>null);if(!o||!o.m)return false;let bm=null;try{bm=JSON.parse(o.m)}catch(e){return false}
   if(nwProg(bm)<=nwProg(M)){try{if(o.s&&nwProg(bm)===nwProg(M)&&!localStorage.getItem("nwt-run")&&!localStorage.getItem("nwt-run-end")){const r=JSON.parse(o.s);if(r&&r.v===2){localStorage.setItem("nwt-run",o.s);return true}}}catch(e){}return false}
-  Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,bm);try{localStorage.setItem("nwt-meta",o.m);if(o.s&&!localStorage.getItem("nwt-run"))localStorage.setItem("nwt-run",o.s)}catch(e){}
+  Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,bm);if(o.s)window.__nwbRun=o.s;try{localStorage.setItem("nwt-meta",o.m);if(o.s&&!localStorage.getItem("nwt-run"))localStorage.setItem("nwt-run",o.s)}catch(e){}
   return true}};
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch(e){}
 
@@ -46,7 +46,7 @@ const CLOUD={st:"off",dirty:false,busy:false,last:[],back:0,fail:0,lastUp:0,time
    if(cp>lp){if(this.idle())this.apply(o);else{this.pend=o;this.st="ask";this.askLater();return}}
    else if(o.s&&o.s.v===2&&this.idle()){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}
     if(!lr&&cp===lp||lr&&(o.s.ts||0)>(lr.ts||0)+3000){try{localStorage.setItem("nwt-run",JSON.stringify(o.s))}catch(e){}if($("#title").classList.contains("on"))titleScreen()}}}
-  this.st="on";this.hot()},
+  this.st="on";this.hot();setTimeout(()=>{try{LB.resend()}catch(e){}},4000)},
  apply(o){const old=JSON.parse(JSON.stringify(M));Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,nwMergeMeta(o.m,old));try{localStorage.setItem("nwt-meta",JSON.stringify(M));if(o.s&&o.s.v===2){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}if(!lr||(o.s.ts||0)>=(lr.ts||0))localStorage.setItem("nwt-run",JSON.stringify(o.s))}}catch(e){}
   NWB.save();if(typeof titleScreen==="function"&&$("#title").classList.contains("on"))titleScreen();if(typeof toast==="function")toast("已从云端找回你的存档")},
  askLater(){const go=()=>{if(this.st!=="ask"||!this.pend)return;if(!this.idle()||!$("#title").classList.contains("on")||$("#ov").classList.contains("on")){setTimeout(go,1500);return}
@@ -74,16 +74,19 @@ const GSTAT={detect(){return null},load(){return Promise.resolve(null)},add(){re
    board 1：爬塔积分；board 2：最痛一击（单次最高伤害） */
 const LB={cache:{},
  ok(){return !!(window.toy&&toy.getRankList&&toy.submitScore)},
- BOARDS:{1:{n:"爬塔积分",u:"分",d:"爬得越高、首领打得越多、难度越高，分越高"},2:{n:"最痛一击",u:"点",d:"一局里打出的单次最高伤害"},3:{n:"真结局",u:"分",d:"只有走到真结局才会上榜：难度越高、周目越多、用的回合越少、最后剩的血越多，分越高"}},
+ BOARDS:{1:{n:"爬塔积分",u:"分",d:"爬得越高、首领打得越多、难度越高，分越高"},2:{n:"最痛一击",u:"点",d:"一局里打出的单次最高伤害（超过 9999 万的按 9999 万上榜）"},3:{n:"真结局",u:"分",d:"只有走到真结局才会上榜：难度越高、周目越多、用的回合越少、最后剩的血越多，分越高"}},
  score(win){if(!S)return 0;const fl=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;const mul={easy:.5,normal:1,hard:1.6}[S.diff||"normal"]||1;return Math.round((fl*10+(S.stats.endb||0)*50+(win?300:0)+(S.endKey==="true"?500:0))*mul+asc()*80)},
  trueScore(){if(!S)return 0;const mul={easy:.5,normal:1,hard:1.6}[S.diff||"normal"]||1;return Math.round(1000*mul+asc()*150+Math.max(0,400-((S.stats&&S.stats.turns)||0))+Math.round(300*Math.max(0,S.hp)/Math.max(1,S.max)))},
- submit(b,score){score=Math.floor(score||0);if(score<=0)return false;M.lbBest=M.lbBest||{};let rec=false;if(score>(M.lbBest[b]||0)){rec=true;M.lbBest[b]=score;saveMeta()}if(!this.ok())return rec;toy.submitScore({board:b,score}).then(()=>{for(const k in this.cache)if(k.indexOf(b+"|")===0)delete this.cache[k]}).catch(()=>{});return rec},
+ CAP:99999999,
+ submit(b,score){score=Math.floor(+score||0);if(!isFinite(score))score=this.CAP;score=Math.min(this.CAP,score);if(score<=0)return false;M.lbBest=M.lbBest||{};let rec=false;if(score>(M.lbBest[b]||0)){rec=true;M.lbBest[b]=score;M.lbHero=M.lbHero||{};try{M.lbHero[b]=S&&S.hero}catch(e){}saveMeta()}if(!this.ok())return rec;this.send(b,score,0);return rec},
+ send(b,score,n){M.lbPend=M.lbPend||{};if(score>(M.lbPend[b]||0))M.lbPend[b]=score;saveMeta();TOY.timeout(toy.submitScore({board:b,score}),10000).then(()=>{if(M.lbPend&&M.lbPend[b]<=score){delete M.lbPend[b];saveMeta()}for(const k in this.cache)if(k.indexOf(b+"|")===0)delete this.cache[k]}).catch(()=>{if(n<3)setTimeout(()=>this.send(b,score,n+1),[5000,20000,60000][n])})},
+ resend(){if(!this.ok()||!M.lbPend)return;for(const b in M.lbPend)this.send(+b,M.lbPend[b],0);for(const b in (M.lbBest||{}))if(!M.lbPend[b]&&!(M.lbSync||{})[b]){M.lbSync=M.lbSync||{};M.lbSync[b]=1;this.send(+b,Math.min(this.CAP,M.lbBest[b]),0)}},
  onRunEnd(win){try{const r=[];if(this.submit(1,this.score(win)))r.push("爬塔积分 "+this.score(win));const mh=(S&&S.stats&&S.stats.maxHit)||0;if(this.submit(2,mh))r.push("最痛一击 "+mh);if(S&&S.endKey==="true"){const t=this.trueScore();if(this.submit(3,t))r.push("真结局 "+t)}if(r.length)setTimeout(()=>{toast(`<b>新纪录！</b>${r.join("　")}`);sfx("relic")},1200)}catch(e){}},
  async get(b,per){const k=b+"|"+per,c=this.cache[k];if(c&&Date.now()-c.t<60000)return c;const o={t:Date.now(),list:[],me:null};
   try{const R=await Promise.all([TOY.timeout(toy.getRankList({board:b,period:per,limit:50}),8000).then(x=>x||[],()=>null),toy.getMyRank?TOY.timeout(toy.getMyRank({board:b,period:per}),8000).catch(()=>null):Promise.resolve(null)]);if(R[0]===null)o.err=1;else o.list=R[0];o.me=R[1]}catch(e){o.err=1}if(!o.err)this.cache[k]=o;return o}};
 function cleanName(s){return String(s||"奶蛙").replace(/[<>&"]/g,"").slice(0,12)}
-async function rankScreen(){let b=1,per="week";
- const draw=async()=>{const B0=LB.BOARDS[b];ov(`<div class="lbBox"><div class="mgHead"><span class="ribbon b">排行榜</span></div><div class="lbTabs">${Object.entries(LB.BOARDS).map(([k,v])=>`<button class="${+k===b?"on":""}" data-b="${k}">${v.n}</button>`).join("")}<span class="lbSep"></span>${[["week","本周"],["all","总榜"]].map(([k,v])=>`<button class="${k===per?"on":""}" data-p="${k}">${v}</button>`).join("")}</div><p class="lbDesc">${B0.d}</p><div class="lbList" id="lbList"><p class="lbMsg">${LB.ok()?"正在读取全服排名……":"全服排行榜要在 B站 Toy 里打开才能看到。"}</p></div><div class="lbMe">我的最好成绩：<b>${(M.lbBest||{})[b]||0}</b> ${B0.u}</div><div class="ovFoot"><button class="btn sm" id="ovX">返回</button></div></div>`);
+async function rankScreen(){let b=1,per="week";try{LB.resend()}catch(e){}
+ const draw=async()=>{const B0=LB.BOARDS[b];ov(`<div class="lbBox"><div class="mgHead"><span class="ribbon b">排行榜</span></div><div class="lbTabs">${Object.entries(LB.BOARDS).map(([k,v])=>`<button class="${+k===b?"on":""}" data-b="${k}">${v.n}</button>`).join("")}<span class="lbSep"></span>${[["week","本周"],["all","总榜"]].map(([k,v])=>`<button class="${k===per?"on":""}" data-p="${k}">${v}</button>`).join("")}</div><p class="lbDesc">${B0.d}</p><div class="lbList" id="lbList"><p class="lbMsg">${LB.ok()?"正在读取全服排名……":"全服排行榜要在 B站 Toy 里打开才能看到。"}</p></div><div class="lbMe">我的最好成绩：<b>${(M.lbBest||{})[b]||0}</b> ${B0.u}${(()=>{const h=(M.lbHero||{})[b];const H=h&&HEROES.find(x=>x.id===h);return H?`（${H.n}）`:""})()}</div><div class="ovFoot"><button class="btn sm" id="ovX">返回</button></div></div>`);
   $$("#ov .lbTabs [data-b]").forEach(x=>x.onclick=()=>{b=+x.dataset.b;sfx("click");draw()});$$("#ov .lbTabs [data-p]").forEach(x=>x.onclick=()=>{per=x.dataset.p;sfx("click");draw()});$("#ovX").onclick=closeOv;
   if(!LB.ok())return;const o=await LB.get(b,per);const el=$("#lbList");if(!el)return;
   if(o.err){el.innerHTML=`<p class="lbMsg">全服榜暂时连不上，稍后再试。</p>`;return}
