@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="5.6";
+const VER="5.7";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -16,12 +16,12 @@ const fmtPlay=ms=>{const m=Math.floor((ms||0)/60000),h=Math.floor(m/60);return h
 setInterval(()=>{try{if(document.hidden||typeof M==="undefined"||!M)return;M.playMs=(M.playMs||0)+5000;if(typeof S!=="undefined"&&S&&!S.noSave)S.playMs=(S.playMs||0)+5000;M._pt=(M._pt||0)+1;if(M._pt>=12){M._pt=0;saveMeta()}const e=document.getElementById("tPlay");if(e)e.textContent=fmtPlay(M.playMs)}catch(e){}},5000);
 addEventListener("pagehide",()=>{try{if(M._pt){M._pt=0;saveMeta()}}catch(e){}});
 const saveMeta=()=>{M.t=Date.now();try{localStorage.setItem("nwt-meta",JSON.stringify(M))}catch(e){saveWarn()}try{NWB.soon();CLOUD.mark()}catch(e){}};
-let SAVE_ERR=0;const saveWarn=()=>{if(SAVE_ERR)return;SAVE_ERR=1;try{toast("这台设备的存储空间写不进去了，进度可能存不上。请点右上角设置里的「立即存档」试试")}catch(e){}};
-const saveRun=()=>{if(S&&S.noSave)return;try{if(S)S.ts=Date.now();window.__nwbRun=S?JSON.stringify(S):null}catch(e){}try{if(S){localStorage.setItem("nwt-run",window.__nwbRun||JSON.stringify(S));localStorage.removeItem("nwt-run-end")}else{localStorage.removeItem("nwt-run");localStorage.setItem("nwt-run-end","1")}}catch(e){saveWarn()}try{NWB.soon();CLOUD.hot()}catch(e){}};
+let SAVE_ERR=0;const saveWarn=()=>{try{NWB.save();CLOUD.hot()}catch(e){}if(SAVE_ERR)return;SAVE_ERR=1;setTimeout(()=>{try{NWB.save().then(ok=>toast(ok?"这台设备的普通存储写不进去，已经改存到<b>备份存档</b>里"+(CLOUD.st==="on"?"，云端也会同步":"")+"，进度不会丢":"这台设备的存储写不进去，"+(CLOUD.st==="on"?"进度会存到<b>云端</b>":"请登录 B站 开启云存档，否则退出后进度会丢")))}catch(e){}},300)};
+const saveRun=()=>{if(S&&S.noSave)return;try{if(S)S.ts=Date.now();window.__nwbRun=S?JSON.stringify(S):null}catch(e){}let bad=0;try{if(S){localStorage.setItem("nwt-run",window.__nwbRun||JSON.stringify(S));localStorage.removeItem("nwt-run-end")}else{localStorage.removeItem("nwt-run");localStorage.setItem("nwt-run-end","1")}}catch(e){bad=1;saveWarn()}try{if(bad||SAVE_ERR)NWB.save();else NWB.soon();CLOUD.hot()}catch(e){}};
 async function manualSave(){let okL=false,okC=null;try{if(S&&!S.noSave){S.ts=Date.now();const j=JSON.stringify(S);localStorage.setItem("nwt-run",j);okL=localStorage.getItem("nwt-run")===j}else okL=true;M.t=Date.now();const mj=JSON.stringify(M);localStorage.setItem("nwt-meta",mj);okL=okL&&localStorage.getItem("nwt-meta")===mj}catch(e){okL=false}
- try{NWB.save()}catch(e){}
+ let okB=false;try{okB=await NWB.save()}catch(e){}
  try{if(CLOUD.st==="on"){CLOUD.dirty=true;const t0=Date.now();for(let i=0;i<20&&CLOUD.busy;i++)await sleep(300);await CLOUD.up(true);okC=CLOUD.lastUp>=t0-200}}catch(e){okC=false}
- sfx(okL?"relic":"hurt");toast(okL?(okC===true?"<b>存好了</b>：本机和云端都已保存":okC===false?"<b>本机已保存</b>，云端这次没连上，稍后会自动再传":"<b>本机已保存</b>"+(CLOUD.st==="nologin"?"（登录 B站 后才有云存档）":"")):"<b>没存上</b>：这台设备写不进存储，请不要关闭游戏，稍后再试");return okL}
+ sfx(okL?"relic":"hurt");toast(okL?(okC===true?"<b>存好了</b>：本机和云端都已保存":okC===false?"<b>本机已保存</b>，云端这次没连上，稍后会自动再传":"<b>本机已保存</b>"+(CLOUD.st==="nologin"?"（登录 B站 后才有云存档）":"")):(okB?"<b>存到备份里了</b>：这台设备的普通存储写不进去，已经改存到浏览器的备份区"+(okC===true?"，云端也存好了":okC===false?"，云端这次没连上，稍后会自动再传":""):okC===true?"<b>存到云端了</b>：这台设备写不进存储，下次打开会从云端找回":"<b>没存上</b>：这台设备写不进存储，"+(CLOUD.st==="nologin"?"登录 B站 后可以存到云端":"请不要关闭游戏，稍后再试")));if(!okL&&okB)sfx("relic");return okL||okB||okC===true}
 const loadRun=()=>{let raw=null;try{raw=localStorage.getItem("nwt-run")}catch(e){}if(!raw&&window.__nwbRun){let ended=null;try{ended=localStorage.getItem("nwt-run-end")}catch(e){}if(!ended)raw=window.__nwbRun}try{const s=JSON.parse(raw||"null");return s&&s.v===2?s:null}catch(e){return null}};
 
 /* ---------- 随机数（存档可复现） ---------- */
@@ -32,12 +32,18 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=ri(i+1);[a[i],a[j]]=[a
 const has=r=>S&&S.relics.includes(r);
 
 /* ---------- 舞台缩放 / 横屏 ---------- */
-function fit(){const W=innerWidth,H=innerHeight,st=$("#stage");const port=H>W*1.05;let s;
- if(port){s=Math.min(W/720,H/1280);st.style.transform=`translate(-50%,-50%) rotate(90deg) scale(${s})`}
- else{s=Math.min(W/1280,H/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}
- document.body.classList.toggle("port",port);fit._k=innerWidth+"x"+innerHeight}
+/* 5.6 屏幕适配：用真正看得见的那块区域（visualViewport），避开刘海和圆角（safe-area），在剩下的区域里居中 */
+function safeIn(){let p=document.getElementById("safeProbe");if(!p){p=document.createElement("div");p.id="safeProbe";p.style.cssText="position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)";document.body.appendChild(p)}const c=getComputedStyle(p);return{t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}
+function fit(){const vv=window.visualViewport;let W=innerWidth,H=innerHeight,ox=0,oy=0;if(vv&&vv.width>0&&vv.height>0){W=Math.min(W,vv.width);H=Math.min(H,vv.height);ox=vv.offsetLeft||0;oy=vv.offsetTop||0}
+ const de=document.documentElement;if(de.clientWidth>0)W=Math.min(W,de.clientWidth);if(de.clientHeight>0)H=Math.min(H,de.clientHeight);
+ const st=$("#stage");const port=H>W*1.05;let sf={t:0,r:0,b:0,l:0};try{sf=safeIn()}catch(e){}
+ const aw=Math.max(100,W-sf.l-sf.r),ah=Math.max(100,H-sf.t-sf.b),cx=ox+sf.l+aw/2,cy=oy+sf.t+ah/2;let s;
+ st.style.left=cx+"px";st.style.top=cy+"px";
+ if(port){s=Math.min(aw/720,ah/1280);st.style.transform=`translate(-50%,-50%) rotate(90deg) scale(${s})`}
+ else{s=Math.min(aw/1280,ah/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}
+ document.body.classList.toggle("port",port);document.body.classList.toggle("wide",!port&&aw/ah>1280/720+.02);document.body.classList.toggle("tall",!port&&aw/ah<1280/720-.02);fit._k=innerWidth+"x"+innerHeight+(vv?"|"+vv.width+"x"+vv.height:"");try{_stR=null}catch(e){}}
 function fitSoon(){[60,250,600,1200,2500].forEach(t=>setTimeout(fit,t))}
-setInterval(()=>{if(fit._k!==innerWidth+"x"+innerHeight)fit()},700);
+setInterval(()=>{const vv=window.visualViewport;if(fit._k!==innerWidth+"x"+innerHeight+(vv?"|"+vv.width+"x"+vv.height:""))fit()},700);
 if(window.visualViewport)visualViewport.addEventListener("resize",fit);
 addEventListener("load",()=>{try{if(window.toy&&toy.onContainerChange)toy.onContainerChange(()=>{fit();fitSoon()})}catch(e){}fitSoon()});
 /* 流畅模式：手机上自动打开，去掉大面积投影和会重绘的循环动画 */
@@ -169,7 +175,7 @@ function bossCodex(){const ids=Object.keys(BOSS_LORE);const rec=M.boss||{};const
  $("#bcxX").onclick=()=>codex()}
 const mlvRaw=id=>((M.up||{})[id]||0);const mlv=id=>(M.upOff||{})[id]?0:mlvRaw(id);
 function earnShards(win){if(!S)return{n:0};LB.onRunEnd(win);const mx=mastGain(win);const rooms=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;
- const n=Math.max(1,Math.round((Math.floor(rooms/15)+Math.floor((S.stats.endb||0)/2)+(win?3:0)+Math.floor(asc()/3))*({easy:.6,normal:1,hard:1.5}[S.diff||"normal"]||1)));
+ const n=Math.max(1,Math.round((1+Math.floor(rooms/8)+Math.floor((S.elites||0)/3)+Math.floor((S.stats.endb||0)/2)+(win?3:0)+Math.floor(asc()/3))*({easy:.7,normal:1,hard:1.5}[S.diff||"normal"]||1)));
  M.shards=(M.shards||0)+n;M.shardsAll=(M.shardsAll||0)+n;saveMeta();return{n}}
 function villageTale(){M.seenT=M.seenT||[];const un=VILLAGE_TALES.filter(t=>!M.seenT.includes(t.t));const T=pick(un.length?un:VILLAGE_TALES);if(!M.seenT.includes(T.t))M.seenT.push(T.t);if(VILLAGE_TALES.every(t=>M.seenT.includes(t.t)))ach("tales");saveMeta();return T}
 function shardHTML(r){return`<div class="shardRes"><div class="srN">${ICON.star}<b>记忆碎片 +${r.n}</b><small>在主页「长老的小院」换成永久成长</small></div></div>`}
@@ -197,6 +203,31 @@ function yardScreen(){
 /* ===================== 信箱：作者写给玩家的信 ===================== */
 const MAIL_SVG=`<svg viewBox="0 0 40 32" class="mailIco"><rect x="2" y="4" width="36" height="25" rx="2" fill="#fff" stroke="#0d0d0d" stroke-width="3"/><path d="M3 6 L20 19 L37 6" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-linejoin="round"/><path d="M28 2 h9 v8" fill="none" stroke="#e5191c" stroke-width="3"/></svg>`;
 const TMAILS=[
+ {id:"m57",t:"5.7 大版本更新",date:"11月17日",body:[
+  "【开屏】打开游戏会先看到奶蛙工作室的标志，点一下可以跳过",
+  "【同伴】一路同行的伙伴会开口了：进酒馆、打首领之前、走 SS 路线的时候，都会说上一两句",
+  "【同伴结局】老铁、阿蓝、小火、豆子的故事都有了新的走向，你的选择决定它们最后怎么样。有好的，也有不好的",
+  "【新同伴】桂嫂：丢了七个蛋的奶鸡，一路往上找",
+  "【阿岳的梦】多了几段旧事，会按顺序讲给你听：钓鱼、出发、留灯、一条毯子、预言家、塔顶、山下的灯。这一次没讲完，下次进梦接着讲",
+  "【SS 路线】初号机和灭却诅咒师的路线变长了，路上能找到线索，线索会让首领战轻松一点；斗场门口多了一位退役的斗士",
+  "【支线】新加 5 个支线，每层一个。办完支线，委托人会回来跟你说几句话",
+  "【小心】塔里有人会坑你：卖圣水的、卖古董的、卖暖宝宝的……仔细看看，都能识破",
+  "【名人堂】放在「长老的小院」下面，所有人都能打开：通关次数、最高周目、最痛一击、打出过的结局、同伴结局都在里面",
+  "【排行榜】真结局榜的分数旁边会写是第几周目打的",
+  "【存档】有些手机写不进普通存储，退出重进进度就没了。现在会自动改存到浏览器的备份区，登录 B站 还会同步到云端，重进以后能接着打",
+  "【隐藏房间】更容易碰到了；秘密房间有了自己的曲子",
+  "【岔路】隐藏层出现的机会从 25% 提到 30%，寂静之海还是一定会出现",
+  "【困难模式】周目越高涨得更多一点：每个周目约 +4% 血、+3% 伤害（原来是 +3%、+2.5%）",
+  "【屏幕适配】按手机真正看得见的区域来摆画面，避开刘海；两边多出来的地方用背景图铺满，不再是黑边",
+  "【新塔况】动物派对、Weather Report、三月女神、诅咒师、最后的奶蛋、奶蛋之塔：各自让一路牌更容易拿到，也各有代价",
+  "【新遗物】10 件奶马 / 奶鸡 / 奶蛋遗物：旧马鞍、马蹄铁、胡萝卜、羽毛枕、公鸡闹钟、鸡舍、蛋托、恒温箱、金蛋黄、全家福",
+  "【天气 / 月相】又加了 8 张牌（毛毛雨、倾盆大雨、冻疮、暴风雪、旋风、雾隐、雷步、满月祭）和 8 件遗物（雨量计、冰晶、风筝、雾灯、雷核、风向标、四季手账、月光瓶）。四季手账：这场战斗每经历过 1 种天气，攻击每一下 +2",
+  "【修复】5.5 加的天气月相牌和对付负面状态的遗物，之前一直没放进奖励池，打不出来。现在都能拿到了",
+  "【记忆碎片】一局里走得越远、打的精英和首领越多，碎片越多；不用打完第一个首领才拿得到",
+  "【自动省电】画面一直卡的话，会自动切到省电模式，少放一些特效。设置里可以手动开关",
+  "【吸血鬼削弱】吸血比例：平时 42% → 35%，血月形态 90% → 70%。一回合吸回的血超过生命上限的一半以后，超出的部分只按一半算",
+  "【鲜血盛宴】改成按这场战斗开始时的生命上限算（不会再越打越大），比例 8% → 7%，升级后 11% → 10%，打出后消耗",
+  "【长老的小院】多了「家族」和「天象」两条路，原来的四条路也各往后多了一格，一共 10 个新的成长"]},
  {id:"m56",t:"5.6 版本更新",date:"11月17日",body:[
   "【秘密房间】地图上偶尔会出现「秘密房间」：没有战斗，只有探索。一共 7 种：冒险者博物馆、漏水的地下室、镜子迷宫、不许出声的图书馆、漏风的天文台、没人的奶茶厨房、睡着的宝库",
   "【新事件】又加了 8 个随机事件：青蛙合唱团、幽灵厨师、冰窟窿钓鱼、奶茶贩卖机、流星、换牌的旅人、挡路的大猫、吟游奶蛙",
@@ -521,7 +552,7 @@ const BIO={vamp:"吸血鬼奶蛙在古堡里长大。他小时候以为父亲是
 const mastLv=h=>{const x=((M.mast||{})[h]||0);let l=0;for(let i=1;i<MAST_LV.length;i++)if(x>=MAST_LV[i])l=i;return l};
 function mastGain(win){if(!S)return 0;const fl=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;const x=Math.round(Math.max(3,fl+5*(S.stats.endb||0)+(win?25:0)+3*asc())*(1+.15*asc()));M.mast=M.mast||{};const h=S.hero||"naiwa";const before=mastLv(h);M.mast[h]=(M.mast[h]||0)+x;const after=mastLv(h);saveMeta();if(after>before)setTimeout(()=>toast(`${HN()} 熟练度升到 <b>Lv.${after}</b>：${MAST_REW[after-1]}`),1200);return x}
 const DIFF={easy:{n:"简单",d:"第一次玩推荐",hp:.75,dmg:.75,heal:1.4},normal:{n:"普通",d:"标准难度",hp:1,dmg:1,heal:1},hard:{n:"困难",d:"敌人更强、你的伤害 -10%，碎片更多；周目越高，敌人的血和伤害涨得越多",hp:1.2,dmg:1.15,heal:.8}};
-const DF=()=>{const b=DIFF[(S&&S.diff)||"normal"]||DIFF.normal;try{if(S&&S.diff==="hard"){const a=asc();if(a>0)return Object.assign({},b,{hp:b.hp*(1+.03*a),dmg:b.dmg*(1+.025*a),ascK:1+.03*a})}}catch(e){}return b};
+const DF=()=>{const b=DIFF[(S&&S.diff)||"normal"]||DIFF.normal;try{if(S&&S.diff==="hard"){const a=asc();if(a>0)return Object.assign({},b,{hp:b.hp*(1+.04*a),dmg:b.dmg*(1+.03*a),ascK:1+.04*a})}}catch(e){}return b};
 function heroSelect(){show("heroSel");setBg("title");let cur=0;
  $("#heroSel").innerHTML=`<div class="hsTitle"><span class="ribbon b">选择你的奶蛙</span></div><div class="hsRow">${HEROES.map((h,i)=>`<div class="hcard ${h.on?"":"lock"} ${i===0?"on":""} ${h.on&&mastLv(h.id)>=2?"mframe":""} ${h.on&&mastLv(h.id)>=5?"mframe5":""}"><div class="pic"><img src="${IMG(h.img)}">${h.on?(()=>{const l=mastLv(h.id),x=(M.mast||{})[h.id]||0,nx=MAST_LV[Math.min(l+1,MAST_LV.length-1)],pv=MAST_LV[l];return`<button class="mast lv${l}" data-h="${h.id}"><b>LV${l}</b><i><u style="width:${l>=5?100:Math.round((x-pv)/(nx-pv)*100)}%"></u></i></button>`})():""}</div>${h.on?"":`<span class="lk">敬请期待</span>`}<h3>${h.n}</h3><div class="tag">${h.tag}</div><p>${h.on?h.d:"之后的版本开放"}</p>${h.on?`<div class="hst"><span title="初始生命">${ICON.heart}生命 ${h.hp}</span></div>`:""}</div>`).join("")}</div><div class="hsGo"><div class="diffSel">${["easy","normal","hard"].map(k=>`<button class="dBtn ${k===(M.diff||"normal")?"on":""}" data-d="${k}"><b>${DIFF[k].n}</b><small>${DIFF[k].d}</small></button>`).join("")}</div>${(M.ascMax||0)>0?`<div class="ascSel"><button id="ascL">◀</button><div><b id="ascN"></b><small id="ascD"></small></div><button id="ascR">▶</button></div>`:""}<button class="btn ghost" id="hsB">返回</button><button class="btn" id="hsGo">出发！</button></div>`;
  $$(".mast").forEach(m=>m.onclick=ev=>{ev.stopPropagation();const h=m.dataset.h,l=mastLv(h);tipAt(m,`<b>${(HEROES.find(x=>x.id===h)||{}).n} · 熟练度 Lv.${l}</b><p>经验 ${(M.mast||{})[h]||0}。输了也会涨，爬得越高涨得越多。</p>${MAST_REW.map((r,i)=>`<p style="opacity:${l>i?1:.45}">Lv.${i+1}（${MAST_LV[i+1]}）${l>i?"✓":"🔒"} ${r}</p>`).join("")}${l>=3?`<p style="margin-top:8px;font-size:14px">${BIO[h]}</p>`:""}`);});
@@ -1108,7 +1139,7 @@ function renderEggs(pop){if(!B)return;const pl=$("#player");if(!pl)return;let w=
 async function hatchEggs(){if(!B||!(B.eggs||[]).length)return;B.eggs.forEach(e=>{if(e.nw)delete e.nw;else e.t--});const ready=B.eggs.filter(e=>e.t<=0);B.eggs=B.eggs.filter(e=>e.t>0);renderEggs();if(ready.length&&!PREV&&S.hero==="naiwa")setTimeout(()=>{try{if(sxPlay("vAndi",1,1,0,{jit:0}))duck(.35,1100)}catch(e){}},120);for(const e of ready){if(B.over||!B.alive().length)break;toast(e.gold?"大蛋孵出来了！":e.d>0?"蛋孵出来了：小奶鸡啄了上去！":"蛋孵出来了！");sfx("egg");B.curType="egg";const ed=Math.round(e.d*(1+.5*perk("egg"))*((B.p.pw2||{}).hatchery?1.5:1));{const hc=(B.p.pw2||{}).hatchery;if(hc){if(B.hatchT!==B.turn){B.hatchT=B.turn;B.hatchN=0}if(B.hatchN<hc){B.hatchN++;B.draw(1)}}}if(ed>0||e.st){const tg=e.all?B.alive():[pick(B.alive())].filter(Boolean);tg.forEach(x=>{if(ed>0)B.hit(x,ed,1,1);if(e.st&&x.hp>0)B.apply(x,e.st,e.sv||1);if(e.st2&&x.hp>0)B.apply(x,e.st2,1)})}{const hp2=(B.p.pw2||{}).henpeck;if(hp2){const t=pick(B.alive());if(t)B.hit(t,hp2,1,1)}}B.curType=null;if(e.h)B.heal(e.h);if(e.coin){S.gold+=e.coin;sfx("coin");renderTop()}if(e.twin)B.layEgg({t:1,d:4,b:0,nw:1});if(e.rnd){const k=ri(4);if(k===0){const t=pick(B.alive());if(t)B.hit(t,12,1,1)}else if(k===1)B.heal(8);else if(k===2)B.gainEnergy(2);else B.draw(2)}if(e.any)B.poolAdd("any");if(e.dr)B.draw(e.dr);if(e.b)B.block(e.b,1);if(e.e)B.gainEnergy(e.e);if(S.hero!=="vamp")B.block(2,1);S.stats.hatch=(S.stats.hatch||0)+1;questTick("hatch");if(S.stats.hatch>=10)ach("hatch10");renderBattle();await sleep(320)}if(!B.alive().length&&!B.over)win()}
 /* ---- 吸血鬼奶蛙 ---- */
 function vampUseless(id){const D=CARDS[id];if(D.fam==="chick")return true;let t="";try{t=D.d(false)}catch(e){}return /护盾/.test(t)&&!/伤害|抽|奶力|回复/.test(t)}
-function vampLs(loss,tg){if(!B||PREV)return;if(B.noLs===B.turn)return;if(tg&&tg.hp>0&&B.p.pw2&&B.p.pw2.toxblood)B.apply(tg,"poison",B.p.pw2.toxblood);let r=B.vForm||B.rebelNow?.9:.42;if(has("qz_pact")&&S.hp<S.max/2)r*=2;r*=B.lsMul||1;if(has("mr_watch")&&!B.watchUsed){B.watchUsed=1;r*=2;relicPulse("mr_watch")}const h=Math.max(1,Math.floor(loss*r))+(B.p.nightLs||0);B.vLs=(B.vLs||0)+h;const before=S.hp;S.hp=Math.min(S.max,S.hp+h);const got=S.hp-before;if(got>0){const c=center($("#player .body"));fnum(c.x+30,c.top+10,"+"+got,"heal")}renderTop()}
+function vampLs(loss,tg){if(!B||PREV)return;if(B.noLs===B.turn)return;if(tg&&tg.hp>0&&B.p.pw2&&B.p.pw2.toxblood)B.apply(tg,"poison",B.p.pw2.toxblood);let r=B.vForm||B.rebelNow?.7:.35;if(has("qz_pact")&&S.hp<S.max/2)r*=2;r*=B.lsMul||1;if(has("mr_watch")&&!B.watchUsed){B.watchUsed=1;r*=2;relicPulse("mr_watch")}let h=Math.max(1,Math.floor(loss*r))+(B.p.nightLs||0);{if(B.lsTurn!==B.turn){B.lsTurn=B.turn;B.lsT=0}const cap=Math.round(.5*Math.max(1,S.max-(B.feastMax||0))),room=Math.max(0,cap-(B.lsT||0));B.lsT=(B.lsT||0)+h;if(h>room)h=room+Math.floor((h-room)/2)}B.vLs=(B.vLs||0)+h;const before=S.hp;S.hp=Math.min(S.max,S.hp+h);const got=S.hp-before;if(got>0){const c=center($("#player .body"));fnum(c.x+30,c.top+10,"+"+got,"heal")}renderTop()}
 const RAGE={naiwa:{n:"顿悟",sub:"奶力 +2 · 力气 +4 · 抽 2",say:"……原来如此。我睡了那么久，就是为了这一刻醒过来。"},kungfu:{n:"通透世界",sub:"本回合每一拳都暴击",say:"师父说过，看得见风的时候，拳就到了。"},knight:{n:"顿悟",sub:"奶力 +2 · 力气 +3 · 护盾 +15",say:"剑小又怎样，村口那扇门，我守了十年！"},mage:{n:"星之力",sub:"奶力 +2 · 魔力 +4",say:"老师，您看——星星听我的了。"}};
 function rageGain(v){if(!S||!RAGE[S.hero]||S.rageUsed||PREV)return;v*=1+.3*perk("rage");const o=S.rage||0;S.rage=Math.min(100,o+v);if(o<100&&S.rage>=100){toast(`<b>${RAGE[S.hero].n}</b>攒满了！点主角头上的按钮发动（用完可以重新攒）`);sfx("relic")}rageUI()}
 function rageUI(){const pl=$("#player");if(!pl||!S)return;let w=pl.querySelector(".rageW");if(!RAGE[S.hero]||S.rageUsed){if(w)w.remove();return}if(!w){w=document.createElement("div");w.className="rageW";w.innerHTML=`<i class="rf"></i><span></span><button class="rageGo"></button>`;const hw=pl.querySelector(".hpw");if(hw)hw.after(w);else pl.appendChild(w);w.querySelector(".rageGo").onclick=ev=>{ev.stopPropagation();rageGo()}}const v=Math.floor(S.rage||0);w.querySelector(".rf").style.width=v+"%";w.querySelector("span").textContent=RAGE[S.hero].n+" "+v+"%";w.classList.toggle("full",v>=100);w.querySelector(".rageGo").textContent=RAGE[S.hero].n+"！"}
@@ -1452,7 +1483,7 @@ async function seaBossIntro(){clearBattleUI();setBg("sea");show("battle");$("#ha
 function juncLeave(){if(!S.junc)return;delete S.jside;const sv=S.juncSave||{};S.junc=0;delete S.juncSave;S.map=sv.map||genMap();S.sky=sv.sky||genSky();S.row=-1;S.col=-1;S.path=[];S.atBoss=false;S.lowHalf=0;S.cur=null;saveRun();show("none");talk(HS("act"+S.act)).then(()=>openMap())}
 async function juncFinish(){if(S.juncDone)return;S.juncDone=1;jsideTick("end");S.gold+=40;M.shards=(M.shards||0)+1;M.shardsAll=(M.shardsAll||0)+1;saveMeta();sfx("relic");ach("junction2");questTick("jDeep");renderTop();
  await chooseReward(offerCards(3,"R"),"走完岔路：+40 金币、记忆碎片 +1，再挑一张稀有牌");delete S.juncDone;renderTop();setTimeout(()=>juncLeave(),500)}
-async function actClear(){if(S){S.rageUsed=0;S.rage=S.rage||0}setTimeout(()=>CLOUD.up(true),1500);if((S.act||0)<ACTS.length-1){const a=S.act||0,ob=curBoss();S.act=a;const jQ=S.quest&&!S.quest.done&&(QUESTS.find(x=>x.id===S.quest.id)||{}).j;const jOffer=!S.dream&&!S.fin&&(S.flags.juncForce||jQ||a===2||rnd()<.25);if(S.flags.juncForce)delete S.flags.juncForce;S.act++;if(S.act>=2)ach("act3");pickBoss();S.lowHalf=0;S.row=-1;S.col=-1;S.path=[];S.atBoss=false;S.actCombats=0;S.cur=null;S.map=genMap();S.sky=genSky();
+async function actClear(){if(S){S.rageUsed=0;S.rage=S.rage||0}setTimeout(()=>CLOUD.up(true),1500);if((S.act||0)<ACTS.length-1){const a=S.act||0,ob=curBoss();S.act=a;const jQ=S.quest&&!S.quest.done&&(QUESTS.find(x=>x.id===S.quest.id)||{}).j;const jOffer=!S.dream&&!S.fin&&(S.flags.juncForce||jQ||a===2||rnd()<.3);if(S.flags.juncForce)delete S.flags.juncForce;S.act++;if(S.act>=2)ach("act3");pickBoss();S.lowHalf=0;S.row=-1;S.col=-1;S.path=[];S.atBoss=false;S.actCombats=0;S.cur=null;S.map=genMap();S.sky=genSky();
   const heal=asc()>=7?(mlv("ascRest")?Math.floor((S.max-S.hp)*.3):0):Math.floor((S.max-S.hp)*.5);S.hp+=heal;saveRun();B=null;show("ending");setBg(["castle","snowfield","factory","cosmos"][a]);playMusic("title");
   $("#ending").innerHTML=`<div class="endBox"><div class="endImg"><img src="${IMG(ENEMY[ob].img)}"></div><h1>第${"一二三四"[a]}层 · 通关</h1><p>${ENEMY[ob].n}倒下的时候没有出声。往上的楼梯就在它身后，一直都在。</p><p style="font-size:20px;color:#ffe7a0">休整一下：回复 ${heal} 生命</p><div class="tbc"><span class="ribbon b">下一层：${ACTS[a+1].n}</span></div><div style="margin-top:22px">${jOffer?`<button class="btn pink" id="eJunc">走进 ${a+1}.5 层</button> `:""}<button class="btn" id="eNext">继续往上爬 ▶</button></div>${jOffer?`<p class="juncHint">楼梯旁边岔出去一条小路：<b>${a+1}.5层 · ${JNAME[a+1]||"交叉路口"}</b>。${jQ?"你接的酒馆任务就要在这里做。":"进去看看也行，直接上楼也行。"}</p>`:""}</div>`;
   sparks(640,200,"#ffd23f",30);$("#eNext").onclick=async()=>{show("none");await talk(HS("act"+S.act));openMap()};if(jOffer)$("#eJunc").onclick=()=>juncEnter();return}
@@ -1490,7 +1521,7 @@ async function dreamClear(){B=null;show("none");await talk(STORY.dreamOut);gainR
 function finMap(){const T=[["C","king"],["C","bishop"],["C","iceking"],["C","boilerdragon"],["C","general"],["r"]];const c=Math.floor(COLS/2);return T.map((x,r)=>{const row=Array(COLS).fill(null);row[c]={r,c,t:x[0],nx:r<T.length-1?[c]:[],jx:0,jy:0,grp:x[1]?[x[1]]:undefined};return row})}
 function chapterCard(title,text,lines){show("ending");setBg(S.fin?"final":"low4");playMusic("title");$("#ending").innerHTML=`<div class="endBox chapter${S.dream?" dream":""}"><h1>${title}</h1><p>${text}</p><div style="margin-top:22px"><button class="btn" id="eNext">继续 ▶</button></div></div>`;sparks(640,200,S.dream?"#b8a8ff":"#ff4ad8",30);$("#eNext").onclick=async()=>{show("none");await talk(lines);openMap()}}
 async function trueFinale(){B=null;show("none");setBg("final");await talk(STORY.trueEnd);ach("trueend");
- M.trueEnds=M.trueEnds||[];M.trueEnds.push({h:S.hero,n:HN(),t:Date.now(),a:asc(),d:S.diff||"normal",k:S.stats.kills,deck:S.deck.length});saveMeta();try{CLOUD.up(true)}catch(e){}
+ M.trueEnds=M.trueEnds||[];M.trueEnds.push({h:S.hero,n:HN(),t:Date.now(),a:asc(),d:S.diff||"normal",k:S.stats.kills,deck:S.deck.length,mh:S.stats.maxHit||0});saveMeta();try{CLOUD.up(true)}catch(e){}
  await credits();S.endKey="true";S.act=ACTS.length-1;return actClear()}
 function credits(){return new Promise(res=>{const L=[["奶蛙之塔",""],["",""],["制作人 · 程序 · 策划","龙井茉莉"],["美术 · 测试","乔乔"],["",""],["做这个游戏的时候",""],["","我们爆肝了很多个夜晚"],["","有时候光做一个角色，就做了好几天"],["","有一只奶蛙的腿画了三遍"],["","有一个首领的台词改了七次"],["",""],["谢谢每一位爬过塔的你",""],["","你们的反馈，让这座塔一层一层长高"],["",""],["小七的歌",""],["","送给每一个还在等泉水回来的人"],["",""],["抖音搜索【仰冬】","继续关注我们"],["",""],["—— 完 ——",""]];
  const d=document.createElement("div");d.id="credits";d.innerHTML=`<div class="crRoll">${L.map(([a,b])=>a?`<h3>${a}</h3>${b?`<p>${b}</p>`:""}`:b?`<p>${b}</p>`:`<br>`).join("")}</div><button class="btn sm ghost crSkip">跳过</button>`;$("#stage").appendChild(d);playMusic("credits");
@@ -2428,7 +2459,7 @@ function packSummary(cards,dust,sh){const el=$("#gacha");if(!el)return;const all
 /* ===================== 5.1 碗底志、对话支线、隐藏关卡 ===================== */
 /* ---------- 隐藏关卡：斗兽场 A、镜之间 Y、奶茶厂后门 Z ---------- */
 Object.assign(NODE,{A:{n:"隐藏房间",e:"skull"},Y:{n:"镜之间",ic:"xsh"},Z:{n:"奶茶厂后门",ic:"v_lava"}});
-function hiddenPlace(g){try{if(!S||S.junc||S.dream||S.fin)return g;const a=S.act||0;S.hid=S.hid||{};const types=["A","Y","Z"].filter(t=>!S.hid[t]&&(a>=1||t==="A")&&(t!=="Z"||a>=2));if(!types.length||rnd()>.5)return g;const t=pick(types);const all=g.flat().filter(n=>n&&(n.t==="m"||n.t==="q")&&n.r>=2&&n.r<=MAPR-4&&!n.story);if(!all.length)return g;const n=pick(all);n.t=t;n.grp=null;S.hid[t]=1}catch(e){}return g}
+function hiddenPlace(g){try{if(!S||S.junc||S.dream||S.fin)return g;const a=S.act||0;S.hid=S.hid||{};const types=["A","Y","Z"].filter(t=>!S.hid[t]&&(a>=1||t==="A")&&(t!=="Z"||a>=2));if(!types.length||rnd()>.7)return g;const t=pick(types);const all=g.flat().filter(n=>n&&(n.t==="m"||n.t==="q")&&n.r>=2&&n.r<=MAPR-4&&!n.story);if(!all.length)return g;const n=pick(all);n.t=t;n.grp=null;S.hid[t]=1}catch(e){}return g}
 {const _g=genMap;genMap=function(){return hiddenPlace(_g.apply(this,arguments))}}
 function hidIntro(title,lines,go,leave){show("event");setBg("event");$("#event").innerHTML=`<div class="evBox"><div class="phead"><span class="ribbon">${title}</span></div><div class="evTxt" style="max-width:760px"><p id="evP">${lines}</p><div class="evOpts"><button class="evo" id="hGo"><b>进去</b></button><button class="evo" id="hNo"><b>绕过去</b><small>什么都不会发生</small></button></div></div></div>`;$("#hGo").onclick=()=>{sfx("click");go()};$("#hNo").onclick=()=>{sfx("click");S.cur=null;saveRun();(leave||openMap)()}}
 function arenaStart(){hidIntro("隐藏房间","铁门后面是一圈看台，看台上一个人都没有。场地中间立着一块木牌：<br><b>连胜三场小怪、一场精英。中间不能歇，血带到下一场。每赢一场，奖励就多押一份；每场之间都可以拿着奖励走人。输了，押的东西全没收，你会被抬出去，只剩一点血。</b>",()=>{S.arena={w:0,g:0,c:0};saveRun();startCombat("m")})}

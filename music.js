@@ -198,6 +198,7 @@ const ORCH={
  shop:{lead:"fiddle",bass:"acoustic_bass",arp:"acoustic_guitar_nylon",perc:"wood"},
  rest:{lead:"orchestral_harp",bass:"cello",arp:"acoustic_guitar_nylon",pad:"string_ensemble_1"},
  event:{lead:"flute",bass:"cello",pad:"string_ensemble_1",bells:1},
+ secret:{lead:"celesta",dbl:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1},
  map1:{lead:"church_organ",dbl:"harpsichord",bass:"cello",pad:"string_ensemble_1"},
  battle1:{lead:"harpsichord",bass:"cello",stab:"string_ensemble_1",perc:"timp"},
  map2:{lead:"celesta",dbl:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp"},
@@ -226,11 +227,14 @@ Object.assign(TR,{
  // 预言家「已告知影」：八音盒，慢，半音往下滑
  curser:{bpm:84,sw:0,lead:"celesta",bass:"soft",dr:"waltz",pad:.06,bell:1,ch:[[50,"m"],[46,"M"],[43,"m"],[45,"7"],[50,"m"],[46,"M7"],[43,"m"],[45,"7"]],
   mel:[74,0,77,0,76,0,73,0, 74,-1,-1,0,0,0,0,0, 70,0,74,0,73,0,70,0, 69,-1,-1,0,0,0,0,0, 81,0,80,0,77,0,76,0, 74,0,73,0,70,0,69,0, 70,0,0,73,0,0,76,0, 74,-1,-1,-1,0,0,0,0]},
+ // 秘密房间「没人来过的屋子」：「雾中」的旋律放慢一点，钢片琴和八音盒，轻轻摇摆
+ secret:{bpm:80,sw:.18,lead:"celesta",bass:"soft",dr:"none",pad:.06,bell:1,arp:1,ch:[[50,"m7"],[48,"M7"],[46,"M7"],[45,"sus"],[50,"m7"],[43,"m7"],[46,"M7"],[45,"7"]],
+  mel:[74,-1,-1,0,77,-1,76,0, 74,-1,72,0,69,-1,-1,0, 70,-1,72,0,74,-1,79,0, 77,-1,-1,-1,0,0,0,0, 81,-1,79,0,77,-1,76,0, 74,-1,76,0,77,-1,-1,0, 79,-1,81,0,82,-1,81,0, 74,-1,-1,-1,0,0,0,0]},
  // 二番战「深渊里没有结局」：同一段旋律，换成管风琴和重鼓
  curser2:{bpm:132,sw:0,lead:"organ",bass:"heavy",dr:"doom",pad:.05,ch:[[50,"m"],[46,"M"],[43,"m"],[45,"7"],[50,"m"],[46,"M7"],[43,"m"],[45,"7"]],
   mel:[74,0,77,0,76,0,73,0, 74,0,0,86,0,0,85,0, 70,0,74,0,73,0,70,0, 69,0,0,81,0,0,80,0, 81,0,80,0,77,0,76,0, 74,0,73,0,70,0,69,0, 70,0,73,0,76,0,79,0, 74,-1,-1,-1,0,0,0,0]}
 });
-const TVOL={"dsq":1.0,"champ":1.0,"curser":1.35,"curser2":0.95,"homemain":1.4,"sea":1.4,"seaboss":1.0,"junc":1.3,"mirror":1.05,"backdoor":1.0,"hidroom":1.0,"tavern":1.35,"victory":1.3,"title":1.36,"map":1.38,"battle":0.99,"elite":1.07,"boss":1.02,"final":0.94,"shop":1.45,"rest":1.43,"event":1.23,"map1":1.38,"battle1":0.98,"map2":1.35,"battle2":1.15,"map3":1.0,"battle3":1.23,"map4":1.08,"battle4":1.14,"dream":1.12,"fin":0.91,"chair":0.91,"memo":1.38,"proto":1.1,"credits":1.1};
+const TVOL={"secret":1.3,"dsq":1.0,"champ":1.0,"curser":1.35,"curser2":0.95,"homemain":1.4,"sea":1.4,"seaboss":1.0,"junc":1.3,"mirror":1.05,"backdoor":1.0,"hidroom":1.0,"tavern":1.35,"victory":1.3,"title":1.36,"map":1.38,"battle":0.99,"elite":1.07,"boss":1.02,"final":0.94,"shop":1.45,"rest":1.43,"event":1.23,"map1":1.38,"battle1":0.98,"map2":1.35,"battle2":1.15,"map3":1.0,"battle3":1.23,"map4":1.08,"battle4":1.14,"dream":1.12,"fin":0.91,"chair":0.91,"memo":1.38,"proto":1.1,"credits":1.1};
 function harmUnder(m,chord){let best=null;for(const c of chord)for(const o of [12,24,36]){const n=c+o;if(n<m-2&&n>=m-9&&(best===null||n>best))best=n}return best}
 function sched(h=.15){const c=A.ctx;if(!c)return;if(A.next<c.currentTime-.2)A.next=c.currentTime+.05;
  while(A.next<c.currentTime+h){const T=TR[A.cur];const q=60/(T?T.bpm*(A.rage?1.18:1):100)/2;

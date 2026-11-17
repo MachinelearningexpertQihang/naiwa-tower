@@ -17,14 +17,24 @@ const TOY={ok:false,
 function nwProg(m){if(!m)return 0;const n=o=>o&&typeof o==="object"?Object.keys(o).length:0;let p=(m.runs||0)*10+(m.deaths||0)*10+(m.wins||0)*50+n(m.got)*2+n(m.ach)*5+n(m.boss)*5+(m.shardsAll||0)+(m.kills||0)/10;try{Object.values(m.mast||{}).forEach(v=>p+=(+v||0)/5)}catch(e){}return Math.round(p)}
 const NWB={t:0,
  open(){return new Promise((res,rej)=>{try{const r=indexedDB.open("nwt-backup",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}})},
- save(){clearTimeout(this.t);this.t=0;let m=null,s=null;try{m=JSON.stringify(M)}catch(e){}try{s=(typeof S!=="undefined"&&S&&!S.noSave)?JSON.stringify(S):(typeof S!=="undefined"&&!S?null:localStorage.getItem("nwt-run"))}catch(e){s=null}if(!m)try{m=localStorage.getItem("nwt-meta")}catch(e){}if(!m)return;
-  this.open().then(db=>{const tx=db.transaction("kv","readwrite");tx.objectStore("kv").put({t:Date.now(),m,s},"s");tx.oncomplete=tx.onerror=()=>db.close()}).catch(()=>{})},
+ // 要存的东西：进度 m、这一局 s（局外为 null）
+ snap(){let m=null,s=null;try{m=JSON.stringify(M)}catch(e){}try{s=(typeof S!=="undefined"&&S&&!S.noSave)?JSON.stringify(S):(typeof S!=="undefined"&&!S?null:(window.__nwbRun||localStorage.getItem("nwt-run")))}catch(e){s=window.__nwbRun||null}if(!m)try{m=localStorage.getItem("nwt-meta")}catch(e){}return m?{t:Date.now(),m,s}:null},
+ // 备份写两处：IndexedDB 和 Cache Storage。哪一处能写就写哪一处，返回是否至少写进了一处
+ save(){clearTimeout(this.t);this.t=0;const o=this.snap();if(!o)return Promise.resolve(false);
+  const a=this.open().then(db=>new Promise(res=>{const tx=db.transaction("kv","readwrite");tx.objectStore("kv").put(o,"s");tx.oncomplete=()=>{db.close();res(true)};tx.onerror=tx.onabort=()=>{db.close();res(false)}})).catch(()=>false);
+  const b=(async()=>{try{if(!window.caches)return false;const c=await caches.open("nwt-backup");await c.put("nwt-save.json",new Response(JSON.stringify(o),{headers:{"content-type":"application/json"}}));return true}catch(e){return false}})();
+  return Promise.all([a,b]).then(r=>r[0]||r[1])},
  soon(){if(!this.t)this.t=setTimeout(()=>this.save(),1500)},
- load(){return this.open().then(db=>new Promise(res=>{const tx=db.transaction("kv","readonly");const r=tx.objectStore("kv").get("s");r.onsuccess=()=>{res(r.result||null);db.close()};r.onerror=()=>{res(null);db.close()}})).catch(()=>null)},
- async restore(){const o=await TOY.timeout(this.load(),3000).catch(()=>null);if(!o||!o.m)return false;let bm=null;try{bm=JSON.parse(o.m)}catch(e){return false}
-  if(nwProg(bm)<=nwProg(M)){try{if(o.s&&nwProg(bm)===nwProg(M)&&!localStorage.getItem("nwt-run")&&!localStorage.getItem("nwt-run-end")){const r=JSON.parse(o.s);if(r&&r.v===2){localStorage.setItem("nwt-run",o.s);return true}}}catch(e){}return false}
-  Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,bm);if(o.s)window.__nwbRun=o.s;try{localStorage.setItem("nwt-meta",o.m);if(o.s&&!localStorage.getItem("nwt-run"))localStorage.setItem("nwt-run",o.s)}catch(e){}
-  return true}};
+ load1(){return this.open().then(db=>new Promise(res=>{const tx=db.transaction("kv","readonly");const r=tx.objectStore("kv").get("s");r.onsuccess=()=>{res(r.result||null);db.close()};r.onerror=()=>{res(null);db.close()}})).catch(()=>null)},
+ async load2(){try{if(!window.caches)return null;const c=await caches.open("nwt-backup");const r=await c.match("nwt-save.json");return r?await r.json():null}catch(e){return null}},
+ // 两处备份里取比较新的那一份
+ async load(){const [a,b]=await Promise.all([this.load1(),this.load2()]);if(a&&b)return (b.t||0)>(a.t||0)?b:a;return a||b},
+ async restore(){const o=await TOY.timeout(this.load(),3000).catch(()=>null);if(!o||!o.m)return false;let bm=null;try{bm=JSON.parse(o.m)}catch(e){return false}let changed=false;
+  if(nwProg(bm)>nwProg(M)){Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,bm);try{localStorage.setItem("nwt-meta",o.m)}catch(e){}changed=true}
+  // 这一局：本机存储里没有（写不进去或者被清掉了），就用备份里的
+  let lr=null,ended=null;try{lr=localStorage.getItem("nwt-run");ended=localStorage.getItem("nwt-run-end")}catch(e){}
+  if(o.s&&!lr&&!ended&&!window.__nwbRun){try{const r=JSON.parse(o.s);if(r&&r.v===2){window.__nwbRun=o.s;try{localStorage.setItem("nwt-run",o.s)}catch(e){}changed=true}}catch(e){}}
+  return changed}};
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch(e){}
 
 /* ---------- 云存档 ---------- */
@@ -45,9 +55,9 @@ const CLOUD={st:"off",dirty:false,busy:false,last:[],back:0,fail:0,lastUp:0,time
   if(o&&o.m){const cp=nwProg(o.m),lp=nwProg(M);try{const cb=o.m.lbBest||{};M.lbBest=M.lbBest||{};let ch=0;for(const k in cb)if((+cb[k]||0)>(M.lbBest[k]||0)){M.lbBest[k]=+cb[k];ch=1}if(ch)saveMeta()}catch(e){}
    if(cp>lp){if(this.idle())this.apply(o);else{this.pend=o;this.st="ask";this.askLater();return}}
    else if(o.s&&o.s.v===2&&this.idle()){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}
-    if(!lr&&cp===lp||lr&&(o.s.ts||0)>(lr.ts||0)+3000){try{localStorage.setItem("nwt-run",JSON.stringify(o.s))}catch(e){}if($("#title").classList.contains("on"))titleScreen()}}}
+    if(!lr&&window.__nwbRun){try{lr=JSON.parse(window.__nwbRun)}catch(e){}}if(!lr&&cp===lp||lr&&(o.s.ts||0)>(lr.ts||0)+3000){const j=JSON.stringify(o.s);window.__nwbRun=j;try{localStorage.setItem("nwt-run",j);localStorage.removeItem("nwt-run-end")}catch(e){}if($("#title").classList.contains("on"))titleScreen()}}}
   this.st="on";this.hot();setTimeout(()=>{try{LB.resend()}catch(e){}},4000)},
- apply(o){const old=JSON.parse(JSON.stringify(M));Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,nwMergeMeta(o.m,old));try{localStorage.setItem("nwt-meta",JSON.stringify(M));if(o.s&&o.s.v===2){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||"null")}catch(e){}if(!lr||(o.s.ts||0)>=(lr.ts||0))localStorage.setItem("nwt-run",JSON.stringify(o.s))}}catch(e){}
+ apply(o){const old=JSON.parse(JSON.stringify(M));Object.keys(M).forEach(k=>delete M[k]);Object.assign(M,nwMergeMeta(o.m,old));try{localStorage.setItem("nwt-meta",JSON.stringify(M))}catch(e){}if(o.s&&o.s.v===2){let lr=null;try{lr=JSON.parse(localStorage.getItem("nwt-run")||window.__nwbRun||"null")}catch(e){}if(!lr||(o.s.ts||0)>=(lr.ts||0)){const j=JSON.stringify(o.s);window.__nwbRun=j;try{localStorage.setItem("nwt-run",j);localStorage.removeItem("nwt-run-end")}catch(e){}}}
   NWB.save();if(typeof titleScreen==="function"&&$("#title").classList.contains("on"))titleScreen();if(typeof toast==="function")toast("已从云端找回你的存档")},
  askLater(){const go=()=>{if(this.st!=="ask"||!this.pend)return;if(!this.idle()||!$("#title").classList.contains("on")||$("#ov").classList.contains("on")){setTimeout(go,1500);return}
    const o=this.pend;this.pend=null;this.apply(o);this.st="on";this.hot()};go()},

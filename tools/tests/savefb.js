@@ -1,0 +1,11 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:1280,height:720}});
+await ctx.addInitScript(()=>{Storage.prototype.setItem=function(){const e=new Error('QuotaExceededError');e.name='QuotaExceededError';throw e};});
+const p=await ctx.newPage();const er=[];p.on('pageerror',e=>er.push(e.message));
+await p.goto('file://'+process.env.NWT_FAST+'/index.html');await p.waitForTimeout(1500);
+await p.evaluate(()=>{newRun();$('#ov').classList.remove('on');S.gold=777;S.act=1;saveRun()});await p.waitForTimeout(1500);
+console.log('toast:',await p.evaluate(()=>$('#toast').textContent));
+const ms=await p.evaluate(()=>manualSave());await p.waitForTimeout(500);console.log('manual ok',ms,'toast:',await p.evaluate(()=>$('#toast').textContent));
+await p.reload();await p.waitForTimeout(3000);
+console.log('after reload run gold:',await p.evaluate(()=>{const r=loadRun();return r&&r.gold}),'meta runs',await p.evaluate(()=>M.runs));
+console.log('continue btn',await p.evaluate(()=>/继续/.test($('#title').textContent)));await p.screenshot({path:(process.env.NWT_OUT||'.')+'/savefb.png'});
+console.log(er);await b.close()})();
