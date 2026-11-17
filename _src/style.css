@@ -1044,7 +1044,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 5.6";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 5.7";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -3075,6 +3075,59 @@ body{background:transparent!important}
 .p5Scene .p5rays,.p5Scene .p5ring,.p5Scene .p5ring2{animation:none!important}
 #title #tCodex{animation:none!important}
 #title .tkungfu,#title .tknight,#title .tmage,#title .thero,#title .tWaFrog,#title .ffly,#title .tMail,#title #tMail{will-change:transform}
+body::before{content:"";position:fixed;left:-60px;top:-60px;right:-60px;bottom:-60px;background:var(--fillImg,none) center/cover no-repeat,radial-gradient(ellipse at 50% 40%,#2a1f4a,#0d0a1c 70%);filter:blur(22px) brightness(.42) saturate(.85);z-index:-1;pointer-events:none}
+html.lite body::before{filter:brightness(.35);background:radial-gradient(ellipse at 50% 40%,#2a1f4a,#0d0a1c 70%)}
+/* 5.6 小院变成 6 条路：每格缩小一点，放得下 */
+.yard .ytree{gap:6px;top:100px;bottom:84px;left:20px;right:20px;overflow:auto}
+.yard .yHead{width:44px;height:82px;font-size:17px;letter-spacing:3px}
+.yard .yNode{width:176px;min-height:82px;height:82px;padding:4px 8px;gap:1px}
+.yard .yNode .uiH b{font-size:16px}
+.yard .yNode .uiH span{font-size:10px}
+.yard .yNode p{font-size:10.5px;line-height:1.3;margin:1px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.yard .yNode .uiBuy,.yard .yNode .uiTog{font-size:12px;padding:1px 4px}
+.yard .yNode .yLock{font-size:11px}
+.yard .yLink{width:14px}
+
+/* ===== 5.7 同伴气泡 ===== */
+.cmpB{position:absolute;left:24px;top:118px;z-index:60;display:flex;align-items:flex-end;pointer-events:none;opacity:0;transform:translateX(-24px);transition:opacity .3s,transform .3s}
+.cmpB.on{opacity:1;transform:none}
+.cmpB .av{width:84px;height:84px;background:#111;border:4px solid #fff;box-shadow:5px 5px 0 var(--p5r,#e5191c);overflow:hidden;transform:rotate(-4deg);flex:none}
+.cmpB .av img{width:150%;margin:-8% 0 0 -25%;display:block}
+.cmpB .bx{position:relative;margin:0 0 26px 18px;max-width:440px;background:#fff;border:3px solid #111;padding:10px 16px 12px;box-shadow:5px 5px 0 #111;font:500 18px/1.45 'NW Black',sans-serif;color:#111}
+.cmpB .bx:before{content:"";position:absolute;left:-17px;bottom:10px;border:9px solid transparent;border-right:14px solid #111}
+.cmpB .bx:after{content:"";position:absolute;left:-10px;bottom:12px;border:7px solid transparent;border-right:10px solid #fff}
+.cmpB .nm{position:absolute;left:-6px;top:-16px;background:#111;color:#fff;font:400 14px 'NW Black',sans-serif;padding:2px 10px;transform:skewX(-10deg)}
+.cmpB.ev{top:auto;bottom:34px;left:40px;flex-direction:column-reverse;align-items:flex-start}
+.cmpB.ev .av{width:62px;height:62px;border-width:3px}
+.cmpB.ev .bx{margin:0 0 14px 0;max-width:200px;font-size:15px;padding:8px 12px 10px}
+.cmpB.ev .bx:before{left:18px;bottom:-17px;border:9px solid transparent;border-top:14px solid #111}
+.cmpB.ev .bx:after{left:20px;bottom:-10px;border:7px solid transparent;border-top:10px solid #fff}
+/* ===== 5.7 名人堂 ===== */
+.hofBtn2{top:212px}
+.hofBtn2.cup .ybPic img{left:0;top:0;width:100%;height:100%}
+.hofBtn2 .ybPic img{left:-18%;top:-2%;width:136%;height:136%}
+.hofBtn2 span{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.hofBtn2 em{margin-left:0}
+.hofTabs{position:absolute;top:96px;left:0;right:0;display:flex;justify-content:center;gap:10px}
+.hofTabs button{font:900 17px 'NW Black',sans-serif;padding:4px 18px;background:#0d0d0d;color:#fff;border:3px solid #fff;transform:skewX(-12deg);cursor:pointer}
+.hofTabs button.on{background:var(--p5r,#e5191c)}
+#ov .hofList{top:150px}
+.hofStats{position:absolute;left:140px;right:140px;top:160px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.hofStats>div{background:#fff8ea;border:3px solid #111;box-shadow:4px 4px 0 #ffd23f;padding:12px 14px;color:#111;display:flex;flex-direction:column;gap:2px;transform:skewX(-4deg)}
+.hofStats small{font:700 14px 'NW Black',sans-serif;opacity:.65}
+.hofStats b{font:900 34px var(--num,sans-serif);line-height:1.1}
+.hofStats i{font:600 14px 'NW Black',sans-serif;font-style:normal;opacity:.75}
+.hofEnds{position:absolute;left:120px;right:120px;top:150px;bottom:90px;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:auto;gap:8px;align-content:start}
+.hofEnds h4{grid-column:1/-1;margin:8px 0 0;color:#fff;font:900 18px 'NW Black',sans-serif}
+.hofE{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:2px 10px;padding:8px 12px;background:#2a2a2a;border:2px solid #555;color:#aaa;min-height:44px;height:auto}
+.hofEnds>.hofE:not(:has(img)){grid-template-columns:1fr}
+.hofE.got{background:#fff8ea;border:3px solid #111;color:#111;box-shadow:3px 3px 0 #ffd23f}
+.hofE img{width:34px;height:34px;object-fit:contain;filter:grayscale(1) brightness(.6)}
+.hofE.got img{filter:none}
+.hofE b{font:800 15px 'NW Black',sans-serif}
+.hofE small{grid-column:2;position:static!important;display:block;font-size:12px;line-height:1.35;opacity:.75;transform:none!important}
+.hofE img{grid-row:span 2}
+.lbAsc{font-style:normal;font-size:13px;margin-left:8px;padding:1px 6px;background:var(--p5r,#e5191c);color:#fff;transform:skewX(-8deg);display:inline-block}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}

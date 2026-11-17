@@ -607,10 +607,10 @@ vault:{n:"睡着的宝库",img:"egar",steps:[
   {t:"再抓一把",d:"越抓越容易吵醒它",go:1,f:()=>{const g=S.cur.sec.g;if(rnd()<.18*g){S.cur.sec.woke=1;return null}S.gold+=40+10*g;S.cur.sec.g=g+1;if(g+1>=5)ach("greedy");return`又一把。巨蛙翻了个身，金币哗啦啦地滑下来一片。`},ok:()=>!S.cur.sec.woke},
   {t:"见好就收",d:"",f:()=>{ach("secret");return`你揣着鼓鼓的口袋溜了出来，一共抓了 ${S.cur.sec.g} 把。`}}]}]}
 };
-{const _gm=genMap;genMap=function(){const g=_gm.apply(this,arguments);try{if(S&&!S.junc&&!S.dream&&!S.fin&&rnd()<.4){const all=g.flat().filter(n=>n&&(n.t==="m"||n.t==="q")&&n.r>=2&&n.r<=MAPR-4&&!n.story);if(all.length){const n=pick(all);n.t="W";n.grp=null}}}catch(e){}return g}}
+{const _gm=genMap;genMap=function(){const g=_gm.apply(this,arguments);try{if(S&&!S.junc&&!S.dream&&!S.fin&&rnd()<.55){const all=g.flat().filter(n=>n&&(n.t==="m"||n.t==="q")&&n.r>=2&&n.r<=MAPR-4&&!n.story);if(all.length){const n=pick(all);n.t="W";n.grp=null}}}catch(e){}return g}}
 function secretRoom(){S.secSeen=S.secSeen||[];if(!S.cur.sec){let ids=Object.keys(SECRET).filter(k=>!S.secSeen.includes(k));if(!ids.length)ids=Object.keys(SECRET);const id=pick(ids);S.secSeen.push(id);S.cur.sec={id,step:0}}saveRun();secRender()}
 function secRender(){const c=S.cur.sec,T=SECRET[c.id];if(c.woke){c.woke=0;hurt(15);S.gold=Math.max(0,S.gold-40);renderTop();show("event");$("#event").innerHTML=`<div class="evBox"><div class="phead"><span class="ribbon">秘密房间 · ${T.n}</span></div><div class="evPic"><img src="${IMG(T.img)}"></div><div class="evTxt"><p id="evP">巨蛙睁开了眼睛。<br>它没说话，一巴掌把你拍出了门，连带你刚抓的金币也撒了一路。<br><span class='bad'>失去 15 生命和 40 金币</span></p><div class="evOpts"><button class="evo" id="evGo"><b>离开秘密房间</b></button></div></div></div>`;S.cur=null;saveRun();$("#evGo").onclick=openMap;return}
- const st=T.steps[c.step];show("event");setBg("event");playMusic("event");const opts=st.o.filter(o=>!o.ok||o.ok());const txt=(c.pre?`<span class="secPre">${c.pre}</span><br>`:"")+(typeof st.t==="function"?st.t():st.t);c.pre=null;
+ const st=T.steps[c.step];show("event");setBg("event");playMusic("secret");const opts=st.o.filter(o=>!o.ok||o.ok());const txt=(c.pre?`<span class="secPre">${c.pre}</span><br>`:"")+(typeof st.t==="function"?st.t():st.t);c.pre=null;
  $("#event").innerHTML=`<div class="evBox"><div class="phead"><span class="ribbon">秘密房间 · ${T.n}</span></div><div class="evPic"><img src="${IMG(T.img)}"></div><div class="evTxt"><p id="evP">${txt}</p><div class="evOpts">${opts.map((o,i)=>`<button class="evo" data-i="${i}"><b>${o.t}</b><small>${o.d||""}</small></button>`).join("")}</div></div></div>`;
  $$("#event .evo").forEach(b=>b.onclick=async()=>{if(b.dataset.busy)return;$$("#event .evo").forEach(x=>x.dataset.busy=1);sfx("click");const o=opts[+b.dataset.i];const r=o.f?await o.f():null;renderTop();if(o.go!=null&&!c.woke||c.woke){if(!c.woke){c.step=o.go;c.pre=r}saveRun();secRender();return}S.cur=null;saveRun();$("#evP").innerHTML=r||"";$(".evOpts").innerHTML=`<button class="evo" id="evGo"><b>离开秘密房间</b></button>`;$("#evGo").onclick=openMap})}
 {const _en2=enterNode;enterNode=function(t,resumed,cur){if(t!=="W")return _en2.apply(this,arguments);S.cur=cur||{t,rs:S.rs};if(resumed&&cur){S.rs=cur.rs}saveRun();M.secN=(M.secN||0)+1;saveMeta();secretRoom()}}
@@ -657,3 +657,132 @@ ev_bard:{n:"吟游奶蛙",img:"n3",t:"一只抱着琴的奶蛙坐在路边：「
  {t:"付钱听",d:"<span class='bad'>-30 金币</span>，<span class='good'>随机升级 2 张牌</span>",ok:S.gold>=30,f:()=>{S.gold-=30;const u=upN(2);return`他唱的是一只奶蛙打了一千场的故事。唱到最后一句，琴弦断了。（升级了：${u}）`}},
  {t:"给他唱一首",d:"<span class='good'>+20 金币</span>",f:()=>{S.gold+=20;return"你唱完，他沉默了一会儿，从琴盒里拿出二十个金币给你：「这首我收下了。」"}}]}
 });
+
+/* 5.6 屏幕两边的空白，用当前背景图模糊铺满，不再是一条黑边 */
+{const _sb=setBg;setBg=function(){const r=_sb.apply(this,arguments);try{const el=document.querySelector("#bg .bgPhoto,#bg .mPhoto");const u=el&&el.style.backgroundImage;document.body.style.setProperty("--fillImg",u&&u!=="none"?u:"none")}catch(e){}return r}}
+
+/* ===================== 5.6 新塔况：让某一路的牌更容易拿到 ===================== */
+Object.assign(MODS,{
+ party:{n:"动物派对",d:"奶蛙、奶马、奶鸡、奶猫、奶蛋这些动物牌更容易拿到，但敌人生命 +8%"},
+ wxreport:{n:"Weather Report",d:"天气牌更容易拿到，每回合开始还可能变天，但天气变得很快"},
+ moongod:{n:"三月女神",d:"月相牌更容易拿到，每场战斗月亮更亮，但敌人力气 +1"},
+ curser:{n:"诅咒师",d:"上负面状态的牌更容易拿到，但每场战斗开始你虚弱 1"},
+ lastegg:{n:"最后的奶蛋",d:"所有的蛋少等 1 回合就孵，但蛋的伤害 -15%"},
+ eggtower:{n:"奶蛋之塔",d:"奶蛋牌更容易拿到，但敌人生命 +8%"}});
+Object.assign(MOD_ST,{party:"派",wxreport:"天",moongod:"月",curser:"咒",lastegg:"蛋",eggtower:"塔"});
+Object.assign(MOD_GB,{party:["动物牌（奶蛙、奶马、奶鸡、奶猫、奶蛋）更容易拿到","敌人生命 +8%"],wxreport:["天气牌更容易拿到；每回合开始有 1/3 的几率变天","天气说变就变，不一定对你有利"],moongod:["月相牌更容易拿到；每场战斗开局月亮往前走一格","敌人力气 +1"],curser:["上负面状态的牌更容易拿到","每场战斗开始你虚弱 1"],lastegg:["所有的蛋少等 1 回合就孵","蛋的伤害 -15%"],eggtower:["奶蛋牌更容易拿到","敌人生命 +8%"]});
+const MOONC=["w_eclipse","w_hidemoon","w_halfmoon","w_moonblade","w_moonwell","w_newmoon","w_waning"];
+function modWants(id){const c=CARDS[id];if(!c)return false;let txt="";try{txt=String(c.d(0))}catch(e){}const m=S&&S.mod;
+ if(m==="party")return["frog","horse","chick","cat","egg"].includes(c.fam);
+ if(m==="eggtower")return c.fam==="egg";
+ if(m==="moongod")return MOONC.includes(id)||/月/.test(txt);
+ if(m==="wxreport")return(/^w_/.test(id)&&!MOONC.includes(id))||/下雨|下雪|大风|大雾|雷雨|天气/.test(txt);
+ if(m==="curser")return(c.type==="atk"||c.type==="skl")&&/虚弱|易伤|中毒|烫伤|冻伤|内伤|破甲|流血|诅咒|麻痹|潮湿/.test(txt);return false}
+{const _oc=offerCards;offerCards=function(n,kind,force,shinyFirst){const out=_oc.apply(this,arguments);try{if(!S||!["party","eggtower","moongod","wxreport","curser"].includes(S.mod))return out;
+  out.forEach((c,i)=>{if(modWants(c.id)||rnd()>.5)return;const r=CARDS[c.id].r;const pool=POOL_HERO.concat(Object.keys(CARDS).filter(k=>/^w_/.test(k))).filter((x,j,a)=>a.indexOf(x)===j&&CARDS[x]&&CARDS[x].r===r&&(!CARDS[x].hero||CARDS[x].hero===S.hero)&&modWants(x)&&!out.some(o=>o.id===x));if(pool.length){const nc=mk(pick(pool),0);if(c.sh)nc.sh=c.sh;out[i]=nc}})}catch(e){}return out}}
+{const _le=API.layEgg;API.layEgg=function(o){try{if(S&&S.mod==="lastegg"&&o){o=Object.assign({},o);o.t=Math.max(1,(o.t||1)-1);if(o.d)o.d=Math.max(1,Math.round(o.d*.85))}}catch(e){}return _le.call(this,o)}}
+{const _sc4=startCombat;startCombat=function(kind){_sc4.apply(this,arguments);try{if(!B||!S)return;const m=S.mod;
+  if(m==="party"||m==="eggtower")B.enemies.forEach(e=>{e.max=Math.round(e.max*1.08);e.hp=e.max});
+  if(m==="moongod"){B.enemies.forEach(e=>e.str=(e.str||0)+1);const O=["new","wax","full","wane"];B.moon=O[(O.indexOf(B.moon)+1)%4];renderSky()}
+  if(m==="curser")B.apply(B.p,"weak",1);renderBattle()}catch(e){}}}
+{const _st4=startTurn;startTurn=async function(){const r=await _st4.apply(this,arguments);try{if(B&&!B.over&&S.mod==="wxreport"&&B.turn>1&&rnd()<1/3){const L=Object.keys(WX).filter(w=>w!==B.wx);B.setWx(pick(L))}}catch(e){}return r}}
+
+/* ===================== 5.6 奶马 / 奶鸡 / 奶蛋流派遗物 ===================== */
+Object.assign(RELICS,{
+ r_saddle:{n:"旧马鞍",img:"hrl",r:"R",d:"每回合打出第 2 张奶马牌时，抽 1 张，奶力 +1"},
+ r_horseshoe:{n:"马蹄铁",img:"hrl",r:"C",d:"奶马牌每一下伤害 +2"},
+ r_carrot:{n:"胡萝卜",img:"hrl",r:"C",d:"这回合第 3 张以后打出的奶马牌，会再踢随机敌人一脚（6 伤害）"},
+ r_featherpillow:{n:"羽毛枕",img:"cki",r:"C",d:"奶鸡牌获得的护盾 +3"},
+ r_rooster:{n:"公鸡闹钟",img:"cki",r:"C",d:"每回合打出第一张奶鸡牌时，抽 1 张"},
+ r_henhouse:{n:"鸡舍",img:"cki",r:"R",d:"回合开始时，如果你还留着 10 点以上护盾，每 10 点下 1 颗小蛋（下回合孵，5 伤害，最多 2 颗）"},
+ r_eggcarton:{n:"蛋托",img:"egt",r:"C",d:"你下的每颗蛋，孵化时伤害 +3"},
+ r_incubator:{n:"恒温箱",img:"egt",r:"R",d:"每 2 回合，场上所有的蛋少等 1 回合。代价：拿到时最大生命 -5"},
+ r_goldyolk:{n:"金蛋黄",img:"egar",r:"R",d:"这场战斗每孵出 5 颗蛋，力气 +1"},
+ r_family:{n:"全家福",img:"egsk",r:"R",d:"一回合里奶马、奶鸡、奶蛋牌各打出过 1 张，获得 2 点奶力和 10 护盾（每回合一次）"}
+});
+{const _pc2=playCard;playCard=async function(c,t){const p0=B?B.played||0:0;const r=await _pc2.apply(this,arguments);try{if(!B||B.over||PREV||(B.played||0)<=p0)return r;const f=(CARDS[c.id]||{}).fam;B.famT=B.famT||{};B.famT[f]=(B.famT[f]||0)+1;
+  if(f==="horse"&&has("r_saddle")&&B.famT.horse===2){relicPulse("r_saddle");B.draw(1);B.gainEnergy(1)}
+  if(f==="horse"&&has("r_carrot")&&(B.played||0)>=3){const tg=pick(B.alive());if(tg){relicPulse("r_carrot");B.hit(tg,6,1,1);renderBattle();if(!B.alive().length)win()}}
+  if(f==="chick"&&has("r_rooster")&&B.famT.chick===1){relicPulse("r_rooster");B.draw(1)}
+  if(has("r_family")&&!B.famDone&&B.famT.horse&&B.famT.chick&&B.famT.egg){B.famDone=1;relicPulse("r_family");B.gainEnergy(2);B.block(10,1);toast("全家福：奶马、奶鸡、奶蛋都到齐了")}
+  renderBattle()}catch(e){console.warn(e)}return r}}
+{const _de2=dealEnemy;dealEnemy=function(t,d,i){try{if(B&&B.curType&&B.curFam==="horse"&&has("r_horseshoe")&&d>0)d+=2}catch(e){}return _de2.call(this,t,d,i)}}
+{const _bk=API.block;API.block=function(v,raw){try{if(!raw&&B&&B.curFam==="chick"&&B.curType&&has("r_featherpillow")&&v>0)v+=3}catch(e){}return _bk.call(this,v,raw)}}
+{const _le2=API.layEgg;API.layEgg=function(o){try{if(has("r_eggcarton")&&o&&o.d>0){o=Object.assign({},o);o.d+=3}}catch(e){}return _le2.call(this,o)}}
+{const _he=hatchEggs;hatchEggs=async function(){const n0=B&&B.eggs?B.eggs.length:0;const r=await _he.apply(this,arguments);try{if(B&&has("r_goldyolk")){const got=Math.max(0,n0-(B.eggs||[]).length);B.yolkN=(B.yolkN||0)+got;while(B.yolkN>=5){B.yolkN-=5;B.p.str+=1;relicPulse("r_goldyolk");toast("金蛋黄：力气 +1")}renderBattle()}}catch(e){}return r}}
+{const _st5=startTurn;startTurn=async function(){try{if(B&&!B.over&&has("r_henhouse")&&B.turn>=1&&(B.p.block||0)>=10){const n=Math.min(2,Math.floor(B.p.block/10));for(let i=0;i<n;i++)B.layEgg({t:1,d:5,b:0,mini:1,nw:1});relicPulse("r_henhouse")}}catch(e){}if(B){B.famT={};B.famDone=0}const r=await _st5.apply(this,arguments);try{if(B&&!B.over&&has("r_incubator")&&B.turn%2===0&&(B.eggs||[]).length){B.warmEggs();relicPulse("r_incubator")}}catch(e){}return r}}
+{const _gr3=gainRelic;gainRelic=function(id){const had=S&&S.relics&&S.relics.includes(id);const r=_gr3.apply(this,arguments);try{if(!had&&id==="r_incubator"&&S.relics.includes(id)){S.max=Math.max(1,S.max-5);S.hp=Math.min(S.hp,S.max);renderTop()}}catch(e){}return r}}
+/* 5.5/5.6 新遗物加进随机池（RELIC_POOL 在 data.js 里就算好了，后加的要自己补进去） */
+["r_bell2","r_salt","r_mask","r_umbrella","r_barometer","r_moonshard","r_saddle","r_horseshoe","r_carrot","r_featherpillow","r_rooster","r_henhouse","r_eggcarton","r_incubator","r_goldyolk","r_family"].forEach(k=>{if(RELICS[k]&&!RELIC_POOL.includes(k))RELIC_POOL.push(k)});
+
+/* ===================== 5.6 天气 / 月相流派加强：更多牌、遗物，抬高上限 ===================== */
+Object.assign(CARDS,{
+w_drizzle:{n:"毛毛雨",cost:0,type:"skl",r:"C",fam:"none",img:"c3",d:u=>`下雨时：所有敌人潮湿 ${U(u,2,3)}。不下雨：天气变成下雨`,fx:(B,u)=>{if(B.wx==="rain")B.alive().forEach(e=>B.apply(e,"wet",U(u,2,3)));else B.setWx("rain")}},
+w_downpour:{n:"倾盆大雨",cost:2,cu:1,type:"atk",r:"R",fam:"frog",img:"c3",d:u=>`对所有敌人造成 ${U(u,7,10)} 伤害，目标每有 1 层潮湿再 +2；下雨时打两次`,fx:(B,u)=>{const n=B.wx==="rain"?2:1;B.alive().forEach(e=>B.hit(e,U(u,7,10)+2*(e.wet||0),n))}},
+w_frostbite:{n:"冻疮",cost:1,type:"atk",r:"C",fam:"chick",img:"egl",tgt:1,d:u=>`造成 ${U(u,7,10)} 伤害，冻伤 2；下雪时改成冻伤 4`,fx:(B,u,t)=>{B.hit(t,U(u,7,10));if(t.hp>0)B.apply(t,"frost",B.wx==="snow"?4:2)}},
+w_blizzard:{n:"暴风雪",cost:2,cu:1,type:"skl",r:"R",fam:"none",img:"egl",d:u=>`天气变成下雪，所有敌人冻伤 3，获得 ${U(u,10,14)} 护盾`,fx:(B,u)=>{B.setWx("snow");B.alive().forEach(e=>B.apply(e,"frost",3));B.block(U(u,10,14))}},
+w_whirlwind:{n:"旋风",cost:1,type:"atk",r:"C",fam:"horse",img:"hrl",d:u=>`对所有敌人造成 ${U(u,4,6)} 伤害 2 次；大风时再抽 1 张`,fx:(B,u)=>{B.alive().forEach(e=>B.hit(e,U(u,4,6),2));if(B.wx==="wind")B.draw(1)}},
+w_fogveil:{n:"雾隐",cost:1,cu:0,type:"skl",r:"R",fam:"cat",img:"xsh",d:u=>`天气变成大雾，获得 2 层闪避和 ${U(u,4,7)} 护盾`,fx:(B,u)=>{B.setWx("fog");B.p.evade=(B.p.evade||0)+2;B.block(U(u,4,7))}},
+w_thunderstep:{n:"雷步",cost:0,type:"skl",r:"C",fam:"none",img:"c7",d:u=>`雷雨时：奶力 +1，抽 ${U(u,1,2)} 张。不是雷雨：天气变成雷雨`,fx:(B,u)=>{if(B.wx==="storm"){B.gainEnergy(1);B.draw(U(u,1,2))}else B.setWx("storm")}},
+w_moonrite:{n:"满月祭",cost:2,cu:1,type:"pow",r:"E",fam:"none",img:"np",d:u=>`满月时，每回合开始奶力 +1、获得 ${U(u,6,9)} 护盾。现在就把月亮变满`,fx:(B,u)=>{PW(B,"moonrite",U(u,6,9));B.setMoon("full")}}
+});
+try{["w_drizzle","w_downpour","w_frostbite","w_blizzard","w_whirlwind","w_fogveil","w_thunderstep","w_moonrite"].forEach(k=>{if(!POOL_HERO.includes(k))POOL_HERO.push(k)});["w_moonrite"].forEach(k=>MOONC.push(k))}catch(e){}
+Object.assign(RELICS,{
+ r_raingauge:{n:"雨量计",img:"c3",r:"R",d:"下雨时，每回合开始所有敌人潮湿 1。你对潮湿的敌人伤害 +20%"},
+ r_icecrystal:{n:"冰晶",img:"egl",r:"R",d:"下雪时，你的攻击每打中一次就让目标冻伤 1（每回合最多 3 次）"},
+ r_kite:{n:"风筝",img:"hrl",r:"C",d:"大风时，每回合开始多抽 1 张"},
+ r_foglamp:{n:"雾灯",img:"xsh",r:"C",d:"大雾时，敌人每次攻击你有 25% 打偏"},
+ r_stormcore:{n:"雷核",img:"c7",r:"R",d:"雷雨时，每回合开始力气 +1（每场最多 +5）"},
+ r_vane:{n:"风向标",img:"m5",r:"R",d:"天气每变一次，抽 1 张，获得 4 护盾"},
+ r_seasons:{n:"四季手账",img:"m5",r:"E",d:"这场战斗每经历过 1 种天气，你的攻击每一下伤害 +2"},
+ r_moonvial:{n:"月光瓶",img:"np",r:"R",d:"满月时，每回合开始奶力 +1"}
+});
+["r_raingauge","r_icecrystal","r_kite","r_foglamp","r_stormcore","r_vane","r_seasons","r_moonvial"].forEach(k=>{if(!RELIC_POOL.includes(k))RELIC_POOL.push(k)});
+{const _st6=startTurn;startTurn=async function(){const r=await _st6.apply(this,arguments);try{if(!B||B.over)return r;B.iceN=0;
+  if(B.wx==="rain"&&has("r_raingauge")){B.alive().forEach(e=>B.apply(e,"wet",1));relicPulse("r_raingauge")}
+  if(B.wx==="wind"&&has("r_kite")){B.draw(1);relicPulse("r_kite")}
+  if(B.wx==="storm"&&has("r_stormcore")&&(B.coreN||0)<5){B.coreN=(B.coreN||0)+1;B.p.str+=1;relicPulse("r_stormcore")}
+  if(B.moon==="full"&&has("r_moonvial")){B.gainEnergy(1);relicPulse("r_moonvial")}
+  const mr=B.p.pw2&&B.p.pw2.moonrite;if(mr&&B.moon==="full"){B.gainEnergy(1);B.block(mr,1)}
+  renderBattle()}catch(e){console.warn(e)}return r}}
+{const _de3=dealEnemy;dealEnemy=function(t,d,i){try{if(B&&B.curType&&d>0&&!PREV){if(has("r_raingauge")&&(t.wet||0)>0)d=Math.round(d*1.2);if(has("r_seasons")){const n=Object.keys(Object.assign({[B.wx0||B.wx]:1},B.wxSeen||{})).length;d+=2*n}}}catch(e){}const r=_de3.call(this,t,d,i);try{if(B&&!PREV&&B.curType&&B.wx==="snow"&&has("r_icecrystal")&&(B.iceN||0)<3&&t&&t.hp>0&&d>0){B.iceN=(B.iceN||0)+1;B.apply(t,"frost",1)}}catch(e){}return r}}
+{const _sw2=API.setWx;API.setWx=function(w){const old=this.wx;if(B&&!B.wx0)B.wx0=old;const r=_sw2.apply(this,arguments);try{if(!PREV&&B&&old!==w&&has("r_vane")){B.draw(1);B.block(4,1);relicPulse("r_vane")}}catch(e){}return r}}
+{const _dp=dmgPlayer;dmgPlayer=function(d,src,raw){try{if(!raw&&src&&B&&B.wx==="fog"&&has("r_foglamp")&&d>0&&rnd()<.25){fxSay2("打偏了");relicPulse("r_foglamp");return}}catch(e){}return _dp.apply(this,arguments)}}
+/* 5.5/5.6 加的天气月相牌也放进奖励池（以前漏了，只能在商店以外的地方看到） */
+try{Object.keys(CARDS).forEach(k=>{if(/^w_/.test(k)&&!POOL_HERO.includes(k))POOL_HERO.push(k)})}catch(e){}
+
+/* ===================== 5.6 自动省电：掉帧就少放特效 ===================== */
+const LITE={on:false,auto:false};
+function liteSet(on,auto){LITE.on=!!on;document.documentElement.classList.toggle("lite",LITE.on);try{M.lite=on?(auto?"auto":"on"):"off";saveMeta()}catch(e){}}
+try{if(M.lite==="on"||M.lite==="auto")liteSet(true,M.lite==="auto")}catch(e){}
+/* 每 4 秒看一次帧率：页面在前台、不在过场、连续两次低于 38 帧，就自动切省电 */
+{let fr=[],last=0,low=0;const tick=t=>{if(last)fr.push(t-last);last=t;requestAnimationFrame(tick)};requestAnimationFrame(tick);
+ setInterval(()=>{const f=fr;fr=[];last=0;if(document.hidden||LITE.on||(M&&M.lite==="off")||f.length<20)return;const fps=1000*f.length/f.reduce((a,b)=>a+b,0);if(fps<38)low++;else low=0;if(low>=2){low=0;liteSet(true,true);try{toast("画面有点卡，已经自动切到<b>省电模式</b>（少放一些特效）。设置里可以关掉")}catch(e){}}},4000)}
+{const _set=settings;settings=function(){const r=_set.apply(this,arguments);try{const box=document.querySelector("#ov .modal .row");if(box&&!document.getElementById("sLite")){const b=document.createElement("button");b.className="btn sm ghost";b.id="sLite";b.style.minWidth="240px";const lab=()=>b.textContent=LITE.on?"省电模式：开（少放特效）":"省电模式：关";lab();b.onclick=()=>{liteSet(!LITE.on,false);if(!LITE.on)M.lite="off";saveMeta();lab();sfx("click")};box.insertBefore(b,box.firstChild)}}catch(e){}return r}}
+
+/* ===================== 5.6 长老的小院：多两条路，旧的路也往后延 ===================== */
+META.push(
+ {id:"lastBreath",n:"回光",d:()=>"每局第一次受到致命伤害时，留下 1 点生命",max:1,cost:()=>55},
+ {id:"pocketM",n:"压岁钱",d:l=>`每上一层，多拿 ${12*l} 金币`,max:3,cost:l=>12+l*8},
+ {id:"fastLearn",n:"学得快",d:l=>`获得的经验 +${20*l}%`,max:2,cost:l=>16+l*10},
+ {id:"comboHeart",n:"连击心得",d:()=>"一回合连击 5 次以后，之后每一下攻击伤害 +2",max:1,cost:()=>40},
+ {id:"famEgg",n:"暖窝",d:l=>`每场战斗开局，场上有 ${l} 颗蛋（2 回合后孵化，8 伤害）`,max:2,cost:l=>14+l*10},
+ {id:"famHorse",n:"马厩",d:l=>`奶马牌每一下伤害 +${l}`,max:2,cost:l=>14+l*10},
+ {id:"famChick",n:"鸡窝",d:l=>`奶鸡牌获得的护盾 +${2*l}`,max:2,cost:l=>14+l*10},
+ {id:"skyWx",n:"看云",d:l=>`天气每变一次，获得 ${3*l} 护盾`,max:2,cost:l=>12+l*8},
+ {id:"skyMoon",n:"拜月",d:()=>"满月的战斗里，每回合多抽 1 张",max:1,cost:()=>30},
+ {id:"skyStart",n:"老天爷赏饭",d:()=>"每场战斗开局，天气变成对你牌组最有利的那种",max:1,cost:()=>45});
+try{YTREE.forEach(b=>{if(b.n==="生存")b.ids.push("lastBreath");if(b.n==="财富")b.ids.push("pocketM");if(b.n==="修行")b.ids.push("fastLearn");if(b.n==="武艺")b.ids.push("comboHeart")});
+ YTREE.push({n:"家族",c:"#35b06a",ids:["famEgg","famHorse","famChick"]},{n:"天象",c:"#3a8bff",ids:["skyWx","skyMoon","skyStart"]})}catch(e){}
+/* 成长的效果 */
+{const _sc5=startCombat;startCombat=function(kind){_sc5.apply(this,arguments);try{if(!B||kind==="R")return;
+  for(let i=0;i<mlv("famEgg");i++)B.layEgg({t:2,d:8,b:0,nw:1});
+  if(mlv("skyStart")&&!has("r_windbell")&&!has("r_drum")&&!has("snowglobe")){const cnt={};S.deck.forEach(c=>{const f=CARDS[c.id].fam;cnt[f]=(cnt[f]||0)+1});const W={frog:"rain",horse:"wind",chick:"snow",egg:"snow",cat:"fog"};let best=null,bv=0;for(const f in W)if((cnt[f]||0)>bv){bv=cnt[f];best=f}if(best)B.wx=W[best];renderSky()}
+  B.lbUsed=0}catch(e){console.warn(e)}}}
+{const _de4=dealEnemy;dealEnemy=function(t,d,i){try{if(B&&B.curType&&d>0&&!PREV){if(B.curFam==="horse")d+=mlv("famHorse");if(mlv("comboHeart")&&(B.hitStreak||0)>5)d+=2}}catch(e){}return _de4.call(this,t,d,i)}}
+{const _bk2=API.block;API.block=function(v,raw){try{if(!raw&&B&&B.curType&&B.curFam==="chick"&&v>0)v+=2*mlv("famChick")}catch(e){}return _bk2.call(this,v,raw)}}
+{const _sw3=API.setWx;API.setWx=function(w){const old=this.wx;const r=_sw3.apply(this,arguments);try{if(!PREV&&B&&old!==w&&mlv("skyWx"))B.block(3*mlv("skyWx"),1)}catch(e){}return r}}
+{const _st7=startTurn;startTurn=async function(){const r=await _st7.apply(this,arguments);try{if(B&&!B.over&&B.moon==="full"&&mlv("skyMoon"))B.draw(1)}catch(e){}return r}}
+{const _gx=gainXP;gainXP=async function(n){try{const l=mlv("fastLearn");if(l&&n>0)n=Math.max(n,Math.round(n*(1+.2*l)))}catch(e){}return _gx.call(this,n)}}
+{const _ac=actClear;actClear=async function(){const a0=S&&S.act;const r=await _ac.apply(this,arguments);try{if(S&&mlv("pocketM")&&S.act!==a0){S.gold+=12*mlv("pocketM");renderTop();saveRun()}}catch(e){}return r}}
+{const _dp2=dmgPlayer;dmgPlayer=function(v,src,raw){const r=_dp2.apply(this,arguments);try{if(S&&S.hp<=0&&mlv("lastBreath")&&!S.flags.lastBreath){S.flags.lastBreath=1;S.hp=1;toast("长老教你的「回光」：你留住了 <b>1</b> 点生命（一局一次）");renderBattle()}}catch(e){}return r}}
