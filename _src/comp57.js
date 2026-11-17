@@ -45,13 +45,13 @@ const COMP_LINES={
 function compActive(){const c=S&&S.comp;if(!c||!COMP_LINES[c.id])return false;if(c.gone||c.dead||c.left||c.swept)return false;if(c.id==="fire"&&c.alive===0)return false;if(c.done<0)return false;if(!(c.rel>=1)&&c.id!=="blue")return false;return true}
 let CB_Q=[],CB_ON=0;
 // 一次只出一条，排队；同一句不会连着排两次
-function compSay(text){if(!text||!S||!S.comp)return;if(CB_Q.includes(text))return;CB_Q.push(text);if(!CB_ON)cbNext()}
-function cbNext(){const t=CB_Q.shift();if(!t){CB_ON=0;return}CB_ON=1;const C=COMP[S.comp.id]||{};document.querySelectorAll(".cmpB").forEach(x=>x.remove());const d=document.createElement("div");d.className="cmpB"+($("#event.on")?" ev":"");d.innerHTML=`<div class="av"><img src="${IMG(C.img)}" alt=""></div><div class="bx"><span class="nm">${C.n}</span>${t}</div>`;const st=$("#stage");if(!st){CB_ON=0;return}st.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));const ms=Math.max(2600,1400+t.length*120);setTimeout(()=>{d.classList.remove("on");setTimeout(()=>{d.remove();cbNext()},380)},ms)}
+function compSay(text){if(!text||!S||(!S.comp&&typeof text!=="object"))return;if(CB_Q.some(x=>x===text||(x&&x.t&&text&&x.t===text.t)))return;CB_Q.push(text);if(!CB_ON)cbNext()}
+function cbNext(){let t=CB_Q.shift();if(!t){CB_ON=0;return}CB_ON=1;let th=null;if(typeof t==="object"){th=t;t=t.t}const C=th?{img:th.img}:((S.comp&&COMP[S.comp.id])||{});document.querySelectorAll(".cmpB").forEach(x=>x.remove());const d=document.createElement("div");d.className="cmpB"+($("#event.on")?" ev":"")+(th?" think":"");d.innerHTML=`<div class="av"><img src="${IMG(C.img)}" alt=""></div><div class="bx">${th?"":`<span class="nm">${C.n}</span>`}${th?"（"+t+"）":t}</div>`;const st=$("#stage");if(!st){CB_ON=0;return}st.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));const ms=Math.max(2600,1400+t.length*120);setTimeout(()=>{d.classList.remove("on");setTimeout(()=>{d.remove();cbNext()},380)},ms)}
 function compLine(kind,once){try{if(!compActive())return;const L=COMP_LINES[S.comp.id][kind];if(!L||!L.length)return;S.comp.said=S.comp.said||{};if(once){const k=kind+"_"+once;if(S.comp.said[k])return;S.comp.said[k]=1}const n=S.comp.said[kind]|0;S.comp.said[kind]=n+1;compSay(L[n%L.length])}catch(e){console.warn(e)}}
 // 酒馆：进门说一句；替它还过钱的阿蓝，前两次会抢着付酒钱
 {const _tv=tavernScreen;tavernScreen=function(){const r=_tv.apply(this,arguments);try{const c=S.comp;if(c&&c.id==="blue"&&c.blue==="paid"&&compActive()&&(c.treat|0)<2&&S.cur&&!S.cur.treated){S.cur.treated=1;c.treat=(c.treat|0)+1;S.gold+=20;renderTop();saveRun();setTimeout(()=>compSay("这次记我账上。真的记我账上。（阿蓝付了酒钱：+20 金币）"),700)}else setTimeout(()=>compLine("tav"),700)}catch(e){}return r}}
 // 首领战：开打前说一句
-{const _sc=startCombat;startCombat=function(kind){const r=_sc.apply(this,arguments);try{if(["B","K","F","C","O"].includes(kind))setTimeout(()=>compLine("boss"),1300)}catch(e){}return r}}
+{const _sc=startCombat;startCombat=function(kind){const r=_sc.apply(this,arguments);try{if(["B","K","F","C","O"].includes(kind))setTimeout(()=>compBoss(),1300)}catch(e){}return r}}
 // SS 路线：每到一个节点说一句
 function ssLine(){const a=S.act||0;return a===2?"proto":a===3?"arena":a===4?"curser":null}
 {const _en=enterNode;enterNode=function(t,resumed,cur){const r=_en.apply(this,arguments);try{if(!resumed&&["X","H","P","D","U","J","L"].includes(t)){const k=ssLine();if(k)setTimeout(()=>compLine(k),900)}}catch(e){}return r}}
@@ -330,3 +330,55 @@ LB.decode=function(b,s){s=+s||0;if(+b===3&&s>=100000)return{s:Math.floor(s/100),
 {const _rs=LB.resend.bind(LB);LB.resend=function(){try{if(M.lbBest&&M.lbBest[3]&&M.lbBest[3]<100000){const a=Math.max(0,...(M.trueEnds||[]).map(x=>x.a||0));M.lbBest[3]=M.lbBest[3]*100+Math.min(99,a);if(M.lbSync)delete M.lbSync[3];saveMeta()}}catch(e){}return _rs()}}
 // 排行榜画出来以后，把第 3 个榜的分数拆成「分 + 周目」
 {const _rk=rankScreen;rankScreen=async function(){const r=await _rk.apply(this,arguments);try{const fix=()=>{const on=$("#ov .lbTabs [data-b].on");if(!on||on.dataset.b!=="3")return;$$("#ov .lbS").forEach(el=>{if(el.dataset.fx)return;const n=parseInt(el.textContent);const d=LB.decode(3,n);if(d.a!=null){el.innerHTML=`${d.s} <small>分</small><i class="lbAsc">第 ${d.a+1} 周目</i>`}el.dataset.fx=1});const me=$("#ov .lbMe b");if(me&&!me.dataset.fx){const d=LB.decode(3,parseInt(me.textContent));me.dataset.fx=1;if(d.a!=null){me.textContent=d.s;me.insertAdjacentHTML("afterend",`<i class="lbAsc">第 ${d.a+1} 周目</i>`)}}};const o=new MutationObserver(fix);const ov=$("#ov");if(ov){o.observe(ov,{childList:true,subtree:true});setTimeout(()=>o.disconnect(),120000)}fix()}catch(e){}return r}}
+
+/* ---------- 15. 同伴：见到首领、路上的事 ----------
+   首领每个人挑性格对得上的写；路上的事大约一半的机会说一句，同一类一局里按顺序轮着说。 */
+const COMP_BOSS={
+ iron:{king:"这人……我年轻时候见过。那会儿他头上还没长莲花。",count:"贵族。打贵族要先打膝盖，他们站不惯。",bloodbeast:"冷的东西不怕砍，怕你不停。",iceking:"冰做的王冠，戴着不冷吗。",fourhead:"四个头，一张嘴吃饭。打中间那个。",lavagiant:"大个子。腿慢。绕着它走。",witch:"别看她眼睛。我爹说的。",tophat:"变戏法的。手比眼快，那就让眼更快。",fallen:"掉下来的东西，最想爬回去。",demon:"……替我好好看看他。我上次没看清。"},
+ blue:{pearlqueen:"这壶得值多少钱啊……打碎了是不是就不值钱了？轻点打！",tophat:"变魔术的？我也会。看，钱没了。……哦，是真没了。",count:"伯爵！他家的勺子我认得！……不是我拿的。",king:"这老头身上全是荷叶，能卖吗？",cosmicegg:"这么大的蛋，煎出来够全塔吃一年。",snowking:"雪球大王？我小时候堆的比它好看。",fourhead:"四个头，一个头欠我十块，加起来就是四十。",shadow:"没有脸？那它借钱也不用还了。羡慕。",buddha:"金的！……是金的吧？你帮我咬一口试试。",demon:"就是他？……我能先躲起来再看吗。"},
+ fire:{iceking:"它把我冻过！……不对，是那块冰。都一样！",boilerdragon:"它烧的是我哥搬的煤吗？",bloodbeast:"好大……我哥说，大的都怕痒。",king:"沼泽里的老爷爷！他会不会认识我哥？",witch:"她的扫把能借我骑一下吗？",count:"伯爵家有我哥的画！我要问问他！",lavagiant:"烫烫烫！我的包！",snowking:"我要把它堆成雪人！……它已经是雪人了？",cosmicegg:"蛋！好大的蛋！……它会孵出什么啊？",demon:"我哥……没爬到这儿。我替他看。"},
+ bean:{fourhead:"四个头……那寄件人写哪个名字？",shadow:"没有脸的，没法签收。",king:"沼泽之王？我往这儿送过信。他没拆，一直揣着。",count:"伯爵家的信箱塞满了，从来没人取。",witch:"女巫的信，要用扫帚送吗？",pearlqueen:"茶壶也收信？那得找个长嘴的信封。",tophat:"帽子里能装多少封信？",iceking:"冻住的信，要捂化了才能看。",abyssdragon:"深渊底下，邮路不通。",demon:"这一单……地址就写这里吗？"},
+ hen:{cosmicegg:"……这蛋是谁下的？我得找它妈妈谈谈。",snowking:"穿这么少，难怪脾气大。",count:"就是他！早饭吃蛋的就是他！",boilerdragon:"把火关小点！蛋都要煮老了！",fourhead:"四张嘴，吃饭得多费粮食。",witch:"她锅里煮的什么？……不是蛋吧？",lavagiant:"这么大个子，小时候肯定没少吃。",iceking:"冻得发紫了都，谁给它披件衣服。",pearlqueen:"茶叶蛋……是你煮的吧？！",demon:"你也是谁家的孩子。打完了，记得回家吃饭。"}};
+const COMP_MORE={
+ iron:{bwin:["嗯。腰转过来了。","还行。比我年轻时强一点。"],shop:["买刀，别买花哨的。"],chest:["打开。别指望太多。"],rest:["睡吧。我守着。……我也守不了多久，睡快点。"],low:["站着。倒下去就起不来了，我知道。"],big:["……这一下，像我爹。"],relic:["好东西。别显摆。"],scam:["这人眼神飘。别信。"]},
+ blue:{bwin:["赢了！我押对了！……我没押，我就是说说。","这把我出了大力。我负责喊。"],shop:["你砍价，我望风。"],chest:["先给我看一眼！就一眼！"],rest:["睡觉不花钱，这是塔里唯一不花钱的事。"],low:["要不……咱们跑吧？我跑得可快了。"],big:["这一下能卖多少钱！"],relic:["这个归你，下一个归我。说好了啊。"],scam:["这个我熟。我以前就干这个。……别跟别人说。"]},
+ fire:{bwin:["看见没！我就说我们能赢！","赢了！等我找到哥，我要讲给他听！"],shop:["我想买那个！……算了，钱要留着请我哥喝奶茶。"],chest:["我来开我来开！"],rest:["我哥说，篝火边上不能说丧气话。"],low:["你别倒下！你倒下我扛不动你！"],big:["哇！！再来一次！"],relic:["这个好亮！"],scam:["他骗人！跟我哥骗我说他不疼一个味儿。"]},
+ bean:{bwin:["签收了。","这一单送完了，下一单。"],shop:["能开发票吗？……塔里没有发票？"],chest:["这包裹没有寄件人。……先打开吧。"],rest:["包裹放火边上热一热。"],low:["你倒了，我这单就送不到了。……你也送不到了。"],big:["这一下，加急件。"],relic:["这个有人寄过来吗？没有？那就是捡的。捡的也算。"],scam:["地址都写不对，还想骗人。"]},
+ hen:{bwin:["饿了吧？来，吃一口。","打完了就好，打完了就好。"],shop:["贵！太贵了！老板，你也是有孩子的人吧？"],chest:["里面有吃的吗？没吃的就给你。"],rest:["睡吧，我给你掖掖被子。"],low:["快吃一口！我兜里还有米！"],big:["好！吃饱了就是有劲！"],relic:["收好了，别弄丢了。"],scam:["骗人骗到我头上？我在菜市场砍了三十年价！"]}};
+for(const k in COMP_MORE)Object.assign(COMP_LINES[k],COMP_MORE[k]);
+function compBoss(){try{if(!compActive()||!B||!B.enemies)return;const id=(B.enemies.find(e=>COMP_BOSS[S.comp.id][e.id])||{}).id;if(id){S.comp.said=S.comp.said||{};const k="b_"+id;if(!S.comp.said[k]){S.comp.said[k]=1;return compSay(COMP_BOSS[S.comp.id][id])}}compLine("boss")}catch(e){}}
+function compMaybe(kind,p){try{if(compActive()&&rnd()<(p==null?.5:p))compLine(kind)}catch(e){}}
+{const _f=shopScreen;shopScreen=function(){const r=_f.apply(this,arguments);setTimeout(()=>compMaybe("shop"),700);return r}}
+{const _f=treasure;treasure=function(){const r=_f.apply(this,arguments);setTimeout(()=>compMaybe("chest",.6),500);return r}}
+{const _f=restSite;restSite=function(){const r=_f.apply(this,arguments);setTimeout(()=>compMaybe("rest"),700);return r}}
+{const _w=win;win=async function(){try{const k=B&&!B.over&&B.kind;if(["B","K","F","C","O","H","J"].includes(k))setTimeout(()=>{if(compActive())compLine("bwin")},1200)}catch(e){}return _w.apply(this,arguments)}}
+{const _st=startTurn;startTurn=async function(){const r=await _st.apply(this,arguments);try{if(B&&!B.over&&S.hp>0&&S.hp<=S.max*.25&&!B.cLow){B.cLow=1;compMaybe("low",.8)}}catch(e){}return r}}
+{const _de=dealEnemy;dealEnemy=function(t,d){const r=_de.apply(this,arguments);try{if(!PREV&&B&&!B.cBig&&d>=30&&B.myTurn!==false){B.cBig=1;compMaybe("big",.5)}}catch(e){}return r}}
+{const _gr=gainRelic;gainRelic=function(id){const r=_gr.apply(this,arguments);try{const R=RELICS[id];if(R&&/^[RS]$/.test(R.r))compMaybe("relic",.5)}catch(e){}return r}}
+{const _es2=eventScreen;eventScreen=function(force){const r=_es2.apply(this,arguments);try{const ev=(S&&S.cur&&S.cur.ev)||force;if(ev&&/^sc_/.test(ev))setTimeout(()=>compMaybe("scam",.8),900)}catch(e){}return r}}
+
+
+/* ---------- 16. 主角的心里话（每个主角不一样） ---------- */
+const HERO_THINK={
+ naiwa:{act0:["泥巴好软……要是能在这儿睡一觉就好了。不行，不能睡。"],act1:["好大的房子……打扫起来得多累啊。"],act2:["冷。早知道把长老那条旧被子带上了。"],act3:["好甜的味道。……不能吃，这里的东西都不能乱吃。"],act4:["星星离得好近。村里看不见这么多。"],
+  meet:["多一个人，路上就不那么安静了。","它看起来也挺累的。那就一起走吧。"],quest:["反正也是顺路。……应该是顺路吧。","帮一下又不会少块肉。"],thanks:["被人谢谢，脸有点烫。"],scam:["我就知道。我怎么每次都知道，还每次都买。"],caught:["这次没上当！……下次可能就上当了。"],low:["好困……不对，这不是困。"]},
+ kungfu:{act0:["泥地，练步法正好。"],act1:["城堡里的人站姿都不稳。可以打。"],act2:["冷，正好练下盘。"],act3:["这里的人一直在动，却没有一个在练功。"],act4:["师父说过，站得越高，越要沉得住气。"],
+  meet:["同行的人多一个，出拳要更收敛些。","它的步子很乱。……路上可以教它几招。"],quest:["路见不平。","师父没教过怎么拒绝别人。"],thanks:["举手之劳，不该收谢礼。……收都收了。"],scam:["师父说过：手快的人，心不一定正。我又忘了。"],caught:["呼吸乱了，眼神也乱了。这种人不用出手。"],low:["气还没断。还能出一拳。"]},
+ knight:{act0:["骑士的靴子不该踩泥。……算了，没人看见。"],act1:["这里的骑士都忘了自己在守护什么。"],act2:["盔甲会冻在身上。那就不脱了。"],act3:["盔甲在这里会生锈的。……那就趁生锈前打完。"],act4:["一个骑士最远能走到哪里？就是这里了。"],
+  meet:["有同伴的骑士，才算骑士。","我会保护它的。……它好像不需要。"],quest:["有人求助，骑士不能装作没听见。"],thanks:["骑士不需要谢礼。但这份心意，我收下了。"],scam:["我被骗，是因为我相信人。这不是缺点。……应该不是。"],caught:["骑士的眼睛，不是用来装饰的。"],low:["盔甲还没倒，我就还没倒。"]},
+ mage:{act0:["泥巴里的魔力浓度……出乎意料地高。值得研究。"],act1:["城堡的法阵是反着画的。故意的？"],act2:["冰的结晶是六边形的。和书上一样。总算有一样一样的。"],act3:["这些管子在搬运某种东西。不是奶茶。"],act4:["星星的排列……和书上画的不一样。书上是错的？还是天在变？"],
+  meet:["同伴会让这趟旅程变得不可预测。有意思。","多一个观察对象。"],quest:["一个可以验证的小委托。好。"],thanks:["道谢时的表情，和书上写的不太一样。更好一点。"],scam:["概率上讲，这次被骗是小概率事件。……第三次了。"],caught:["这个把戏我三岁就会拆穿了。"],low:["计算一下……不，现在不是计算的时候。"]},
+ vamp:{act0:["泥。我的披风。我的鞋。"],act1:["真怀念。……不，一点都不怀念。"],act2:["冷对我没用。……就是有点冷。"],act3:["这里的甜味，比血还腻。"],act4:["月亮这么近。今晚的血月会很美。"],
+  meet:["又一个跟着我的。……随它吧。","不是我想带上它。是它非要跟。"],quest:["不是我想帮。只是看不下去而已。"],thanks:["他们道谢的样子……还挺好看的。"],scam:["我被一个骗子骗了。这件事要是传出去，我就把这座塔咬穿。"],caught:["想骗吸血鬼？我活得比你的谎话长。"],low:["这点血……还不够我喝的。"]}};
+function think(kind){try{if(!S)return;const H=HERO_THINK[S.hero]||HERO_THINK.naiwa;const L=H[kind];if(!L||!L.length)return;S.thk=S.thk||{};const n=S.thk[kind]|0;S.thk[kind]=n+1;const h=HEROES.find(x=>x.id===S.hero)||HEROES[0];compSay({t:L[n%L.length],img:h.img})}catch(e){}}
+// 第一次进入每一层
+{const _om3=openMap;openMap=function(){const r=_om3.apply(this,arguments);try{if(S&&!S.junc&&!S.dream&&!S.fin&&S.row<0&&!(S.postQ&&S.postQ.length)){S.thAct=S.thAct||{};const a=S.act||0;if(!S.thAct[a]){S.thAct[a]=1;saveRun();setTimeout(()=>think("act"+a),1600)}}if(S&&S.thinkAfter&&!(S.postQ&&S.postQ.length)){const k=S.thinkAfter;delete S.thinkAfter;setTimeout(()=>think(k),900)}}catch(e){}return r}}
+// 遇到同伴
+{const _es3=eventScreen;eventScreen=function(force){const r=_es3.apply(this,arguments);try{const ev=(S&&S.cur&&S.cur.ev)||force;if(ev&&/^c_(fire|blue|iron|bean|hen)0$/.test(ev))setTimeout(()=>think("meet"),1500)}catch(e){}return r}}
+// 接下支线、办完支线
+{const _jt=jsideTake;jsideTake=function(){const r=_jt.apply(this,arguments);try{if(r)setTimeout(()=>think("quest"),900)}catch(e){}return r}}
+{const _j2=jsideTick1;jsideTick1=function(q,need){const was=q&&!q.done;const r=_j2.apply(this,arguments);try{if(was&&q.done)S.thinkAfter="thanks"}catch(e){}return r}}
+// 被坑 / 识破：坑人事件的第一个选项是上当，写着「识破」的是识破
+["sc_holy","sc_antique","sc_warmer","sc_fee","sc_robber","sc_star"].forEach(k=>{const E=EVENTS[k];if(!E)return;const o1=E.o;E.o=()=>o1().map((op,i)=>{const f0=op.f;return Object.assign({},op,{f:async()=>{const r=await f0();try{if(r!=null){if(i===0&&!/真的/.test(r))setTimeout(()=>think("scam"),900);else if(/识破/.test(op.d||""))setTimeout(()=>think("caught"),900)}}catch(e){}return r}})})});
+// 快不行了（同伴不在的时候，主角自己想）
+{const _st2=startTurn;startTurn=async function(){const r=await _st2.apply(this,arguments);try{if(B&&!B.over&&S.hp>0&&S.hp<=S.max*.25&&!B.tLow&&!compActive()){B.tLow=1;think("low")}}catch(e){}return r}}

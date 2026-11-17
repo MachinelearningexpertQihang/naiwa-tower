@@ -27,20 +27,20 @@ const SF={};let SF_N=4,SF_LOADING=0;
 function loadSF(){if(SF_LOADING||!A.ctx)return;SF_LOADING=1;for(let i=0;i<SF_N;i++){const sc=document.createElement("script");sc.src="sf/sf"+i+".js?v="+(typeof VER!=="undefined"?VER:"1");sc.onload=()=>decodeSF();document.head.appendChild(sc)}}
 function decodeSF(){const W=window.__NWT_SF||{};for(const inst in W){if(SF[inst])continue;SF[inst]={keys:[],buf:{}};const notes=W[inst];for(const m in notes){const bin=atob(notes[m]);const arr=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)arr[j]=bin.charCodeAt(j);
   const done=b=>{SF[inst].buf[m]=b;SF[inst].keys=Object.keys(SF[inst].buf).map(Number).sort((a,b)=>a-b)};try{const p=A.ctx.decodeAudioData(arr.buffer,done,()=>{});if(p&&p.then)p.then(done).catch(()=>{})}catch(e){}}delete W[inst]}}
-function samp(inst,m,t,dur,vol,wet,dest){const I=SF[inst];if(!I||!I.keys.length||!A.ctx)return false;let k=I.keys[0];for(const x of I.keys)if(Math.abs(x-m)<Math.abs(k-m))k=x;const b=I.buf[k];if(!b)return false;
+function samp(inst,m,t,dur,vol,wet,dest){if(A.inS)vol*=A.vk;const I=SF[inst];if(!I||!I.keys.length||!A.ctx)return false;let k=I.keys[0];for(const x of I.keys)if(Math.abs(x-m)<Math.abs(k-m))k=x;const b=I.buf[k];if(!b)return false;
  const c=A.ctx,src=c.createBufferSource(),g=c.createGain();src.buffer=b;src.playbackRate.value=Math.pow(2,(m-k)/12);const end=Math.min(t+Math.max(.08,dur),t+b.duration/src.playbackRate.value);
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.006);g.gain.setValueAtTime(vol,Math.max(t+.01,end-.12));g.gain.linearRampToValueAtTime(0,end+.02);src.connect(g);g.connect(dest||A.bgm);const rv=dest?A.fxRev:A.rev;if(wet&&rv){const w=c.createGain();w.gain.value=wet;g.connect(w);w.connect(rv)}src.start(t);src.stop(end+.05);return true}
 /* ---- 基础发声 ---- */
 function tone(o){const c=A.ctx;if(!c)return;const t=o.t||c.currentTime,dur=o.dur||.15;
  const os=c.createOscillator(),g=c.createGain();os.type=o.type||"sine";os.frequency.setValueAtTime(o.f,t);if(o.f2)os.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
  if(o.vib){const l=c.createOscillator(),lg=c.createGain();l.frequency.value=o.vib;lg.gain.value=o.vibD||10;l.connect(lg);lg.connect(os.frequency);l.start(t+(o.vibDelay||0));l.stop(t+dur+.05)}
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(o.vol||.3,t+(o.att||.005));
- if(o.sus){g.gain.setValueAtTime(o.vol||.3,t+dur*o.sus)}g.gain.exponentialRampToValueAtTime(8e-4,t+dur);
+ const V=(o.vol||.3)*(A.inS?A.vk:1);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(V,t+(o.att||.005));
+ if(o.sus){g.gain.setValueAtTime(V,t+dur*o.sus)}g.gain.exponentialRampToValueAtTime(8e-4,t+dur);
  let n=os;if(o.filt){const f=c.createBiquadFilter();f.type=o.filt;f.frequency.value=o.ff||1e3;f.Q.value=o.q||1;os.connect(f);n=f}
  n.connect(g);g.connect(o.dest||A.fx);if(o.wet&&A.rev){const w=c.createGain();w.gain.value=o.wet;g.connect(w);w.connect(A.rev)}os.start(t);os.stop(t+dur+.05)}
 function noise(o){const c=A.ctx;if(!c)return;const t=o.t||c.currentTime,dur=o.dur||.1;const s=c.createBufferSource();s.buffer=A.noise;
  const f=c.createBiquadFilter();f.type=o.filt||"bandpass";f.Q.value=o.q||1;f.frequency.setValueAtTime(o.f||1e3,t);if(o.f2)f.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
- const g=c.createGain();g.gain.setValueAtTime(o.vol||.2,t);g.gain.exponentialRampToValueAtTime(8e-4,t+dur);s.connect(f);f.connect(g);g.connect(o.dest||A.fx);s.start(t,Math.random()*.5);s.stop(t+dur+.02)}
+ const g=c.createGain();g.gain.setValueAtTime((o.vol||.2)*(A.inS?A.vk:1),t);g.gain.exponentialRampToValueAtTime(8e-4,t+dur);s.connect(f);f.connect(g);g.connect(o.dest||A.fx);s.start(t,Math.random()*.5);s.stop(t+dur+.02)}
 const SFX={boom(){const c=A.ctx;if(!c)return;const t=c.currentTime;tone({type:"sine",f:110,f2:32,t,dur:.55,vol:.6});noise({t,dur:.45,vol:.45,filt:"lowpass",f:1400,f2:160})}};
 
 /* ---- 乐器 ---- */
@@ -236,29 +236,139 @@ Object.assign(TR,{
 });
 const TVOL={"secret":1.3,"dsq":1.0,"champ":1.0,"curser":1.35,"curser2":0.95,"homemain":1.4,"sea":1.4,"seaboss":1.0,"junc":1.3,"mirror":1.05,"backdoor":1.0,"hidroom":1.0,"tavern":1.35,"victory":1.3,"title":1.36,"map":1.38,"battle":0.99,"elite":1.07,"boss":1.02,"final":0.94,"shop":1.45,"rest":1.43,"event":1.23,"map1":1.38,"battle1":0.98,"map2":1.35,"battle2":1.15,"map3":1.0,"battle3":1.23,"map4":1.08,"battle4":1.14,"dream":1.12,"fin":0.91,"chair":0.91,"memo":1.38,"proto":1.1,"credits":1.1};
 function harmUnder(m,chord){let best=null;for(const c of chord)for(const o of [12,24,36]){const n=c+o;if(n<m-2&&n>=m-9&&(best===null||n>best))best=n}return best}
+/* ---- 5.8 编曲：每首歌不再只是 8 小节循环 ----
+   一轮 = 主歌 A → 变奏 A2 → 副歌 B →（快歌再来一遍副歌 B2）→ 间奏 Br，然后回到 A。
+   副歌的和弦、旋律从原曲推出来；变奏加经过音；间奏只留长音，鼓停下。
+   每个音有轻重（强拍重、弱拍轻，副歌整体更响），时间上有一点点误差，听起来像人在弹。
+   也可以像 battle0 那样，直接手写 parts / order。 */
+const ROLE_K={A:.86,A2:.95,B:1.08,B2:1.12,Br:.7};
+function scaleOf(r0,minor){return(minor?[0,2,3,5,7,8,10,11]:[0,2,4,5,7,9,11]).map(x=>(r0+x)%12)}
+function snapTo(n,pcs){for(let d=0;d<7;d++){if(pcs.includes(((n-d)%12+12)%12))return n-d;if(pcs.includes((n+d)%12))return n+d}return n}
+function melVar(mel,sc){const m=mel.slice();for(let i=1;i<m.length-1;i++){if(m[i]!==0)continue;let p=i-1;while(p>0&&m[p]===-1)p--;const a=m[p],b=m[i+1];if(a>0&&b>0&&Math.abs(b-a)>=3&&(i%8)!==0)m[i]=snapTo(Math.round((a+b)/2),sc)}return m}
+function buildArr(T){if(T._arr)return T._arr;const secs=[];
+ if(T.parts){(T.order||[]).forEach(([k,role])=>{const P=T.parts[k];const sc=P.sc||T.sc||scaleOf(P.ch[0][0],/^m/.test(P.ch[0][1]));secs.push({mel:role==="A2"||role==="B2"?melVar(P.mel,sc):P.mel,ch:P.ch,role,dr:P.dr})});return T._arr=secs}
+ const mel=T.mel,bars=Math.round(mel.length/8),chs=[...Array(bars)].map((_,b)=>T.ch[b%T.ch.length]);const [r0,q0]=T.ch[0];const minor=/^m/.test(q0);const sc=scaleOf(r0,minor);
+ const deg=minor?[[8,"M"],[10,"M"],[0,"m"],[7,"7"],[5,"m"],[8,"M"],[10,"M"],[7,"7"]]:[[5,"M"],[7,"M"],[4,"m"],[9,"m"],[5,"M"],[7,"M"],[0,"M"],[7,"7"]];
+ const bch=deg.map(([d,ty])=>{let r=r0+d;if(r>r0+5)r-=12;return[r,ty]});
+ const order=[4,5,6,7,0,1,2,3];const bmel=[];order.forEach((ob,nb)=>{const pcs=CH(bch[nb][0],bch[nb][1]).map(x=>x%12);for(let e=0;e<8;e++){const n=mel[(ob*8+e)%mel.length];bmel.push(n>0?(e===0||e===4?snapTo(n,pcs):snapTo(n,sc)):n)}});
+ if(bmel[0]===-1)bmel[0]=snapTo(72,CH(bch[0][0],bch[0][1]).map(x=>x%12));
+ const br=[];for(let b=0;b<4;b++)for(let e=0;e<8;e++){const n=mel[b*8+e];br.push(e===0||e===4?(n>0?n:-1):-1)}if(br[0]===-1)br[0]=CH(chs[0][0],chs[0][1])[2]+12;
+ secs.push({mel,ch:chs,role:"A"},{mel:melVar(mel,sc),ch:chs,role:"A2"},{mel:bmel,ch:bch,role:"B"});
+ if(240/T.bpm*28<48)secs.push({mel:melVar(bmel,sc),ch:bch,role:"B2"});
+ secs.push({mel:br,ch:chs.slice(0,4),role:"Br"});return T._arr=secs}
+function secAt(T,step){const S2=buildArr(T);let tot=0;S2.forEach(x=>tot+=x.mel.length);let s=step%tot;for(const x of S2){if(s<x.mel.length)return[x,s];s-=x.mel.length}return[S2[0],0]}
 function sched(h=.15){const c=A.ctx;if(!c)return;if(A.next<c.currentTime-.2)A.next=c.currentTime+.05;
  while(A.next<c.currentTime+h){const T=TR[A.cur];const q=60/(T?T.bpm*(A.rage?1.18:1):100)/2;
-  if(T&&A.music&&(c.state==="running"||A.offline)){const s=A.step%64,bar=Math.floor(s/8),e=s%8,t=A.next+(e%2?q*T.sw:0);const [r,ty]=T.ch[bar%T.ch.length];const chord=CH(r,ty);
-   A.T=T;const O=T.s||{};const loop=Math.floor(A.step/64);const m=T.mel[s];if(m>0){let l=1;while(T.mel[(s+l)%64]===-1&&l<8)l++;if(!(O.lead&&samp(O.lead,m,t,q*l,.72,.3)))INST[T.lead](m,t,q*l);if(O.dbl&&(loop%2===1||A.rage))samp(O.dbl,m+(O.dbl==="music_box"||O.dbl==="celesta"?12:0),t,q*l,.28,.3);if(loop%2===1||A.rage){const hm=harmUnder(m,chord);if(hm)tone({type:"triangle",f:mtof(hm),t,dur:q*l*.9,vol:.05,dest:D(),wet:.3})}}
-   if(loop%4===2&&!T.arp&&e%2===0)tone({type:"triangle",f:mtof(chord[(e/2)%chord.length]+12),t,dur:q*1.5,vol:.04,dest:D(),wet:.4});
-   if(A.rage){hat(t,.05);if(e===2||e===6)kick(t,.4);if(e===7)snare(t,.1);tone({type:"sawtooth",f:mtof(r+(e%2?7:0)),t,dur:q*.8,vol:.035,dest:D(),filt:"lowpass",ff:900})}
-   BASS[T.bass](r,t,e,q);DRUM[T.dr](t,e,bar);
-   if(e===0&&O.pad&&SF[O.pad]){chord.forEach(n=>samp(O.pad,n,t,q*8.1,.16,.35))}else if(T.pad&&e===0)chord.forEach(n=>tone({type:"sine",f:mtof(n),t,dur:q*8.2,vol:T.pad,att:.4,dest:D(),wet:.3}));
-   if(O.arp&&SF[O.arp]&&(loop>0||!T.mel[s])){const pat=[0,2,1,2,0,2,1,2];const n=chord[pat[e]%chord.length]+(e>=4?12:0);if(e%2===0||T.bpm<100)samp(O.arp,n,t,q*2,.2,.3)}
-   if(O.stab&&SF[O.stab]&&(e===2||e===5||(e===7&&bar%2)))chord.forEach(n=>samp(O.stab,n+12,t,q*.6,.08,.15));
-   if(O.perc==="taiko"&&SF.taiko_drum){if(e===0&&bar%2===0)samp("taiko_drum",48,t,.8,.7,.2);if(bar%4===3&&e>=4)samp("taiko_drum",[60,48,48,36][e-4],t,.5,.5+.08*(e-4),.2)}
-   if(O.perc==="timp"&&SF.timpani){if(e===0)samp("timpani",r-12,t,1,.55,.25);if(bar%4===3&&e>=4)samp("timpani",r-12+(e%2?7:0),t,.3,.35+.05*(e-4),.2)}
-   if(O.perc==="wood"&&SF.woodblock&&(e===3||(e===6&&bar%2)))samp("woodblock",e===3?72:84,t,.2,.35);
-   if(O.bells&&SF.tubular_bells&&e===0&&bar%4===0)samp("tubular_bells",r+24,t,2,.22,.6);
-   if(T.arp)tone({type:"triangle",f:mtof(chord[e%chord.length]+(e>=4?12:0)),t,dur:q*2,vol:.07,dest:D(),wet:.4});
-   if(T.bell&&e===0&&bar%2===0)INST.bell(r+24,t,q)}
+  if(T&&A.music&&(c.state==="running"||A.offline)){A.inS=1;try{
+   if(!T.s&&ORCH[A.cur])T.s=ORCH[A.cur];
+   const [X,s]=secAt(T,A.step);const M=X.mel,L=M.length,bar=Math.floor(s/8),e=s%8,role=X.role,full=role==="B"||role==="B2",br=role==="Br";
+   const tg=A.next+(e%2?q*T.sw:0);const hum=()=>tg+(Math.random()-.5)*.014;const [r,ty]=X.ch[bar%X.ch.length];const chord=CH(r,ty);
+   const acc=e===0?1:e===4?.92:e%2===0?.84:.74;const RK=ROLE_K[role]||1;const vk=RK*acc*(.93+Math.random()*.12);
+   A.T=T;const O=T.s||{};const m=M[s];
+   A.vk=vk;if(m>0){let l=1;while(M[(s+l)%L]===-1&&l<8)l++;const t=hum();if(!(O.lead&&samp(O.lead,m,t,q*l,br?.6:.72,br?.45:.3)))INST[T.lead](m,t,q*l);
+    if(O.dbl&&(full||role==="A2"||A.rage))samp(O.dbl,m+(O.dbl==="music_box"||O.dbl==="celesta"?12:0),t,q*l,full?.3:.22,.3);
+    if(full||A.rage){const hm=harmUnder(m,chord);if(hm)tone({type:"triangle",f:mtof(hm),t,dur:q*l*.9,vol:.045,dest:D(),wet:.3})}}
+   // 副旋律：变奏和副歌里，在每半小节放一个和弦内的长音，跟主旋律错开
+   if((role==="A2"||full)&&(e===0||e===4)){let p=s;while(p>0&&!(M[p]>0))p--;const ref=M[p]>0?M[p]:chord[2]+12;let cn=harmUnder(ref,chord);if(!cn)cn=chord[1]+12;if(e===4){const pool=[];chord.forEach(x=>[12,24].forEach(o=>pool.push(x+o)));const alt=pool.filter(x=>x!==cn&&Math.abs(x-cn)<=5).sort((a,b)=>Math.abs(a-cn)-Math.abs(b-cn))[0];if(alt)cn=alt}const ci=O.ctr||(O.lead==="cello"?"orchestral_harp":"cello");A.vk=RK*.95;if(!samp(ci,cn,tg,q*4,.2,.3))tone({type:"triangle",f:mtof(cn),t:tg,dur:q*4,vol:.045,dest:D(),wet:.35})}
+   A.vk=vk;
+   if(A.rage){hat(tg,.05);if(e===2||e===6)kick(tg,.4);if(e===7)snare(tg,.1);tone({type:"sawtooth",f:mtof(r+(e%2?7:0)),t:tg,dur:q*.8,vol:.035,dest:D(),filt:"lowpass",ff:900})}
+   if(br){if(e===0)BASS.soft(r,tg,0,q)}else{BASS[T.bass](r,tg,e,q);(DRUM[X.dr||T.dr]||DRUM.none)(tg,e,bar);if(full&&e===0&&bar===0&&T.dr!=="none"&&T.dr!=="crickets")noise({t:tg,dur:.9,vol:.06,filt:"highpass",f:5000,dest:D()})}
+   const padOn=O.pad&&SF[O.pad];if(e===0){if(padOn&&role!=="A")chord.forEach(n=>samp(O.pad,n,tg,q*8.1,br?.2:.16,.35));else if(padOn&&role==="A"&&bar%2===0)chord.forEach(n=>samp(O.pad,n,tg,q*16,.1,.35));else if(T.pad&&!padOn)chord.forEach(n=>tone({type:"sine",f:mtof(n),t:tg,dur:q*8.2,vol:T.pad,att:.4,dest:D(),wet:.3}))}
+   if(O.arp&&SF[O.arp]&&(role!=="A"||!(m>0))){const pat=[0,2,1,2,0,2,1,2];const n=chord[pat[e]%chord.length]+(e>=4?12:0);if(e%2===0||T.bpm<100||full)samp(O.arp,n,hum(),q*2,br?.24:.2,.3)}
+   else if(!O.arp&&(role==="A2"||br)&&e%2===0)tone({type:"triangle",f:mtof(chord[(e/2)%chord.length]+12),t:tg,dur:q*1.5,vol:.04,dest:D(),wet:.4});
+   if(!br){if(O.stab&&SF[O.stab]&&(full||role==="A2")&&(e===2||e===5||(e===7&&bar%2)))chord.forEach(n=>samp(O.stab,n+12,tg,q*.6,.08,.15));
+    if(O.perc==="taiko"&&SF.taiko_drum){if(e===0&&bar%2===0)samp("taiko_drum",48,tg,.8,.7,.2);if((full||bar%4===3)&&bar%4===3&&e>=4)samp("taiko_drum",[60,48,48,36][e-4],tg,.5,.5+.08*(e-4),.2)}
+    if(O.perc==="timp"&&SF.timpani){if(e===0)samp("timpani",r-12,tg,1,.55,.25);if(bar%4===3&&e>=4)samp("timpani",r-12+(e%2?7:0),tg,.3,.35+.05*(e-4),.2)}
+    if(O.perc==="wood"&&SF.woodblock&&(e===3||(e===6&&bar%2)))samp("woodblock",e===3?72:84,tg,.2,.35)}
+   if(O.bells&&SF.tubular_bells&&e===0&&bar%4===0&&role!=="A")samp("tubular_bells",r+24,tg,2,.22,.6);
+   if(T.arp&&!(O.arp&&SF[O.arp]))tone({type:"triangle",f:mtof(chord[e%chord.length]+(e>=4?12:0)),t:tg,dur:q*2,vol:.07,dest:D(),wet:.4});
+   if(T.bell&&e===0&&bar%2===0)INST.bell(r+24,tg,q)
+  }catch(err){console.warn(err)}A.inS=0}
   A.next+=q;A.step++}}
 function musicRage(on){A.rage=on?1:0}
 function playMusic(n){const map={swing:"map",tense:"battle",space:"event",country:"shop",home:"rest"};n=map[n]||n;const act=(typeof S!=="undefined"&&S&&S.act)||0;
  if(typeof S!=="undefined"&&S){if(S.fin&&(n==="map"||n==="battle"||n==="elite"||n==="rest"))n="fin";else if(S.dream&&(n==="map"||n==="battle"||n==="elite"||n==="shop"||n==="event"))n="dream"}
- if(typeof S!=="undefined"&&S&&S.arena&&(n==="battle"||n==="elite"||n==="map"))n="hidroom";if(typeof S!=="undefined"&&S&&S.junc&&(n==="map"||n==="battle"||n==="elite"||n==="event"))n=S.act===3?"sea":"junc";if(typeof B!=="undefined"&&B&&!B.over&&(n==="battle"||n==="elite")){if(B.kind==="Y")n="mirror";else if(B.kind==="Z")n="backdoor";else if(B.kind==="O")n="seaboss"}if((n==="map"||n==="battle")&&act&&TR[n+act])n=n+act;if(A.cur===n)return;
+ if(typeof S!=="undefined"&&S&&S.arena&&(n==="battle"||n==="elite"||n==="map"))n="hidroom";if(typeof S!=="undefined"&&S&&S.junc&&(n==="map"||n==="battle"||n==="elite"||n==="event"))n=S.act===3?"sea":"junc";if(typeof B!=="undefined"&&B&&!B.over&&(n==="battle"||n==="elite")){if(B.kind==="Y")n="mirror";else if(B.kind==="Z")n="backdoor";else if(B.kind==="O")n="seaboss"}if((n==="map"||n==="battle")&&act&&TR[n+act])n=n+act;if(n==="battle"&&!act&&TR.battle0)n="battle0";if(A.cur===n)return;
  const nv=.24*(TVOL[n]||1);A.bgmVol=nv;const go=()=>{A.rage=0;A.cur=n;A.step=0;if(A.ctx)A.next=A.ctx.currentTime+.08};
  const c=A.ctx;if(!c||!A.bgm||!A.music||!A.cur){if(A.bgm&&A.music)A.bgm.gain.value=nv;go();return}
  /* 换曲：旧曲 0.35 秒淡出，新曲 0.6 秒淡入 */
  const g=A.bgm.gain,t=c.currentTime,v=nv;try{g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(0,t+.35);g.linearRampToValueAtTime(v,t+.95)}catch(e){}
  clearTimeout(A._sw);A.cur=null;A._sw=setTimeout(go,340)}
+
+/* ---- 5.8：第一层战斗「青苔小径」——慢一点、软一点，长笛 + 竖琴 + 弦乐铺底，手鼓和木鱼 ---- */
+DRUM.hand=(t,e,bar)=>{if(e===0)kick(t,.24);if(e===5)kick(t,.15);noise({t,dur:.045,vol:e%2?.022:.034,filt:"bandpass",f:6500,q:1.5,dest:D()});if(e===4)noise({t,dur:.09,vol:.05,filt:"bandpass",f:900,q:1.2,dest:D()});if(bar%4===3&&e===6)tom(t,170,.12)};
+TR.battle0={bpm:112,sw:.08,lead:"flute",bass:"walk",dr:"hand",pad:.03,
+ parts:{
+  A:{ch:[[53,"M"],[50,"m"],[46,"M"],[48,"M"],[53,"M"],[45,"m"],[46,"M"],[48,"7"]],
+   mel:[72,-1,69,72,74,-1,72,-1, 69,-1,65,67,69,-1,-1,0, 70,-1,74,72,70,-1,69,-1, 67,-1,69,70,72,-1,-1,0, 72,-1,77,76,74,-1,72,-1, 69,-1,72,69,76,-1,-1,0, 74,72,70,-1,69,67,65,-1, 67,-1,-1,0,64,-1,67,-1]},
+  B:{ch:[[50,"m"],[46,"M"],[53,"M"],[48,"M"],[50,"m"],[43,"m"],[46,"M"],[48,"7"]],
+   mel:[65,-1,67,69,70,-1,69,-1, 65,-1,-1,0,62,-1,65,-1, 69,-1,72,-1,70,69,67,-1, 64,-1,-1,0,67,-1,-1,0, 69,-1,70,72,74,-1,72,-1, 70,-1,67,-1,74,-1,70,-1, 70,72,74,-1,77,-1,74,-1, 72,-1,-1,-1,0,0,0,0]},
+  C:{ch:[[46,"M"],[48,"M"],[45,"m"],[50,"m"],[46,"M"],[48,"M"],[53,"M"],[53,"M"]],
+   mel:[77,-1,-1,74,77,-1,79,-1, 76,-1,-1,72,76,-1,79,-1, 81,-1,79,76,72,-1,76,-1, 74,-1,-1,-1,0,72,74,76, 77,-1,-1,74,77,-1,82,-1, 81,-1,79,-1,76,-1,72,-1, 77,-1,76,-1,74,-1,72,-1, 77,-1,-1,-1,0,0,0,0]},
+  D:{ch:[[50,"m"],[46,"M"],[43,"m"],[48,"sus"]],
+   mel:[74,-1,-1,-1,72,-1,-1,-1, 70,-1,-1,-1,69,-1,-1,-1, 67,-1,-1,-1,70,-1,-1,-1, 72,-1,-1,-1,0,0,0,0]}},
+ order:[["A","A"],["A","A2"],["B","A2"],["C","B"],["D","Br"],["C","B2"]]};
+TVOL.battle0=1.4;
+Object.assign(ORCH,{battle0:{lead:"flute",dbl:"orchestral_harp",ctr:"cello",bass:"acoustic_bass",pad:"string_ensemble_1",arp:"orchestral_harp",perc:"wood"},
+ hidroom:{lead:"trumpet",dbl:"french_horn",bass:"cello",pad:"string_ensemble_1",perc:"taiko"},
+ tavern:{lead:"acoustic_grand_piano",dbl:"fiddle",bass:"acoustic_bass",arp:"acoustic_guitar_nylon",perc:"wood"},
+ sea:{lead:"celesta",dbl:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1},
+ seaboss:{lead:"french_horn",dbl:"church_organ",bass:"cello",pad:"string_ensemble_1",perc:"timp"},
+ junc:{lead:"kalimba",dbl:"marimba",bass:"acoustic_bass",arp:"acoustic_guitar_nylon",perc:"wood"},
+ mirror:{lead:"harpsichord",dbl:"celesta",bass:"cello",pad:"string_ensemble_1",perc:"timp"},
+ backdoor:{lead:"marimba",dbl:"trumpet",bass:"acoustic_bass",stab:"string_ensemble_1",perc:"taiko"},
+ homemain:{lead:"flute",dbl:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1},
+ victory:{lead:"trumpet",dbl:"orchestral_harp",bass:"acoustic_bass",pad:"string_ensemble_1",arp:"acoustic_guitar_nylon"},
+ dsq:{lead:"trumpet",dbl:"french_horn",bass:"cello",stab:"string_ensemble_1",perc:"taiko"},
+ champ:{lead:"french_horn",dbl:"cello",bass:"cello",pad:"string_ensemble_1",perc:"timp"},
+ curser:{lead:"harpsichord",dbl:"celesta",bass:"cello",pad:"string_ensemble_1",bells:1},
+ curser2:{lead:"church_organ",dbl:"french_horn",bass:"cello",pad:"string_ensemble_1",perc:"timp",bells:1}});
+for(const k in ORCH)if(TR[k])TR[k].s=ORCH[k];
+/* ---- 5.8：战斗曲全部手写——原来的 8 小节当主歌 A，另写第二段 B、副歌 C、间奏 D ---- */
+(function(){const H=(r)=>r.split("|").map(x=>x.trim().split(/[ ,]+/).map(Number)).flat();
+ const C=s=>s.split(" ").map(x=>{const m=x.match(/^(\d\d)(.*)$/);return[+m[1],m[2]||"M"]});
+ const W={
+  battle1:{B:["46 41 43m 457 50m 46 43m 457","74 -1 70 -1 72 74 77 -1|77 -1 72 -1 69 -1 72 -1|74 -1 70 -1 67 -1 70 74|73 -1 -1 -1 76 -1 73 -1|77 -1 74 -1 69 -1 74 77|82 -1 81 79 77 -1 74 -1|79 -1 77 76 74 -1 70 -1|73 -1 -1 -1 0 69 73 76"],
+   C:["50m 48 46 457 50m 48 46 457","81 -1 77 81 86 -1 81 77|79 -1 76 79 84 -1 79 76|77 -1 74 77 82 -1 77 74|76 77 79 81 79 77 76 73|74 77 81 86 -1 84 82 81|79 76 72 76 79 -1 84 -1|82 81 79 77 79 77 76 74|73 -1 76 -1 69 -1 0 0"],
+   D:["43m 50m 46 45sus","70 -1 -1 -1 74 -1 -1 -1|77 -1 -1 -1 74 -1 -1 -1|74 -1 -1 -1 77 -1 -1 -1|76 -1 -1 -1 73 -1 -1 -1"]},
+  battle2:{B:["45m 52m 48 50 43 52m 45m 477","72 -1 71 69 76 -1 72 -1|71 -1 67 -1 64 -1 67 71|72 -1 76 -1 79 -1 76 72|74 -1 -1 78 -1 -1 74 -1|79 -1 74 -1 71 -1 74 79|76 -1 -1 -1 71 72 74 76|72 -1 69 72 76 -1 81 -1|78 -1 -1 -1 75 -1 71 -1"],
+   C:["48 50 47m 52m 48 50 477 52m","84 -1 83 -1 79 -1 76 -1|81 -1 78 -1 74 -1 78 81|83 -1 -1 78 83 -1 86 -1|88 -1 -1 -1 83 -1 79 -1|84 -1 83 79 76 -1 79 84|86 -1 84 81 78 -1 81 86|87 -1 83 -1 78 -1 75 -1|76 -1 -1 -1 0 0 0 0"],
+   D:["45m 48 52m 47sus","81 -1 -1 -1 76 -1 -1 -1|79 -1 -1 -1 76 -1 -1 -1|71 -1 -1 -1 79 -1 -1 -1|78 -1 -1 -1 0 0 0 0"]},
+  battle3:{B:["49 51 53m 53m 49 51 487 487","73 -1 77 -1 80 -1 77 73|75 -1 79 -1 82 -1 79 75|77 -1 80 -1 84 -1 80 -1|77 -1 -1 -1 0 72 75 77|80 -1 77 73 -1 77 80 -1|82 -1 79 75 -1 79 82 -1|84 -1 82 80 79 -1 76 -1|72 -1 -1 -1 0 0 0 0"],
+   C:["53m 44 46m 487 53m 44 46m 487","77 0 77 80 0 84 0 82|80 0 80 84 0 87 0 84|82 0 82 85 0 89 0 85|84 -1 82 -1 79 -1 76 -1|77 0 77 80 0 84 0 82|80 0 84 0 87 0 84 80|82 80 77 -1 79 76 72 -1|76 -1 79 -1 84 -1 0 0"],
+   D:["49 46m 51 487","77 -1 -1 -1 73 -1 -1 -1|77 -1 -1 -1 82 -1 -1 -1|79 -1 -1 -1 75 -1 -1 -1|76 -1 -1 -1 0 0 0 0"]},
+  battle4:{B:["50m 45m 53 527 50m 45m 55 527","77 -1 74 -1 69 -1 74 77|76 -1 72 -1 69 -1 -1 -1|72 -1 77 -1 81 -1 79 77|80 -1 -1 -1 76 -1 -1 -1|81 -1 77 -1 74 -1 77 81|84 -1 81 -1 76 -1 81 84|86 -1 83 -1 79 -1 83 86|88 -1 -1 -1 0 0 0 0"],
+   C:["53 55 52m 57m 53 55 527 57m","84 -1 -1 81 84 -1 88 -1|86 -1 -1 83 79 -1 83 -1|83 -1 -1 79 76 -1 79 83|81 -1 -1 -1 -1 -1 0 0|84 -1 86 -1 88 -1 89 -1|91 -1 -1 89 88 -1 86 -1|88 -1 86 -1 83 -1 80 -1|81 -1 -1 -1 0 0 0 0"],
+   D:["53 48 50m 52sus","77 -1 -1 -1 81 -1 -1 -1|79 -1 -1 -1 76 -1 -1 -1|77 -1 -1 -1 74 -1 -1 -1|76 -1 -1 -1 0 0 0 0"]},
+  elite:{B:["41 48 50m 457 41 48 46 457","72 -1 77 -1 81 -1 77 72|76 -1 79 -1 84 -1 79 76|77 -1 74 77 81 -1 77 74|73 -1 76 -1 79 -1 -1 -1|81 -1 77 -1 72 -1 77 81|84 -1 79 -1 76 -1 79 84|82 -1 81 -1 77 -1 74 -1|76 -1 -1 -1 73 -1 -1 -1"],
+   C:["50m 48 46 457 43m 457 50m 50m","86 -1 -1 81 86 -1 89 -1|88 -1 -1 84 79 -1 84 -1|86 -1 -1 82 77 -1 82 86|85 -1 -1 -1 81 -1 76 -1|82 -1 79 -1 74 -1 79 82|85 -1 81 -1 76 -1 81 85|86 -1 81 -1 77 -1 74 -1|74 -1 -1 -1 0 0 0 0"],
+   D:["43m 50m 46 45sus","74 -1 -1 -1 70 -1 -1 -1|74 -1 -1 -1 77 -1 -1 -1|77 -1 -1 -1 74 -1 -1 -1|76 -1 -1 -1 0 0 0 0"]}};
+ for(const k in W){const T=TR[k];if(!T)continue;const Ach=[...Array(8)].map((_,i)=>T.ch[i%T.ch.length]);T.parts={A:{ch:Ach,mel:T.mel}};for(const p of ["B","C","D"]){const [c,m]=W[k][p];T.parts[p]={ch:C(c),mel:H(m)}}
+  T.order=[["A","A"],["A","A2"],["B","A2"],["C","B"],["D","Br"],["C","B2"]];delete T._arr}})();
+/* ---- 5.8：地图曲（五层 + 两个隐藏层）也手写第二段 B、副歌 C、间奏 D；慢歌一轮少走一遍副歌 ---- */
+(function(){const H=(r)=>r.split("|").map(x=>x.trim().split(/[ ,]+/).map(Number)).flat();
+ const C=s=>s.split(" ").map(x=>{const m=x.match(/^(\d\d)(.*)$/);return[+m[1],m[2]||"M"]});
+ const W={
+  map:{B:["43 50 52m 45 43 50 47m 457","71 -1 74 -1 79 -1 78 76|74 -1 -1 0 69 -1 74 -1|76 -1 79 -1 76 -1 71 -1|73 -1 -1 0 76 -1 -1 0|79 -1 78 79 83 -1 79 -1|78 -1 74 -1 69 -1 74 78|74 -1 73 -1 71 -1 74 -1|73 -1 -1 -1 0 0 0 0"],
+   C:["47m 43 50 45 47m 43 52m 457","78 -1 81 -1 83 -1 81 78|79 -1 -1 0 74 -1 79 -1|81 -1 78 -1 74 -1 78 81|76 -1 -1 -1 0 73 74 76|78 -1 81 -1 86 -1 83 81|83 -1 79 -1 74 -1 79 83|81 -1 79 -1 78 -1 76 -1|76 -1 -1 -1 0 0 0 0"],
+   D:["43 50 52m 45sus","74 -1 -1 -1 71 -1 -1 -1|69 -1 -1 -1 74 -1 -1 -1|71 -1 -1 -1 67 -1 -1 -1|69 -1 -1 -1 0 0 0 0"]},
+  map1:{B:["46 41 43m 457 50m 46 43m 457","70 -1 74 -1 77 -1 74 -1|72 -1 -1 0 69 -1 65 -1|67 -1 70 -1 74 -1 70 -1|69 -1 -1 -1 73 -1 -1 0|74 -1 77 -1 81 -1 77 -1|82 -1 -1 0 77 -1 74 -1|79 -1 77 -1 74 -1 70 -1|73 -1 -1 -1 0 0 0 0"],
+   C:["50m 48 46 45 43m 50m 457 50m","77 -1 -1 -1 74 -1 77 -1|79 -1 -1 -1 76 -1 72 -1|77 -1 -1 -1 74 -1 70 -1|73 -1 76 -1 81 -1 -1 0|82 -1 -1 -1 79 -1 74 -1|81 -1 -1 -1 77 -1 74 -1|76 -1 73 -1 69 -1 73 76|74 -1 -1 -1 0 0 0 0"],
+   D:["46 43m 50m 45sus","70 -1 -1 -1 -1 -1 -1 -1|67 -1 -1 -1 70 -1 -1 -1|69 -1 -1 -1 74 -1 -1 -1|73 -1 -1 -1 0 0 0 0"]},
+  map2:{B:["45m 52m 48 47 45m 52m 50 477","72 -1 -1 76 -1 -1 81 -1|79 -1 -1 76 -1 -1 71 -1|72 -1 -1 76 -1 -1 79 -1|78 -1 -1 -1 75 -1 -1 0|81 -1 -1 79 -1 -1 76 -1|79 -1 -1 -1 71 -1 -1 0|74 -1 78 -1 81 -1 78 -1|75 -1 -1 -1 0 0 0 0"],
+   C:["48 50 43 47m 48 50 477 52m","84 -1 -1 83 -1 -1 79 -1|81 -1 -1 78 -1 -1 74 -1|79 -1 -1 83 -1 -1 86 -1|83 -1 -1 -1 78 -1 -1 0|84 -1 88 -1 86 -1 84 -1|83 -1 81 -1 78 -1 74 -1|75 -1 78 -1 81 -1 78 -1|76 -1 -1 -1 0 0 0 0"],
+   D:["48 43 45m 47sus","76 -1 -1 -1 -1 -1 -1 -1|74 -1 -1 -1 -1 -1 -1 -1|72 -1 -1 -1 76 -1 -1 -1|78 -1 -1 -1 0 0 0 0"]},
+  map3:{B:["46 45m 50m 487 46 41 43m7 487","74 -1 72 70 -1 74 77 -1|76 -1 72 -1 69 -1 72 76|77 -1 74 -1 69 74 77 -1|76 -1 -1 0 72 -1 70 -1|74 0 77 0 81 -1 77 74|72 -1 69 -1 65 -1 69 72|70 -1 74 -1 77 -1 74 70|72 -1 -1 -1 0 0 0 0"],
+   C:["41 50m 46 487 45m 50m 43m7 487","77 -1 -1 76 77 -1 81 -1|79 -1 77 -1 74 -1 -1 0|77 -1 -1 74 77 -1 82 -1|81 -1 79 -1 76 -1 -1 0|76 -1 79 -1 81 -1 84 -1|81 -1 77 -1 74 -1 77 81|79 -1 77 -1 74 -1 70 -1|72 -1 -1 -1 0 0 0 0"],
+   D:["46 45m 43m7 48sus","74 -1 -1 -1 70 -1 -1 -1|72 -1 -1 -1 76 -1 -1 -1|74 -1 -1 -1 70 -1 -1 -1|72 -1 -1 -1 0 0 0 0"]},
+  map4:{B:["50 52 49m 54m 50 52 57 52","78 -1 -1 81 -1 -1 86 -1|83 -1 -1 -1 80 -1 76 -1|80 -1 -1 76 -1 -1 73 -1|78 -1 -1 -1 0 0 0 0|81 -1 -1 78 -1 -1 74 -1|76 -1 80 -1 83 -1 -1 0|85 -1 -1 83 81 -1 76 -1|80 -1 -1 -1 0 0 0 0"],
+   C:["54m 50 57 52 54m 50 52 57","85 -1 -1 -1 81 -1 78 -1|86 -1 -1 -1 81 -1 78 -1|88 -1 -1 -1 85 -1 81 -1|83 -1 -1 -1 80 -1 -1 0|85 -1 88 -1 90 -1 88 -1|86 -1 85 -1 83 -1 81 -1|83 -1 -1 -1 80 -1 83 -1|81 -1 -1 -1 0 0 0 0"],
+   D:["50 49m 54m 52sus","78 -1 -1 -1 -1 -1 -1 -1|76 -1 -1 -1 -1 -1 -1 -1|73 -1 -1 -1 78 -1 -1 -1|76 -1 -1 -1 0 0 0 0"]},
+  junc:{B:["48 43 52m 50 48 43 45m 507","76 -1 72 -1 67 -1 72 76|74 -1 -1 0 71 -1 67 -1|71 -1 74 -1 79 -1 76 -1|78 -1 -1 -1 74 -1 -1 0|79 -1 76 -1 72 -1 76 79|83 -1 79 -1 74 -1 -1 0|81 -1 79 -1 76 -1 72 -1|74 -1 -1 -1 0 0 0 0"],
+   C:["52m 48 43 50 52m 48 507 43","79 -1 83 -1 88 -1 83 79|84 -1 -1 0 79 -1 76 -1|83 -1 79 -1 74 -1 79 83|81 -1 -1 -1 0 78 79 81|83 -1 88 -1 86 -1 83 -1|84 -1 83 -1 79 -1 76 -1|78 -1 81 -1 84 -1 81 -1|79 -1 -1 -1 0 0 0 0"],
+   D:["48 52m 45m 50sus","76 -1 -1 -1 72 -1 -1 -1|71 -1 -1 -1 76 -1 -1 -1|72 -1 -1 -1 69 -1 -1 -1|74 -1 -1 -1 0 0 0 0"]},
+  sea:{B:["46 41 43m 45sus 50m 46 48 457","77 -1 -1 -1 74 -1 -1 0|72 -1 -1 -1 69 -1 -1 0|70 -1 -1 74 -1 -1 79 -1|76 -1 -1 -1 -1 -1 0 0|81 -1 -1 -1 77 -1 -1 0|74 -1 -1 -1 77 -1 -1 0|76 -1 -1 -1 72 -1 -1 0|73 -1 -1 -1 0 0 0 0"],
+   C:["43m 46 50m 48 43m 46 457 50m","79 -1 -1 -1 82 -1 -1 0|81 -1 -1 -1 77 -1 -1 0|77 -1 -1 -1 81 -1 -1 0|79 -1 -1 -1 76 -1 -1 0|74 -1 -1 -1 79 -1 -1 0|77 -1 -1 -1 74 -1 -1 0|73 -1 -1 -1 76 -1 -1 0|74 -1 -1 -1 0 0 0 0"],
+   D:["46 43m 50m 45sus","70 -1 -1 -1 -1 -1 -1 -1|67 -1 -1 -1 -1 -1 -1 -1|69 -1 -1 -1 -1 -1 -1 -1|69 -1 -1 -1 0 0 0 0"]}};
+ for(const k in W){const T=TR[k];if(!T)continue;const Ach=[...Array(8)].map((_,i)=>T.ch[i%T.ch.length]);T.parts={A:{ch:Ach,mel:T.mel}};for(const p of ["B","C","D"]){const [c,m]=W[k][p];T.parts[p]={ch:C(c),mel:H(m)}}
+  T.order=T.bpm<90?[["A","A"],["B","A2"],["C","B"],["D","Br"]]:[["A","A"],["A","A2"],["B","A2"],["C","B"],["D","Br"],["C","B2"]];delete T._arr}})();

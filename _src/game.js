@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="5.7";
+const VER="5.8";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -203,6 +203,15 @@ function yardScreen(){
 /* ===================== 信箱：作者写给玩家的信 ===================== */
 const MAIL_SVG=`<svg viewBox="0 0 40 32" class="mailIco"><rect x="2" y="4" width="36" height="25" rx="2" fill="#fff" stroke="#0d0d0d" stroke-width="3"/><path d="M3 6 L20 19 L37 6" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-linejoin="round"/><path d="M28 2 h9 v8" fill="none" stroke="#e5191c" stroke-width="3"/></svg>`;
 const TMAILS=[
+ {id:"m58",t:"5.8 版本更新",date:"11月18日",body:[
+  "【音乐】所有曲子都重新编排了：不再是十几秒就从头再来，每首一轮在 50 秒到一分半之间，有主歌、变奏、副歌和间奏，间奏里鼓会停下来",
+  "【音乐】副歌换了和弦，变奏和副歌里多了一条副旋律；每个音有轻有重，强拍重、弱拍轻，听起来更像人在弹",
+  "【音乐】原来是电子音的 12 首（隐藏房间、酒馆、寂静之海、斗场、诅咒师等）都换成了真乐器",
+  "【战斗曲】第一层新写了一首「青苔小径」：慢一点、软一点，长笛、竖琴和弦乐，配手鼓和木鱼。第二到第五层的战斗曲和精英战曲都重新手写了第二段、副歌和间奏，一轮 70 到 80 秒",
+  "【地图曲】五层的地图曲和两个隐藏层的曲子也都手写了第二段、副歌和间奏，一轮一分半到两分钟",
+  "【心里话】主角会在心里嘀咕几句：第一次走进一层、遇到同伴、接下和办完支线、被骗或者识破骗子、快撑不住的时候。五个主角想的都不一样",
+  "【同伴】一路同行的伙伴话多了：见到不同的首领会说不同的话，打赢了会说，进商店、开宝箱、篝火边、你快不行的时候、打出一大下的时候、拿到好遗物、碰上骗子，都可能插一句",
+  "【连击】连击打到第 3 下以后，特效会自动减量（数字和火花照样有），连击多的时候没那么卡了"]},
  {id:"m57",t:"5.7 大版本更新",date:"11月17日",body:[
   "【开屏】打开游戏会先看到奶蛙工作室的标志，点一下可以跳过",
   "【同伴】一路同行的伙伴会开口了：进酒馆、打首领之前、走 SS 路线的时候，都会说上一两句",
@@ -890,11 +899,12 @@ function hitStop(ms){const a=$("#arena");if(!a)return;const n=performance.now();
 const ELC={fire:"#ff4a2a",ice:"#6fd3ff",thunder:"#b46bff",arc:"#ff8ce8"};
 function impactFx(x,y,big,col){const F=$("#fx");const _in=performance.now();const LITE=_in-(impactFx._t||0)<220;impactFx._t=_in;const r=document.createElement("div");r.className="impRing"+(big?" big":"");r.style.cssText=`left:${x}px;top:${y}px;--ic:${col}`;F.appendChild(r);setTimeout(()=>r.remove(),450);
  const n=LITE?(big?7:4):(big?12:7);for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,dist=(big?120:70)+Math.random()*50;PFX.add({x,y,dx:Math.cos(a)*dist,dy:Math.sin(a)*dist-30,c:col,s:6.4,r0:45,rr:Math.random()*360,se:.3,d:500,sh:1})}}
-function hitFx(x,y,big,blocked,fam,HK,HO){const F=$("#fx");const _n=performance.now();const LITE=_n-(hitFx._t||0)<200;hitFx._t=_n;let _lc=0;
+function hitFx(x,y,big,blocked,fam,HK,HO){const F=$("#fx");const _n=performance.now();const LITE=_n-(hitFx._t||0)<200||(B&&(B.hitStreak||0)>=3)||document.documentElement.classList.contains("lite");hitFx._t=_n;let _lc=0;
  if(B&&B.curType){B.hitStreak=(B.hitStreak||0)+1;B.maxStreak=Math.max(B.maxStreak||0,B.hitStreak);if(B.hitStreak>=2){let cb=$("#comboCt");if(!cb){cb=document.createElement("div");cb.id="comboCt";F.appendChild(cb)}if(B.hitStreak>=15)ach("combo15");{const em=B.hitStreak>=10?"无双！":B.hitStreak>=7?"停不下来！":B.hitStreak>=4?"好连击！":"";if(!cb._b){cb.innerHTML=`<small>连击</small><i>×</i><b></b><em></em>`;cb._b=cb.querySelector("b");cb._e=cb.querySelector("em")}cb._b.textContent=B.hitStreak;cb._e.textContent=em;cb._e.style.display=em?"":"none"}cb.className=B.hitStreak>=10?"c3":B.hitStreak>=7?"c2":B.hitStreak>=4?"c1":"";sfx("combo");if([4,7,10].includes(B.hitStreak)){stageShake();sparks(640,210,"#ffd23f",14+B.hitStreak)}cb.style.setProperty("--k",Math.min(1.5,1+B.hitStreak*.05));cb.classList.remove("pop");requestAnimationFrame(()=>requestAnimationFrame(()=>cb.classList.add("pop")));clearTimeout(cb._t);cb.classList.remove("out");cb._t=setTimeout(()=>{cb.classList.add("out");setTimeout(()=>{if(cb.classList.contains("out"))cb.remove()},450)},2400)}}
- const add=(cls,html,st,ms)=>{if((LITE&&/hxRing2|hxDust/.test(cls))||(LITE&&/hxSpark|hxBlood|hxEmber|hxIce|drop|hxLines|hxSmoke/.test(cls)&&(_lc++%4))||F.childElementCount>(LITE?45:70))return document.createElement("div");const d=document.createElement("div");d.className=cls;d.innerHTML=html||"";d.style.cssText=`left:${x}px;top:${y}px;${st||""}`;F.appendChild(d);setTimeout(()=>d.remove(),ms);return d};
+ const add=(cls,html,st,ms)=>{if((LITE&&/hxRing2|hxDust/.test(cls))||(LITE&&/hxSpark|hxBlood|hxEmber|hxIce|drop|hxLines|hxSmoke/.test(cls)&&(_lc++%4))||F.childElementCount>(LITE?28:60))return document.createElement("div");const d=document.createElement("div");d.className=cls;d.innerHTML=html||"";d.style.cssText=`left:${x}px;top:${y}px;${st||""}`;F.appendChild(d);setTimeout(()=>d.remove(),ms);return d};
  if(blocked){blockSound(true);add("hxShield","","",520);const o=document.createElement("div");o.className="ono blk";o.textContent=pick(["叮！","铛！"]);o.style.cssText=`left:${x+(Math.random()*60-30)}px;top:${y-70}px;--r:${Math.random()*16-8}deg`;F.appendChild(o);setTimeout(()=>o.remove(),620);return}
  const K=HK||hitKind();hitSound(K,big,HO);
+ if(B&&(B.hitStreak||0)>=3&&B.hitStreak%3&&!big){sparks(x,y,"#ffd23f",4);return}
  if(K==="fist"){add("hxRing"+(big?" big":""),"","",420);add("hxRing2"+(big?" big":""),"","",520);add("hxLines"+(big?" big":""),Array.from({length:big?12:8},(_,k)=>`<i style="--a:${k*(360/(big?12:8))+Math.random()*14}deg;--l:${(big?70:48)+Math.random()*30}px"></i>`).join(""),"",380);for(let k=0;k<(big?4:2);k++)add("hxDust",`<i></i>`,`--dx:${(Math.random()-.5)*120}px;--dy:${20+Math.random()*30}px;--s:${.7+Math.random()*.6}`,700);if(big){const ar=$("#arena");if(ar){ar.classList.remove("punch");void ar.offsetWidth;ar.classList.add("punch")}}}
  else if(K==="blade"){const r=-30+Math.random()*20;add("hxCut"+(big?" big":""),"",`--r:${r}deg`,380);if(big)add("hxCut big","",`--r:${r+70}deg;animation-delay:.06s`,440);for(let k=0;k<(big?12:7);k++){const a=(r+(Math.random()<.5?0:180))*Math.PI/180+(Math.random()-.5)*.8,dd=60+Math.random()*80;add("hxSpark",`<i></i>`,`--dx:${Math.cos(a)*dd}px;--dy:${Math.sin(a)*dd}px`,420)}}
  else if(K==="claw"){add("hxClaw"+(big?" big":""),"<i></i><i></i><i></i>","",560);for(let k=0;k<(big?9:5);k++){const a=Math.PI*(.15+Math.random()*.7),dd=50+Math.random()*70;add("hxBlood",`<i></i>`,`--dx:${Math.cos(a)*dd*(Math.random()<.5?-1:1)}px;--dy:${Math.sin(a)*dd}px;--s:${.6+Math.random()*.8}`,620)}}
