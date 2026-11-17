@@ -55,7 +55,7 @@ Object.assign(BM,{
 {const _bg=bossGuard;bossGuard=function(t,d){if(/^curser/.test(t.id)&&d>0&&B&&B.alive().some(x=>/^ss_minion/.test(x.id)))d=Math.ceil(d/2);return _bg(t,d)}}
 {const _de=dealEnemy;dealEnemy=function(t,d,i){if(t&&t.id==="ss_shield"&&d>0)d=Math.max(0,d-3);return _de.call(this,t,d,i)}}
 {const _ke=killEnemy;killEnemy=function(t){const r=_ke.apply(this,arguments);try{if(/^curser/.test(t.id)&&B)B.enemies.forEach(x=>{if(/^ss_minion/.test(x.id)&&x.hp>0){x.hp=0;x.fled=1}});if(/^ss_minion/.test(t.id)){M.minionK=(M.minionK||0)+1;if(M.minionK>=10)ach("minion10")}if(t.id==="seakeeper"){M.seaK=(M.seaK||0)+1;ach("seakeeper");if(M.seaK>=2)ach("seakeeper2");S.flags.seaKill=1}if(t.id==="ss_shield")ach("shieldwin");if(t.id==="ss_archer")ach("archerwin")}catch(e){}return r}}
-{const _ea=enemyAct;enemyAct=async function(e){const I=e.intent;let hp0=S.hp;if(I&&I.burst){I.v=(I.burst>=3?8:6)+I.burst*csStacks()}const r=await _ea.apply(this,arguments);try{if(I&&I.burst&&hp0-S.hp>=50)ach("burst50");if(I&&I.k==="debuff"&&I.s2&&B&&!B.over&&S.hp>0){B.apply(B.p,I.s2,I.v2||1);renderBattle()}if(B&&negKinds().length>=8)ach("debuff8")}catch(x){}return r}}
+{const _ea=enemyAct;enemyAct=async function(e){const I=e.intent;let hp0=S.hp;try{if(I&&I.k==="buff"){const _c=center(enEl(e).querySelector(".body"));sparks(_c.x,_c.y-30,"#ff6b6b",7)}}catch(x){}if(I&&I.burst){I.v=(I.burst>=3?8:6)+I.burst*csStacks()}const r=await _ea.apply(this,arguments);try{if(I&&I.burst&&hp0-S.hp>=50)ach("burst50");if(I&&I.k==="debuff"&&I.s2&&B&&!B.over&&S.hp>0){B.apply(B.p,I.s2,I.v2||1);renderBattle()}if(B&&negKinds().length>=8)ach("debuff8")}catch(x){}return r}}
 
 /* 负面状态：完整生效 / 挡掉 / 免疫 */
 {const _ap=API.apply;API.apply=function(t,s,v){try{if(B&&t===B.p&&NEG55.includes(s)&&v>0){
@@ -88,7 +88,7 @@ function relicSold(){M.relicSold=(M.relicSold||0)+1;ach("relicSell");if(M.relicS
   if(kind==="D"){const boss=B.enemies.some(e=>ENEMY[e.id].boss);setBg("teaarena",B.moon);playMusic(boss?"champ":"dsq");if(boss){bt.classList.add("bossFight","finalFight")}B.enemies.forEach(e=>{if(!/^ss_/.test(e.id)&&!/^奶茶兵/.test(e.n))e.n="奶茶兵·"+e.n});
    if(grp&&grp[0]==="ss_minion"){setBg("curser",B.moon);playMusic("curser");B.introTalk=STORY.cs_minions}renderBattle()}
   if(kind==="J"){B.fullCurse=1;setBg("curser",B.moon);playMusic(S.fin?"curser2":"curser");bt.classList.add("bossFight","finalFight")}
-  B.enemies.forEach(e=>{const el=enEl(e);if(!el)return;el.classList.add("eid-"+e.id);try{if(ENEMY[e.id].boss&&enSize(e)>=280)el.classList.add("bigEn")}catch(x){}});
+  B.enemies.forEach(e=>{const el=enEl(e);if(!el)return;el.classList.add("eid-"+e.id);try{const z=enSize(e);if(ENEMY[e.id].boss&&z>=280)el.classList.add("bigEn");else if(z>=215)el.classList.add("midEn")}catch(x){}});
   if(has("ss_glove")){B.p.str+=2;if(B.enemies.some(e=>ENEMY[e.id].boss))B.p.str+=2}
   if(S.flags&&S.flags.nextEvade){S.flags.nextEvade=0;B.p.evade=(B.p.evade||0)+1}B.noteBlock=has("ss_note")?2:0;B.maskBlock=has("r_mask")?1:0;
   if(kind==="F"&&S.flags&&S.flags.cupFriend){const of=B.introFx;B.introTalk=(B.introTalk||[]).concat(STORY.cup_help);B.introFx=()=>{if(of)of();cleanseAll(B.p);B.heal(15);B.enemies.forEach(e=>e.hp>0&&B.apply(e,"weak",2));ach("cuphelp");renderBattle()}}
@@ -102,8 +102,11 @@ function relicSold(){M.relicSold=(M.relicSold||0)+1;ach("relicSell");if(M.relicS
 
 /* ---------- 隐藏路线 ---------- */
 function injectRoute(types,grps,flag,msg){const GR=GROW();const rows=types.map((_,i)=>GR+1+i);if(rows.some(r=>!S.map[r]))return false;if(S.row>GR)return false;
- for(const n1 of S.map[rows[0]].filter(Boolean)){const ch=[n1];let cur=n1,ok=true;for(let i=1;i<rows.length;i++){const nx=cur.nx.map(c=>S.map[rows[i]][c]).find(Boolean);if(!nx){ok=false;break}ch.push(nx);cur=nx}
-  if(ok){ch.forEach((n,i)=>{n.t=types[i];n.hid=1;n.grp=grps[i]||undefined;n.story=0;n.gold=0});S.flags[flag]=1;saveRun();if(msg)setTimeout(()=>toast(msg),600);return true}}return false}
+ const safe=n=>["m","q","E","t"].includes(n.t)&&!n.story&&!n.hid&&!n.gold;const chains=[];const walk=(ch)=>{if(ch.length===rows.length){chains.push(ch);return}const cur=ch[ch.length-1];cur.nx.map(c=>S.map[rows[ch.length]][c]).filter(Boolean).forEach(nx=>walk([...ch,nx]))};S.map[rows[0]].filter(Boolean).forEach(n1=>walk([n1]));
+ const ch=chains.find(c=>c.every(safe))||chains.find(c=>c.every(n=>!["A","Y","Z","v","s","r"].includes(n.t)&&!n.story))||chains[0];if(!ch)return false;
+ ch.forEach((n,i)=>{n.t=types[i];n.hid=1;n.grp=grps[i]||undefined;n.story=0;n.gold=0});S.flags[flag]=1;saveRun();if(msg)setTimeout(()=>toast(msg),600);return true}
+/* 初号机的隐藏路线也改用同一套：不会盖掉隐藏房间、后门、镜之间、酒馆和剧情房间 */
+injectProto=function(){if(!S||S.junc||!S.flags||!S.flags.ssProto||S.flags.protoDone||S.flags.protoRoute||S.dream||S.fin||(S.act||0)!==2)return;injectRoute(["X","H"],[null,["proto"]],"protoRoute","地图下半层出现了一条<b>彩色的隐藏路线</b>：SS 讨伐目标就在那里")};
 function injectSS(){if(!S||S.junc||S.dream||S.fin||!S.flags||!S.map)return;const a=S.act||0;
  if(a===3&&S.flags.ssArena&&!S.flags.arenaDone&&!S.flags.arenaRoute){if(injectRoute(["P","D"],[null,null],"arenaRoute","地图下半层出现了一条<b>彩色的隐藏路线</b>：尽头是奶茶厂第一斗场"))openMap()}
  if(a===4&&S.flags.cupFriend&&!S.flags.curserDone&&!S.flags.csRoute){if(injectRoute(["U","m","J"],[null,["ss_minion","ss_minion","ss_minion"],["curser"]],"csRoute","")){setTimeout(async()=>{await talk(STORY.cs_smell);toast("地图下半层出现了一条<b>隐藏路线</b>：跟着迷你奶茶杯走")},400);openMap()}}}
@@ -127,7 +130,7 @@ const DICE_NPC=[
  {n:"戴兜帽的人",hi:"……你会掷出七。",w:["……不在预言里。","怎么会？"],l:["我说过了。","一切都在预言里。"],pro:1}];
 function tavDice(T){return new Promise(res=>{const N=(S.act||0)===4?pick(DICE_NPC):pick(DICE_NPC.filter(x=>!x.pro));const DF=[1,2,3,4,5,6].map(n=>`<b class="die">${n}</b>`);const d=document.createElement("div");d.className="shopConf";d.innerHTML=`<div class="scBox rpsBox diceBox"><b>和${N.n}掷骰子</b><p>${N.hi}</p><p class="dcRule">各掷两颗，点数大的赢。押 30，赢了拿回 60</p><div class="rpsRes"><span class="me">？</span><i>VS</i><span class="him">？</span></div><div class="scBtns"><button class="btn sm rpsB" id="dcGo">掷骰子</button><button class="btn sm ghost" data-x="1">算了</button></div></div>`;let done=0;
  d.onclick=async e=>{e.stopPropagation();if(done)return;if(e.target.closest("[data-x]")||!e.target.closest(".scBox")){d.remove();res(null);return}if(!e.target.closest("#dcGo"))return;done=1;sfx("click");const me=[1+ri(6),1+ri(6)],him=[1+ri(6),1+ri(6)];const ms=d.querySelector(".me"),hs=d.querySelector(".him");for(let k=0;k<10;k++){ms.innerHTML=DF[ri(6)]+DF[ri(6)];hs.innerHTML=DF[ri(6)]+DF[ri(6)];await sleep(60)}ms.innerHTML=DF[me[0]-1]+DF[me[1]-1];hs.innerHTML=DF[him[0]-1]+DF[him[1]-1];
-  if(me[0]===6&&me[1]===6)ach("dice66");if(me[0]===1&&me[1]===1)ach("dice11");const a=me[0]+me[1],b=him[0]+him[1];const r=a>b?1:a<b?-1:0;let extra="";if(N.pro&&a===7)extra="<br><small>……他说中了。</small>";
+  if(me[0]===6&&me[1]===6)ach("dice66");if(me[0]===1&&me[1]===1)ach("dice11");const a=me[0]+me[1],b=him[0]+him[1];const r=a>b?1:a<b?-1:0;{const sb=d.querySelector(".scBtns");if(sb)sb.style.display="none"}let extra="";if(N.pro&&a===7)extra="<br><small>……他说中了。</small>";
   d.querySelector(".scBox").insertAdjacentHTML("beforeend",`<p class="rpsOut ${r>0?"w":r<0?"l":""}">${a} 比 ${b}　${r>0?"你赢了！+30":r<0?"你输了…… -30":"平局，再来一次"}${extra}</p><p class="dcSay">${N.n}：「${r>0?pick(N.w):r<0?pick(N.l):"一样大？有意思。"}」</p>`);await sleep(1500);window.SHOP_LOCK=Date.now()+400;d.remove();res(r)};$("#stage").appendChild(d)})}
 
 /* ---------- 死斗场 ---------- */
@@ -143,7 +146,7 @@ function dsqStart(){S.dsq={st:0,g:0,hpFull:1};ach("dsqenter");saveRun();show("ev
 function dsqStep(){const s=S.dsq,D=DSQ[s.st];show("event");setBg("teaarena");playMusic("dsq");
  const prog=DSQ.map((x,i)=>`<i class="${i<s.st?"done":i===s.st?"now":""}">${x.rest?"歇":x.boss?"王":x.el?"精":"兵"}</i>`).join("");
  const opts=D.rest?`<button class="evo" id="dqA"><b>坐下歇一会儿</b><small><span class='good'>回复 30% 生命</span></small></button><button class="evo" id="dqB"><b>对着墙上的划痕练拳</b><small><span class='good'>随机升级 2 张牌</span></small></button>`:`<button class="evo" id="dqGo"><b>${D.boss?"走上场":"上场"}</b><small>${D.boss?"不灭的斗士":D.el?"精英":"奶茶兵"}　·　输了，这一局就结束</small></button>`;
- $("#event").innerHTML=`<div class="evBox dsqBox"><div class="phead"><span class="ribbon">奶茶厂第一斗场</span></div><div class="evPic dsqHorn"><img src="${IMG("v_horn")}" id="dqHorn"></div><div class="evTxt"><div class="dsqProg">${prog}</div><p id="evP">${D.txt}</p><small class="dsqHp">生命 ${S.hp} / ${S.max}　·　押着的金币 ${s.g}</small><div class="evOpts">${opts}</div></div></div>`;
+ $("#event").innerHTML=`<div class="evBox dsqBox"><div class="phead"><span class="ribbon">奶茶厂第一斗场</span></div><div class="evPic dsqHorn"><img src="${IMG("v_horn")}" id="dqHorn"></div><div class="evTxt"><div class="dsqProg">${prog}</div><p id="evP">${D.txt}</p><div class="dsqChips"><span>生命 <b>${S.hp}</b> / ${S.max}</span><span>押着 <b>${s.g}</b> 金币</span>${D.rest?"<span>中场休息</span>":`<span>第 <b>${Math.min(5,s.st+1-(s.st>2?1:0))}</b> / 5 场</span>`}</div>${D.rest?"":`<div class="dsqVs">${D.g.map(id=>`<div class="dsqFoe ${D.boss?"myst":""}"><img src="${IMG(ENEMY[id].img)}"><b>${D.boss?"？？？":ENEMY[id].elite||ENEMY[id].boss?ENEMY[id].n:"奶茶兵"}</b></div>`).join("")}${D.el?`<p class="dsqPd">${ENEMY[D.g[0]].pd||""}</p>`:D.boss?`<p class="dsqPd">一千场，一场没输过。</p>`:""}</div>`}<div class="evOpts">${opts}</div></div></div>`;
  const h=$("#dqHorn");if(h)h.onclick=()=>{M.horn=(M.horn||0)+1;sfx("click");h.classList.remove("hornPop");void h.offsetWidth;h.classList.add("hornPop");toast("喇叭："+HORN_LINES[Math.min(HORN_LINES.length-1,(M.horn-1)%HORN_LINES.length)]);if(M.horn>=10)ach("hornclick");saveMeta()};
  if(D.rest){const done=t=>{s.st++;saveRun();$("#evP").innerHTML=t;$(".evOpts").innerHTML=`<button class="evo" id="dqN"><b>回到场上</b></button>`;$("#dqN").onclick=()=>{sfx("click");dsqStep()}};
   $("#dqA").onclick=()=>{sfx("click");const hh=Math.round(S.max*.3);S.hp=Math.min(S.max,S.hp+hh);renderTop();done(`你靠着墙坐了一会儿。墙那边，好像有人在用同一个节奏，一下一下地捶着什么。<br><span class='good'>回复 ${hh} 生命</span>`)};
@@ -481,3 +484,175 @@ function skyHit(){const v=B&&B.p&&B.p.pw2&&B.p.pw2.skyfall;if(!v)return;setTimeo
   const mw=B.p.pw2&&B.p.pw2.moonwell;if(mw){const O=["new","wax","full","wane"];B.setMoon(O[(O.indexOf(B.moon)+1)%4]);B.block(mw,1)}}catch(e){console.warn(e)}return r}}
 ACH.push({id:"skychange",n:"天有不测",d:"一场战斗里天气变了 5 次",ic:"storm"},{id:"moon4",n:"阴晴圆缺",d:"一场战斗里月亮变了 4 次",ic:"star"});
 try{if(!S&&$("#title").classList.contains("on"))titleScreen()}catch(e){}
+
+/* ===================== 5.5 敌人出手：按招式、体型分开做动作和声音 ===================== */
+const SPK=()=>.72/(typeof SPEED==="number"&&SPEED>0?SPEED:1);
+function strikeKind(e,I){const s=I&&I.s;if(s==="burn")return"fire";if(s==="frost")return"ice";if(["poison","curse","night","para"].includes(s))return"magic";const n=(ENEMY[e.id]||{}).n||"";
+ if(/弓|炮|枪/.test(n))return"shot";if(/巫|法师|诅咒|主教|预言|圣者|佛|堕天|巨蛋|星/.test(n))return"magic";if(/冰|雪|霜/.test(n))return"ice";if(/熔|火|锅炉|岩浆|烫/.test(n))return"fire";
+ if(/骑士|将军|刺客|斗士|伯爵|管家|剑|守卫|魔王|阿岳/.test(n))return"blade";if(/狗|猫|兽|蛇|鼠|龙|熊|蝙蝠|鸡/.test(n))return"claw";return"blunt"}
+const KIND_COL={fire:"#ff8a2a",ice:"#9be4ff",magic:"#b77bff",shot:"#ffe9a8",blade:"#ffffff",claw:"#ff5a5a",blunt:"#ffd23f"};
+function fxDiv(cls,x,y,ms,html){const F=$("#fx");if(!F)return null;const d=document.createElement("div");d.className=cls;d.style.left=x+"px";d.style.top=y+"px";if(html)d.innerHTML=html;F.appendChild(d);setTimeout(()=>d.remove(),ms);return d}
+/* 飞过去的东西：箭、法球、咒 */
+function flyOrb(from,to,col,ms,cls){return new Promise(res=>{const d=fxDiv("eOrb "+(cls||""),from.x,from.y,ms+80);if(!d||!d.animate){res();return}d.style.setProperty("--c",col);const dx=to.x-from.x,dy=to.y-from.y;const ang=Math.atan2(dy,dx)*180/Math.PI;
+  d.animate([{transform:`translate(0,0) rotate(${ang}deg) scale(.6)`,opacity:.2},{transform:`translate(${dx*.5}px,${dy*.5-26}px) rotate(${ang}deg) scale(1.15)`,opacity:1,offset:.5},{transform:`translate(${dx}px,${dy}px) rotate(${ang}deg) scale(.9)`,opacity:1}],{duration:ms,easing:"cubic-bezier(.4,0,.9,.6)",fill:"forwards"});setTimeout(res,ms)})}
+/* 主角挨打：按招式换命中的样子和声音 */
+function playerImpact(c,loss,big){const K=(B._strike||{}),k=K.kind||"blunt",i=K.i||0,heavy=!!K.heavy||big,col=KIND_COL[k]||"#fff",rate=1+Math.min(.5,i*.07);const x=c.x+(Math.random()*26-13),y=c.y-20+(Math.random()*26-13);
+ if(k==="claw"){const sl=fxDiv("pSlash"+(heavy?" big":""),x,y,520,"<i></i><i></i><i></i>");sxPlay("claw",.5,rate*(heavy?.85:1.05),0,{pan:-.2})}
+ else if(k==="blade"){const d=fxDiv("pCut"+(heavy?" big":""),x,y,420,"<i></i>");if(d)d.style.setProperty("--r",(-40+Math.random()*20+(i%2?70:0))+"deg");sxPlay("blade",.5,rate*(heavy?.9:1.1),0,{pan:-.2})||sxPlay("slash",.5,rate)}
+ else if(k==="shot"){const d=fxDiv("pCut thin",x,y,360,"<i></i>");if(d)d.style.setProperty("--r","-8deg");sxPlay("knock",.55,rate,0,{pan:-.2});sxPlay("schwing",.25,1.4*rate,0,{pan:-.2})}
+ else{fxDiv("pBonk"+(heavy?" big":""),x,y,440).style.setProperty("--c",col);
+  if(k==="fire"){sxPlay("firew",.5,rate,0,{pan:-.2});sparks(x,y,"#ff8a2a",heavy?12:6)}else if(k==="ice"){sxPlay("icecrack",.5,rate,0,{pan:-.2});sparks(x,y,"#bff0ff",heavy?12:6)}else if(k==="magic"){sxPlay("glass",.3,1.25*rate,0,{pan:-.2});try{ring(520*rate,.16,.05)}catch(e){}sparks(x,y,"#c79bff",heavy?12:6)}
+  else{sxPlay("thud",.6,rate*(heavy?.8:1),0,{pan:-.2});if(heavy){sxPlay("rock",.35,.9,0.02,{pan:-.2});sparks(x,y,"#ffd23f",8)}}}
+ /* 掉血越多，被打退得越远 */
+ try{const b=$("#player .body");if(b&&b.animate){const d=Math.max(8,Math.min(64,loss*2.2))*(heavy?1.15:1);b.animate([{transform:"none"},{transform:`translateX(${-d}px) rotate(${-Math.min(9,d/7)}deg)`,offset:.22},{transform:`translateX(${-d*.55}px) rotate(${-Math.min(5,d/12)}deg)`,offset:.5},{transform:"none"}],{duration:Math.round((heavy?420:300)*Math.max(.5,SPK()/.72)),easing:"cubic-bezier(.2,.8,.3,1)"})}}catch(e){}}
+function playerGuardFx(c){const K=B._strike||{};fxDiv("pGuard",c.x+46,c.y-10,360);sparks(c.x+52,c.y-10,"#bfe6ff",K.heavy?8:4)}
+/* 上咒：不冲过来，原地抬手，一团颜色飞到你身上 */
+async function enemyCast(e,el,s){try{const body=el.querySelector(".body");const col=(STAT[s]||{}).c||"#b77bff";const k=SPK();
+  if(body&&body.animate)body.animate([{transform:"none"},{transform:"translateY(-14px) scale(1.06) rotate(-3deg)",offset:.35},{transform:"translateY(-10px) scale(1.04)",offset:.7},{transform:"none"}],{duration:Math.round(520*k),easing:"ease-out"});
+  sxPlay("whoosh",.3,1.5,0,{pan:.2});try{ring(660,.2,.04)}catch(x){}await sleep(160);const a=center(body),b=center($("#player .body"));await flyOrb({x:a.x-30,y:a.y-20},{x:b.x,y:b.y-10},col,Math.round(300*k),"hex");
+  fxDiv("pBonk",b.x,b.y-10,440).style.setProperty("--c",col);sparks(b.x,b.y-10,col,6);sxPlay("glass",.28,.9,0,{pan:-.2})}catch(x){}}
+/* 出手 */
+async function enemyStrike(e,el,I,v,n){const body=el.querySelector(".body"),E=ENEMY[e.id]||{},W=E.boss?2:E.elite?1:0,ult=!!I.ult,kind=strikeKind(e,I),k=SPK();
+ const est=v+(e.str||0),heavy=ult||(n===1&&(W===2||est>=18));const ranged=kind==="shot"||(kind==="magic"&&n===1&&!ult&&W<2);
+ const pb=$("#player .body"),pc=center(pb),ec=center(body);const gap=Math.max(40,ec.x-pc.x-(W===2?230:170));const A=(kf,ms,ez)=>{try{return body&&body.animate?body.animate(kf,{duration:Math.max(60,Math.round(ms*k)),easing:ez||"ease-out"}):null}catch(x){return null}};
+ const strike=(i)=>{B._strike={kind,heavy,i,n};dmgPlayer(v,e);renderBattle()};
+ if(ult){const dm=fxDiv("ultDim",0,0,900);sxPlay("sub",.5,.8)||0;sxPlay("whoosh",.4,.5,0,{pan:.2});try{duck(.5,700)}catch(x){}A([{transform:"none"},{transform:"translateX(34px) scale(1.12) rotate(6deg)",offset:.6},{transform:"translateX(40px) scale(1.14) rotate(7deg)"}],320,"ease-in");await sleep(330)}
+ if(ranged){ /* 远程：不冲过来，后坐一下，东西飞过去 */
+  for(let i=0;i<n;i++){A([{transform:"none"},{transform:"translateX(18px) rotate(4deg) scale(1.03)",offset:.3},{transform:"translateX(-10px) rotate(-3deg)",offset:.55},{transform:"none"}],300);sxPlay(kind==="shot"?"schwing":"whoosh",.35,kind==="shot"?1.2:1.4,0,{pan:.2});await sleep(110);
+   const a=center(body),b=center(pb);await flyOrb({x:a.x-40,y:a.y-20},{x:b.x+10,y:b.y-16},KIND_COL[kind],Math.round((heavy?170:210)*k),kind==="shot"?"arrow":"");if(!B||B.over)return;strike(i);if(heavy)stageShake();await sleep(n>1?120:140);if(S.hp<=0)return}
+  return}
+ if(n===1){ /* 单下：往后缩，再冲过来 */
+  const back=heavy?(W===2?54:40):20,wu=heavy?(W===2?.44:.4):.3,T=heavy?(W===2?760:620):440,reach=heavy?gap:Math.min(gap,150+W*40);
+  A([{transform:"none",easing:"ease-out"},{transform:`translateX(${back}px) rotate(${heavy?7:4}deg) scale(${heavy?1.08:1.03})`,offset:wu,easing:"cubic-bezier(.7,0,.9,.4)"},{transform:`translateX(${-reach}px) rotate(${heavy?-9:-6}deg) scale(${heavy?1.12:1.04})`,offset:wu+.14,easing:"ease-out"},{transform:`translateX(${-reach*.92}px) rotate(${heavy?-5:-3}deg) scale(${heavy?1.08:1.02})`,offset:wu+.28,easing:"ease-in-out"},{transform:"none"}],T,"linear");
+  setTimeout(()=>sxPlay("whoosh",heavy?.45:.3,heavy?(W===2?.6:.75):1.25,0,{pan:.15}),Math.max(0,T*k*(wu-.06)));
+  await sleep(T*(wu+.13));if(!B||B.over)return;strike(0);if(heavy){stageShake();try{hitStop(90)}catch(x){}await sleep(90)}await sleep(heavy?150:110);return}
+ /* 多段：凑近以后连戳，越戳越快 */
+ const reach=Math.min(gap,(W===2?gap:200+W*40));A([{transform:"none"},{transform:`translateX(${-reach}px) rotate(-4deg)`}],170,"cubic-bezier(.3,0,.2,1)");sxPlay("whoosh",.3,1.3,0,{pan:.15});await sleep(170);
+ let hold=null;try{hold=body&&body.animate?body.animate([{transform:`translateX(${-reach}px) rotate(-4deg)`},{transform:`translateX(${-reach}px) rotate(-4deg)`}],{duration:60000}):null}catch(x){}
+ try{for(let i=0;i<n;i++){const gapT=Math.max(110,200-i*26);A([{transform:`translateX(${-reach}px) rotate(-4deg)`},{transform:`translateX(${-reach-34}px) rotate(${i%2?-10:2}deg) scale(1.05)`,offset:.4},{transform:`translateX(${-reach}px) rotate(-4deg)`}],gapT*.9);await sleep(gapT*.36);if(!B||B.over)return;strike(i);await sleep(gapT*.64);if(S.hp<=0)return}}finally{if(hold)try{hold.cancel()}catch(x){}}
+ A([{transform:`translateX(${-reach}px) rotate(-4deg)`},{transform:"none"}],200,"ease-out");await sleep(120)}
+
+/* ===================== 5.5 遗物代价 ===================== */
+{const _gr2=gainRelic;gainRelic=function(id){const had=S&&S.relics&&S.relics.includes(id);const r=_gr2.apply(this,arguments);try{if(!had&&id==="r_bowl"&&S.relics.includes("r_bowl")){S.max=Math.max(1,S.max-6);S.hp=Math.min(S.hp,S.max);renderTop()}}catch(e){}return r}}
+{const _sc2=startCombat;startCombat=function(kind){_sc2.apply(this,arguments);try{if(B&&has("r_ledger"))B.p.drawMinus=(B.p.drawMinus||0)+1}catch(e){}}}
+{const _st3=startTurn;startTurn=async function(){const r=await _st3.apply(this,arguments);try{if(B&&!B.over&&B.turn===1&&has("r_twinshell")&&B.p.energy>0){B.p.energy--;relicPulse("r_twinshell");renderBattle()}}catch(e){}return r}}
+{const _sm2=API.setMoon;API.setMoon=function(m){const old=this.moon;const r=_sm2.apply(this,arguments);try{if(!PREV&&B&&m==="new"&&old!=="new"&&has("r_compass")&&B.turn>1){dmgPlayer(3,null,true);relicPulse("r_compass");if(S.hp<=0)lose()}}catch(e){}return r}}
+
+/* ===================== 5.5 秘密房间：没有战斗，只有探索 ===================== */
+NODE.W={n:"秘密房间",ic:"np",badge:1};
+const upN=n=>{const l=shuffle(S.deck.filter(c=>upOK(c))).slice(0,n);l.forEach(c=>c.u=(c.u|0)+1);try{upFx(l)}catch(e){}return l.map(cname).join("、")||"没有能升级的牌"};
+const hpUp=n=>{S.max+=n;S.hp+=n};const sHeal=n=>{S.hp=Math.min(S.max,S.hp+n)};const hurt=n=>{S.hp=Math.max(1,S.hp-n)};
+const SECRET={
+museum:{n:"冒险者博物馆",img:"m6",steps:[
+ {t:"墙上的砖是松的。你推了一下，整面墙转了过去。<br>后面是一间落满灰的展厅，玻璃柜里摆着各种旧东西，每个柜子下面贴着一张小纸条：「某某某，在第几层倒下」。角落里坐着一只戴眼镜的老奶蛙，正在打瞌睡。",o:[
+  {t:"去看玻璃柜",go:1},{t:"叫醒馆长",go:2}]},
+ {t:"三个柜子没上锁。<br>第一个放着一副磨破的拳套，纸条写着「第三层，雪太大了」。<br>第二个放着一张手画的地图，画得歪歪扭扭，有好几处画了圈。<br>第三个放着一张唱片，封面上是一只张着嘴唱歌的小奶蛙。",o:[
+  {t:"戴上拳套",d:"<span class='good'>力气 +1（整局）</span>",f:()=>{S.flags.ssStr=1;ach("secret");return"拳套很合手。里面还有前一个主人留下的汗味，你不讨厌。"}},
+  {t:"带走地图",d:"<span class='good'>+60 金币，随机升级 1 张牌</span>",f:()=>{S.gold+=60;const u=upN(1);ach("secret");return`地图上画圈的地方，有一处就在这间展厅里：地板下面藏着一袋金币。地图背面还写着几招打法（升级了：${u}）。`}},
+  {t:"放一遍唱片",d:"<span class='good'>回满生命</span>",f:()=>{S.hp=S.max;ach("secret");return"是小七的声音。整间展厅的灰好像都安静了下来。你靠着柜子听完了一整面。"}}]},
+ {t:"馆长揉着眼睛：「有客人？好多年没人来了。」<br>他从抽屉里摸出一张卡片：「答对一个问题，我就把镇馆之宝借给你。」<br>「这座塔里，走得最高的那个奶蛙，叫什么名字？」",o:[
+  {t:"「阿岳。」",d:"<span class='good'>挑一张稀有牌</span>",f:async()=>{await chooseReward(offerCards(3,"R",1),"馆长的镇馆之宝");ach("secret");return"馆长愣了一下，点点头：「……对。他走得最高，也走得最远。」他把东西交给你，转过身去，没再说话。"}},
+  {t:"「我。」",d:"<span class='good'>+1 经验</span>",f:async()=>{await gainXP(1);ach("secret");return"馆长笑出了声：「有志气。等你倒下了，我给你也留一个柜子。」"}},
+  {t:"「不知道。」",d:"<span class='good'>回复 15 生命</span>",f:()=>{sHeal(15);ach("secret");return"「不知道也好。」馆长给你倒了杯茶，「知道太多的人，都走不远。」"}}]}]},
+cellar:{n:"漏水的地下室",img:"c3",steps:[
+ {t:"楼梯一直往下走，越走越潮。最底下是一间地下室，伸手不见五指，只听见滴答滴答的水声。<br>墙上挂着一盏油灯，还剩一点点油。",o:[
+  {t:"点上灯，往水声那边走",go:1},{t:"不点灯，摸黑往里走",go:2}]},
+ {t:"灯光照出一条小水沟，水是从墙缝里渗出来的，清得能看见底。<br>你蹲下来闻了闻——是泉水的味道。",o:[
+  {t:"喝几口",d:"<span class='good'>最大生命 +8</span>",f:()=>{hpUp(8);ach("secret");return"凉的，甜的。你突然明白了长老为什么老说「泉水满的时候，喝一口能睡三天」。"}},
+  {t:"灌一瓶带走",d:"<span class='good'>得到 1 瓶回血药水</span>",f:()=>{if(S.pots.length<(S.potSlots||3))S.pots.push("pheal");else S.gold+=40;ach("secret");return"你把瓶子灌满，塞好。水在瓶子里晃，像是还想回去。"}}]},
+ {t:"你摸着墙往前走，膝盖撞到了一个木箱子。箱子很沉，锁已经锈断了。<br>黑暗里，好像有什么东西在看着你。",o:[
+  {t:"打开箱子",d:"<span class='good'>获得一件随机遗物</span>，<span class='bad'>失去 10 生命</span>",f:()=>{hurt(10);gainRelic(randRelic());ach("secret");return"箱子一开，一群蝙蝠从里面炸了出来，在你脸上抓了好几道。等它们飞走，箱底躺着一样东西。"}},
+  {t:"轻轻退出去",d:"<span class='good'>+1 经验</span>",f:async()=>{await gainXP(1);ach("secret");return"你屏住呼吸退了出去。关上门的那一刻，里面传来一声很轻的「咕」。"}}]}]},
+mirrors:{n:"镜子迷宫",img:"xcs",steps:[
+ {t:"一间全是镜子的屋子。每面镜子里都是你，可每个你都不太一样：<br>一个比你壮，一个比你瘦，一个在笑，一个在哭。<br>最里面有三面特别大的镜子。",o:[
+  {t:"走向「比你壮」的那个",go:1},{t:"走向「在哭」的那个",go:2}]},
+ {t:"镜子里的你抬起拳头，对着你比划了几下。好像在说：「来，我教你。」",o:[
+  {t:"跟着它比划",d:"<span class='good'>随机升级 3 张牌</span>，<span class='bad'>失去 8 生命</span>",f:()=>{hurt(8);const u=upN(3);ach("secret");return`它打得太狠了，你被自己的影子揍了一顿。不过打完以后，手上的招式都变利索了（升级了：${u}）。`}},
+  {t:"摇摇头，伸手碰镜子",d:"<span class='good'>复制牌组里的一张牌</span>",f:async()=>{const r=await pickCards(S.deck,{title:"镜子会照出哪一张？",sub:"选的这张会多一张一样的"});if(!r||!r[0])return"镜子里什么都没有了。";const c={...r[0]};c.k=undefined;addCard(mk(r[0].id));const n=S.deck[S.deck.length-1];n.u=r[0].u;ach("secret");return`镜子里的你把「${cname(r[0])}」递了出来。你伸手一接，真的有了两张。`}}]},
+ {t:"镜子里的你在哭。你问它哭什么，它指了指你的背包。",o:[
+  {t:"把一张牌给它",d:"<span class='good'>忘掉一张牌，回复 20 生命</span>",f:async()=>{const r=await pickCards(S.deck,{title:"把哪张牌留给镜子里的你？（忘掉）",sub:"这张牌会从牌组里消失"});if(r&&r[0])S.deck.splice(S.deck.indexOf(r[0]),1);sHeal(20);ach("secret");return r&&r[0]?`它接过「${cname(r[0])}」，不哭了。镜子慢慢变成了一扇普通的窗户。`:"它看了你一会儿，自己擦干了眼泪。"}},
+  {t:"抱抱它",d:"<span class='good'>最大生命 +5</span>",f:()=>{hpUp(5);ach("secret");return"你抱住的是一面冰凉的镜子。可松开的时候，你觉得心里暖了一点。"}}]}]},
+library:{n:"不许出声的图书馆",img:"m5",steps:[
+ {t:"门上贴着一张纸：「本馆不许出声。」<br>屋里一排一排全是书架，书都是奶茶色的封皮。管理员是一只很胖的奶猫，趴在桌上睡着了。<br>有三本书放在桌子上，好像是被人特意挑出来的。",o:[
+  {t:"《魔椅图鉴》",d:"<span class='good'>挑一张稀有牌</span>",f:async()=>{await chooseReward(offerCards(3,"R",1),"书里夹着的");ach("secret");return"第一页写着：「它不是木头做的。」后面的字被人用墨涂掉了，只剩一张夹在书里的牌。"}},
+  {t:"《不要打开》",go:1},
+  {t:"借书卡",d:"<span class='good'>得到 1 瓶随机药水</span>",f:()=>{if(S.pots.length<(S.potSlots||3))S.pots.push(randPot());else S.gold+=40;ach("secret");return"借书卡上写满了名字，最后一个是「阿岳」，借的是一本《怎么让泉水变满》，没还。卡片背面粘着一瓶药水。"}}]},
+ {t:"书很薄。你还没翻开，管理员的耳朵就动了一下。",o:[
+  {t:"还是翻开",d:"一半一半：<span class='good'>+120 金币</span>，或者 <span class='bad'>获得诅咒「沉重」</span>",f:()=>{ach("secret");if(rnd()<.5){S.gold+=120;return"书里夹满了金币，像是谁藏的私房钱。你一枚一枚塞进口袋，管理员翻了个身，没醒。"}addCard(mk("heavy"));return"「啪！」书里弹出一个弹簧拳头，正打在你脑门上。管理员睁开一只眼：「说了不要打开。」"}},
+  {t:"放回去",d:"<span class='good'>回复 10 生命</span>",f:()=>{sHeal(10);ach("secret");return"你把书放回去。管理员闭着眼睛说：「好孩子。」"}}]}]},
+observatory:{n:"漏风的天文台",img:"np",steps:[
+ {t:"楼梯尽头是一间圆顶的小屋，顶上开了一道缝，一架很旧的望远镜正对着天。<br>望远镜旁边的本子上写着：「转到哪，就是哪。」",o:[
+  {t:"对准月亮",go:1},{t:"对准云",go:2}]},
+ {t:"镜头里的月亮很大。旁边有个旋钮，可以拧到不同的月相。",o:[
+  {t:"拧到满月",d:"<span class='good'>下一场战斗是满月</span>（三连只需要 2 个）",f:()=>{S.flags.nextMoon="full";ach("secret");return"你一拧，窗外的月亮真的圆了。下一场战斗，月亮会站在你这边。"}},
+  {t:"拧到上弦月",d:"<span class='good'>下一场战斗是上弦月</span>（攻击牌伤害 +1），<span class='good'>+1 经验</span>",f:async()=>{S.flags.nextMoon="wax";await gainXP(1);ach("secret");return"月亮缺了一半，可是看着很锋利。"}}]},
+ {t:"镜头里的云在动。旁边有个旋钮，上面画着几种天气。",o:[
+  {t:"拧到下雨",d:"<span class='good'>下一场战斗下雨</span>（奶蛙牌伤害 +2）",f:()=>{S.flags.nextWx="rain";ach("secret");return"雨点打在圆顶上，叮叮咚咚。"}},
+  {t:"拧到雷雨",d:"<span class='good'>下一场战斗是雷雨</span>，<span class='good'>+40 金币</span>",f:()=>{S.flags.nextWx="storm";S.gold+=40;ach("secret");return"一道闪电劈在望远镜上，震下来几枚卡在缝里的金币。"}},
+  {t:"拧到下雪",d:"<span class='good'>下一场战斗下雪</span>（回合开始护盾只消一半）",f:()=>{S.flags.nextWx="snow";ach("secret");return"圆顶的缝里飘进来几片雪花，落在你鼻尖上就化了。"}}]}]},
+kitchen:{n:"没人的奶茶厨房",img:"cty",steps:[
+ {t:"一间小厨房，灶上的锅还温着，案板上摆着三样东西：一罐珍珠、一袋糖、一瓶颜色很怪的绿色液体。<br>墙上的配方被撕掉了一半，只剩一句：「先放——」",o:[
+  {t:"先放珍珠",go:1},{t:"先放绿色的",go:2}]},
+ {t:"珍珠在锅里咕嘟咕嘟地滚。接下来呢？",o:[
+  {t:"放糖",d:"<span class='good'>最大生命 +6，回复 10 生命</span>",f:()=>{hpUp(6);sHeal(10);ach("secret");ach("teamaster");return"一锅标准的珍珠奶茶。你一口气喝了三杯，打了一个很长的嗝。"}},
+  {t:"放绿色的",d:"一半一半：<span class='good'>力气 +1（整局）</span>，或者 <span class='bad'>失去 12 生命</span>",f:()=>{ach("secret");if(rnd()<.5){S.flags.ssStr=1;return"难喝，但是喝完浑身是劲。"}hurt(12);return"你喝了一口，在地上躺了很久。"}}]},
+ {t:"绿色的液体倒进锅里，冒出一股紫烟。锅里的东西好像在看你。",o:[
+  {t:"赶紧加糖",d:"<span class='good'>得到 1 瓶解毒剂</span>",f:()=>{if(S.pots.length<(S.potSlots||3))S.pots.push("pantidote");else S.gold+=40;ach("secret");return"紫烟慢慢变白，锅里剩下一小瓶清清亮亮的东西。闻起来像薄荷。"}},
+  {t:"盖上锅盖跑",d:"<span class='good'>+1 经验</span>",f:async()=>{await gainXP(1);ach("secret");return"你刚跑出门，身后就「砰」的一声。回头看，锅盖嵌在了天花板上。"}}]}]},
+vault:{n:"睡着的宝库",img:"egar",steps:[
+ {t:"一间堆满金币的屋子，金币中间趴着一只巨大的奶蛙，鼻孔一张一合，睡得正香。<br>它的肚皮底下压着最多的金币。",o:[
+  {t:"轻轻抓一把",d:"<span class='good'>+40 金币</span>",go:1,f:()=>{S.gold+=40;S.cur.sec.g=1;return"你抓了一把，金币叮当响了一下。巨蛙的鼻子抽了抽，没醒。"}},
+  {t:"什么都不拿",d:"<span class='good'>+1 经验</span>",f:async()=>{await gainXP(1);ach("secret");return"你看了它一会儿，悄悄退了出去。有些东西，就让它好好睡吧。"}}]},
+ {t:()=>`巨蛙还在睡。你已经拿了 ${S.cur.sec.g} 把了。`,o:[
+  {t:"再抓一把",d:"越抓越容易吵醒它",go:1,f:()=>{const g=S.cur.sec.g;if(rnd()<.18*g){S.cur.sec.woke=1;return null}S.gold+=40+10*g;S.cur.sec.g=g+1;if(g+1>=5)ach("greedy");return`又一把。巨蛙翻了个身，金币哗啦啦地滑下来一片。`},ok:()=>!S.cur.sec.woke},
+  {t:"见好就收",d:"",f:()=>{ach("secret");return`你揣着鼓鼓的口袋溜了出来，一共抓了 ${S.cur.sec.g} 把。`}}]}]}
+};
+{const _gm=genMap;genMap=function(){const g=_gm.apply(this,arguments);try{if(S&&!S.junc&&!S.dream&&!S.fin&&rnd()<.4){const all=g.flat().filter(n=>n&&(n.t==="m"||n.t==="q")&&n.r>=2&&n.r<=MAPR-4&&!n.story);if(all.length){const n=pick(all);n.t="W";n.grp=null}}}catch(e){}return g}}
+function secretRoom(){S.secSeen=S.secSeen||[];if(!S.cur.sec){let ids=Object.keys(SECRET).filter(k=>!S.secSeen.includes(k));if(!ids.length)ids=Object.keys(SECRET);const id=pick(ids);S.secSeen.push(id);S.cur.sec={id,step:0}}saveRun();secRender()}
+function secRender(){const c=S.cur.sec,T=SECRET[c.id];if(c.woke){c.woke=0;hurt(15);S.gold=Math.max(0,S.gold-40);renderTop();show("event");$("#event").innerHTML=`<div class="evBox"><div class="phead"><span class="ribbon">秘密房间 · ${T.n}</span></div><div class="evPic"><img src="${IMG(T.img)}"></div><div class="evTxt"><p id="evP">巨蛙睁开了眼睛。<br>它没说话，一巴掌把你拍出了门，连带你刚抓的金币也撒了一路。<br><span class='bad'>失去 15 生命和 40 金币</span></p><div class="evOpts"><button class="evo" id="evGo"><b>离开秘密房间</b></button></div></div></div>`;S.cur=null;saveRun();$("#evGo").onclick=openMap;return}
+ const st=T.steps[c.step];show("event");setBg("event");playMusic("event");const opts=st.o.filter(o=>!o.ok||o.ok());const txt=(c.pre?`<span class="secPre">${c.pre}</span><br>`:"")+(typeof st.t==="function"?st.t():st.t);c.pre=null;
+ $("#event").innerHTML=`<div class="evBox"><div class="phead"><span class="ribbon">秘密房间 · ${T.n}</span></div><div class="evPic"><img src="${IMG(T.img)}"></div><div class="evTxt"><p id="evP">${txt}</p><div class="evOpts">${opts.map((o,i)=>`<button class="evo" data-i="${i}"><b>${o.t}</b><small>${o.d||""}</small></button>`).join("")}</div></div></div>`;
+ $$("#event .evo").forEach(b=>b.onclick=async()=>{if(b.dataset.busy)return;$$("#event .evo").forEach(x=>x.dataset.busy=1);sfx("click");const o=opts[+b.dataset.i];const r=o.f?await o.f():null;renderTop();if(o.go!=null&&!c.woke||c.woke){if(!c.woke){c.step=o.go;c.pre=r}saveRun();secRender();return}S.cur=null;saveRun();$("#evP").innerHTML=r||"";$(".evOpts").innerHTML=`<button class="evo" id="evGo"><b>离开秘密房间</b></button>`;$("#evGo").onclick=openMap})}
+{const _en2=enterNode;enterNode=function(t,resumed,cur){if(t!=="W")return _en2.apply(this,arguments);S.cur=cur||{t,rs:S.rs};if(resumed&&cur){S.rs=cur.rs}saveRun();M.secN=(M.secN||0)+1;saveMeta();secretRoom()}}
+{const _sc3=startCombat;startCombat=function(kind){_sc3.apply(this,arguments);try{if(B&&S.flags){if(S.flags.nextMoon){B.setMoon(S.flags.nextMoon);delete S.flags.nextMoon}if(S.flags.nextWx){B.setWx(S.flags.nextWx);delete S.flags.nextWx}}}catch(e){}}}
+ACH.push({id:"secret",n:"推开那面墙",d:"第一次走进秘密房间",ic:"q"},{id:"greedy",n:"再一把就好",d:"在睡着的宝库里连抓 5 把金币",ic:"coin",hid:1,h:"秘密房间里有一只睡得很香的大奶蛙"},{id:"teamaster",n:"标准答案",d:"在没人的厨房里煮出一锅标准的珍珠奶茶",ic:"heart",hid:1,h:"先放珍珠，再放糖"});
+
+/* ===================== 5.5 2 费、3 费攻击牌：动作和声音更夸张 ===================== */
+{const _pc=playCard;playCard=async function(c,t){let D=null;try{D=CARDS[c.id]}catch(e){}const big=B&&!PREV&&D&&D.type==="atk"&&(D.cost>=2);const prev=B&&B._bc;if(big)B._bc={cost:D.cost>=3?3:2,n:0};try{return await _pc.apply(this,arguments)}finally{if(B&&big)B._bc=prev||null}}}
+{const _hf=hitFx;hitFx=function(x,y,big,blocked,fam,HK,HO){const r=_hf.apply(this,arguments);try{const bc=B&&B._bc;if(bc&&!blocked){bc.n++;if(bc.n===1){const lv=bc.cost;
+  const pb=$("#player .body");if(pb&&pb.animate)pb.animate([{transform:"none"},{transform:`translateX(${lv>=3?70:44}px) rotate(${lv>=3?8:5}deg) scale(${lv>=3?1.12:1.07})`,offset:.3},{transform:"none"}],{duration:lv>=3?380:300,easing:"cubic-bezier(.2,.9,.3,1)"});
+  fxDiv("pBonk big",x,y,440).style.setProperty("--c",lv>=3?"#ff3b3b":"#ffd23f");sparks(x,y,lv>=3?"#ff6b3b":"#ffd23f",lv>=3?14:9);
+  sxPlay("punchH",lv>=3?.7:.5,lv>=3?.72:.85,0,{pan:.2});sxPlay("thud",.5,lv>=3?.6:.75,.01,{pan:.2});try{duck(.6,260)}catch(e){}
+  if(lv>=3){sxPlay("boomx",.38,.85,.03,{pan:.2});stageShake();try{hitStop(110)}catch(e){}fxDiv("bigFlash",0,0,320)}else stageShake()}
+  else if(bc.n<=6&&bc.cost>=3){sxPlay("punch",.35,1+bc.n*.05,0,{pan:.2})}}}catch(e){}return r}}
+
+/* ===================== 5.5 更多随机事件 ===================== */
+Object.assign(EVENTS,{
+ev_choir:{act:0,n:"青蛙合唱团",img:"n3",t:"泥塘边站着一排奶蛙，正在排练。指挥是一只戴着树叶帽子的老蛙，看见你，眼睛一亮：「你，过来！我们缺一个低音。」",o:()=>[
+ {t:"站进去一起唱",d:"<span class='good'>回复 15 生命</span>",f:()=>{sHeal(15);return"你唱得很一般，但是大家都很开心。唱完以后，你觉得肚子暖暖的。"}},
+ {t:"抢过指挥棒",d:"<span class='good'>随机升级 1 张牌</span>",f:()=>{const u=upN(1);return`你挥了几下，合唱团居然跟上了你的节奏。老蛙在旁边点头：「有天分。」（升级了：${u}）`}},
+ {t:"故意唱走调",d:"<span class='good'>+35 金币</span>",f:()=>{S.gold+=35;return"大家笑成了一团。老蛙一边擦眼泪一边塞给你一袋钱：「求你别唱了。」"}}]},
+ev_ghostchef:{act:1,n:"幽灵厨师",img:"e_ctw",t:"古堡的厨房里，一只半透明的奶猫正在熬汤，锅里什么都没有，它却搅得很认真：「客人，来一碗吗？我已经三百年没有客人了。」",o:()=>[
+ {t:"喝一碗",d:"<span class='good'>最大生命 +6</span>，<span class='bad'>获得诅咒「沉重」</span>",f:()=>{hpUp(6);addCard(mk("heavy"));return"汤是凉的，没有味道，可是喝完以后你觉得自己结实了一点——也沉了一点。"}},
+ {t:"夸它做得好",d:"<span class='good'>+1 经验</span>",f:async()=>{await gainXP(1);return"幽灵厨师愣住了，然后慢慢变透明，消失了。锅里留下一句话：「谢谢。」"}}]},
+ev_icefish:{act:2,n:"冰窟窿钓鱼",img:"egl",t:"冰面上有个圆圆的窟窿，旁边插着一根没人要的鱼竿。窟窿底下有什么在发光。",o:()=>[
+ {t:"钓一下",d:"随机：<span class='good'>一张稀有牌 / 60 金币 / 一瓶药水</span>，也可能 <span class='bad'>掉进水里（-10 生命）</span>",f:async()=>{const r=rnd();if(r<.25){hurt(10);return"鱼没上钩，你倒是滑进去了。爬上来的时候，眉毛都结了冰。"}if(r<.5){S.gold+=60;return"钓上来一只铁皮罐子，里面全是金币。"}if(r<.75){if(S.pots.length<(S.potSlots||3))S.pots.push(randPot());else S.gold+=40;return"钓上来一瓶药，瓶子里还游着一条小鱼。"}await chooseReward(offerCards(3,"R",1),"冰窟窿里钓上来的");return"钓上来一张牌，冻得硬邦邦的。"}},
+ {t:"把鱼竿收好留给别人",d:"<span class='good'>回复 10 生命</span>",f:()=>{sHeal(10);return"你把鱼竿插回雪里。不知道为什么，你想起了一根枣树枝削的鱼竿。"}}]},
+ev_vending:{act:3,n:"奶茶贩卖机",img:"cty",t:"墙角立着一台生锈的奶茶贩卖机，屏幕上闪着：「投币 20」。机器侧面被人踹出了好几个坑。",o:()=>[
+ {t:"投币",d:"<span class='bad'>-20 金币</span>，<span class='good'>得到 1 瓶随机药水</span>",ok:S.gold>=20,f:()=>{S.gold-=20;if(S.pots.length<(S.potSlots||3))S.pots.push(randPot());else sHeal(15);return"「咚」的一声，掉出来一瓶药。机器的屏幕上闪了一下：「谢谢惠顾」。"}},
+ {t:"踹一脚",d:"一半一半：<span class='good'>2 瓶药水</span>，或者 <span class='bad'>失去 8 生命</span>",f:()=>{if(rnd()<.5){for(let i=0;i<2;i++)if(S.pots.length<(S.potSlots||3))S.pots.push(randPot());return"机器哐当哐当吐出两瓶药。你明白侧面那些坑是怎么来的了。"}hurt(8);return"机器纹丝不动，你的脚肿了。"}}]},
+ev_wish:{act:4,n:"流星",img:"np",t:"一颗流星从你头顶划过去，拖着很长的尾巴。旁边一只小奶蛙拉了拉你：「快许愿！快！」",o:()=>[
+ {t:"想变强",d:"<span class='good'>力气 +1（整局）</span>",f:()=>{S.flags.ssStr=1;return"你攥紧了拳头。流星好像闪了一下。"}},
+ {t:"想活得久一点",d:"<span class='good'>最大生命 +8</span>",f:()=>{hpUp(8);return"小奶蛙说：「这个愿望好。」"}},
+ {t:"想让泉水满起来",d:"<span class='good'>回满生命，+1 经验</span>",f:async()=>{S.hp=S.max;await gainXP(1);return"小奶蛙看了你很久：「你和他说的一样。」你问他是谁，它没回答。"}}]},
+ev_swap:{n:"换牌的旅人",img:"m4",t:"一只背着大包的奶蛙拦住你：「我收旧牌，换新牌。不问来路，不包好坏。」",o:()=>[
+ {t:"换一张",d:"<span class='good'>把一张牌换成随机一张稀有牌</span>",f:async()=>{const r=await pickCards(S.deck,{title:"把哪张牌换掉？",sub:"会换成随机一张稀有牌"});if(!r||!r[0])return null;const nc=offerCards(1,"R",1)[0];S.deck.splice(S.deck.indexOf(r[0]),1,nc);try{gotCard(nc.id)}catch(e){}return`旅人把「${cname(r[0])}」塞进包里，掏出一张「${cname(nc)}」给你：「拿好，不退不换。」`}},
+ {t:"不换",d:"",f:()=>"「可惜。」他背着包走远了，包里叮叮当当的。"}]},
+ev_bigcat:{n:"挡路的大猫",img:"ctm",t:"一只比你大三倍的奶猫横躺在路中间，肚皮朝天，睡得打呼。路只有这么宽。",o:()=>[
+ {t:"摸摸肚子",d:"<span class='good'>回复 12 生命</span>",f:()=>{sHeal(12);return"肚子又软又暖。大猫眯着眼睛呼噜了几声，翻身让开了路。"}},
+ {t:"从它身上爬过去",d:"<span class='good'>+40 金币</span>，<span class='bad'>失去 6 生命</span>",f:()=>{S.gold+=40;hurt(6);return"大猫一爪子把你拍了下来，掉在地上的还有它藏在毛里的几枚金币。"}},
+ {t:"坐下来等它醒",d:"<span class='good'>+1 经验</span>",f:async()=>{await gainXP(1);return"你等了很久。它醒了，打了个哈欠，看了你一眼，又睡了。你决定绕路。"}}]},
+ev_bard:{n:"吟游奶蛙",img:"n3",t:"一只抱着琴的奶蛙坐在路边：「三十个金币，给你唱一首塔里的故事。听完的人，打架都更有劲。」",o:()=>[
+ {t:"付钱听",d:"<span class='bad'>-30 金币</span>，<span class='good'>随机升级 2 张牌</span>",ok:S.gold>=30,f:()=>{S.gold-=30;const u=upN(2);return`他唱的是一只奶蛙打了一千场的故事。唱到最后一句，琴弦断了。（升级了：${u}）`}},
+ {t:"给他唱一首",d:"<span class='good'>+20 金币</span>",f:()=>{S.gold+=20;return"你唱完，他沉默了一会儿，从琴盒里拿出二十个金币给你：「这首我收下了。」"}}]}
+});
