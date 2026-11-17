@@ -3070,8 +3070,6 @@ body{background:transparent!important}
 .ultDim{position:absolute;left:0!important;top:0!important;width:1280px;height:720px;background:radial-gradient(circle at 70% 45%,transparent 18%,rgba(8,4,14,.72) 62%);pointer-events:none;z-index:1;animation:ultDim .9s ease-out forwards}
 @keyframes ultDim{0%{opacity:0}25%{opacity:1}70%{opacity:1}100%{opacity:0}}
 .secPre{display:block;font-size:.85em;opacity:.75;margin-bottom:6px;padding-left:10px;border-left:4px solid #e5191c}
-.bigFlash{position:absolute;left:0!important;top:0!important;width:1280px;height:720px;background:#fff;pointer-events:none;z-index:60;animation:bigFlash .3s ease-out forwards}
-@keyframes bigFlash{0%{opacity:.55}100%{opacity:0}}
 /* 5.6 主页更顺：SVG 里的星星和光圈不再每一帧重画 */
 .p5Scene .tw,.p5Scene .shim,.p5Scene .halo,.p5Scene .win rect{animation:none!important}
 .p5Scene .p5rays,.p5Scene .p5ring,.p5Scene .p5ring2{animation:none!important}

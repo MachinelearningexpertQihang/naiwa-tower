@@ -618,13 +618,14 @@ function secRender(){const c=S.cur.sec,T=SECRET[c.id];if(c.woke){c.woke=0;hurt(1
 ACH.push({id:"secret",n:"推开那面墙",d:"第一次走进秘密房间",ic:"q"},{id:"greedy",n:"再一把就好",d:"在睡着的宝库里连抓 5 把金币",ic:"coin",hid:1,h:"秘密房间里有一只睡得很香的大奶蛙"},{id:"teamaster",n:"标准答案",d:"在没人的厨房里煮出一锅标准的珍珠奶茶",ic:"heart",hid:1,h:"先放珍珠，再放糖"});
 
 /* ===================== 5.5 2 费、3 费攻击牌：动作和声音更夸张 ===================== */
-{const _pc=playCard;playCard=async function(c,t){let D=null;try{D=CARDS[c.id]}catch(e){}const big=B&&!PREV&&D&&D.type==="atk"&&(D.cost>=2);const prev=B&&B._bc;if(big)B._bc={cost:D.cost>=3?3:2,n:0};try{return await _pc.apply(this,arguments)}finally{if(B&&big)B._bc=prev||null}}}
-{const _hf=hitFx;hitFx=function(x,y,big,blocked,fam,HK,HO){const r=_hf.apply(this,arguments);try{const bc=B&&B._bc;if(bc&&!blocked){bc.n++;if(bc.n===1){const lv=bc.cost;
-  const pb=$("#player .body");if(pb&&pb.animate)pb.animate([{transform:"none"},{transform:`translateX(${lv>=3?70:44}px) rotate(${lv>=3?8:5}deg) scale(${lv>=3?1.12:1.07})`,offset:.3},{transform:"none"}],{duration:lv>=3?380:300,easing:"cubic-bezier(.2,.9,.3,1)"});
-  fxDiv("pBonk big",x,y,440).style.setProperty("--c",lv>=3?"#ff3b3b":"#ffd23f");sparks(x,y,lv>=3?"#ff6b3b":"#ffd23f",lv>=3?14:9);
-  sxPlay("punchH",lv>=3?.7:.5,lv>=3?.72:.85,0,{pan:.2});sxPlay("thud",.5,lv>=3?.6:.75,.01,{pan:.2});try{duck(.6,260)}catch(e){}
-  if(lv>=3){sxPlay("boomx",.38,.85,.03,{pan:.2});stageShake();try{hitStop(110)}catch(e){}fxDiv("bigFlash",0,0,320)}else stageShake()}
-  else if(bc.n<=6&&bc.cost>=3){sxPlay("punch",.35,1+bc.n*.05,0,{pan:.2})}}}catch(e){}return r}}
+{const _pc=playCard;playCard=async function(c,t){let D=null;try{D=CARDS[c.id]}catch(e){}if(B&&!PREV&&D){B._bc=(D.type==="atk"&&D.cost>=2)?{cost:D.cost>=3?3:2,n:0,t:performance.now()}:null}return _pc.apply(this,arguments)}}
+{const _hf=hitFx;hitFx=function(x,y,big,blocked,fam,HK,HO){const r=_hf.apply(this,arguments);try{const bc=B&&B._bc;if(bc&&!blocked&&!PREV&&B.myTurn&&performance.now()-bc.t<2500){bc.n++;const d=HO&&typeof HO.d==="number"?HO.d:99,lite=document.documentElement.classList.contains("lite");
+  /* 稍微夸张一点就够：第一下够重才给冲击波；一串小伤害的多段牌只垫一声闷响 */
+  if(!bc.done&&(d>=(bc.cost>=3?10:8)||bc.n>=4)){bc.done=1;const lv=bc.cost,small=d<(lv>=3?10:8);
+   const pb=$("#player .body");if(pb&&pb.animate&&bc.n===1)pb.animate([{transform:"none"},{transform:`translateX(${lv>=3?40:26}px) rotate(${lv>=3?5:3}deg) scale(${lv>=3?1.07:1.04})`,offset:.3},{transform:"none"}],{duration:lv>=3?340:280,easing:"cubic-bezier(.2,.9,.3,1)"});
+   if(small){sxPlay("thud",.3,.9,0,{pan:.2})}
+   else{fxDiv("pBonk"+(lv>=3?" big":""),x,y,440).style.setProperty("--c",lv>=3?"#ff6b3b":"#ffd23f");if(!lite)sparks(x,y,lv>=3?"#ff6b3b":"#ffd23f",lv>=3?8:5);
+    sxPlay("thud",lv>=3?.42:.35,lv>=3?.7:.82,0,{pan:.2});if(lv>=3){sxPlay("punchH",.42,.78,.01,{pan:.2});stageShake();try{hitStop(60)}catch(e){}}}}}}catch(e){}return r}}
 
 /* ===================== 5.5 更多随机事件 ===================== */
 Object.assign(EVENTS,{
