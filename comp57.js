@@ -459,3 +459,19 @@ const COMP_MEET={
 
 /* 宽屏时，顶部信息栏两边也铺上底色 */
 {const _sh=show;show=function(){const r=_sh.apply(this,arguments);try{const t=$("#top");$("#stage").classList.toggle("hudOn",!!(t&&t.classList.contains("on")))}catch(e){}return r}}
+
+/* ===== 5.8.3 真结局要三条 SS 线：初号机（线索）、死斗场（奶茶杯）、诅咒师（阿岳被骗的真相） ===== */
+STORY.elder_unknown=[["m6","奶蛙长老","我只知道椅子的事。至于阿岳当年为什么会信它……我也想不明白。"]];
+STORY.spare_refuse=[["bx","奶蛙大魔王","……宽恕？"],["bx","奶蛙大魔王","你不懂。你根本不知道我为什么坐在这里。"],["n1","","（他重新抓紧了椅子的扶手。）"]];
+function allSS(){const F=(S&&S.flags)||{};return !!(F.protoDone&&F.arenaDone&&F.curserDone)}
+{const _rc2=restClue;restClue=async function(){const need=S&&S.flags&&S.flags.clue&&!S.flags.truth;const r=await _rc2.apply(this,arguments);if(need&&S.flags.truth&&!(S.flags.arenaDone&&S.flags.curserDone)){await talk(STORY.elder_unknown)}return r}}
+{const _sc=spareChoice;spareChoice=async function(){const r=await _sc.apply(this,arguments);if(!r)return false;if(allSS())return true;await talk(STORY.spare_refuse);return false}}
+
+/* ===== 5.8.3 冰原血兽：改成冰原上的恶霸（story40.js 是生成文件，这里覆盖它的那几段） ===== */
+STORY.bs_bloodbeast=[["xch","冰原血兽","哈哈哈！有热乎的上来了！"],["n1","","……它怎么这么高兴？"],["xch","冰原血兽","冰原上啥都是冻的，就你是热的。来，让我啃一口！"]];
+STORY.bw_bloodbeast=[["xch","冰原血兽","……冷。"],["xch","冰原血兽","又只剩我一个了。"]];
+try{ELINE.bloodbeast={a:["暖和！","别跑，还没啃够！"],s:["哈哈！冻住了！","热乎的，别跑！"],l:["冷……","好冷啊。"]}}catch(e){}
+try{Object.assign(BOSS_LORE.bloodbeast,{lore:["冰原上最吵的那只。老远就听见它在笑。"],lore2:["它以前也爬过塔。同伴都下山了，它说再往上一点就到了。"],lore3:["胸口那几道红，是它最后一点没冻住的血。所以它闻得到你身上的热。"],
+ who:"它以前也是一只爬塔的奶蛙。到了冰原，同伴都下山了，它说再往上一点就到了。一个冬天过去，雪把路埋了，它下不去，也上不去。",
+ why:"冰原上什么都是冻的，它只能抢别的冰原怪身上那一点热来活。打赢一只，就把那只的骨头和冰甲披在身上，越披越厚。胸口那几道红，是它最后一点没冻住的血。它一个人待太久了，有活的东西走上来，它是真高兴。",
+ end:"冷。又只剩我一个了。"})}catch(e){}

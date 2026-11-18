@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="5.8.2";
+const VER="5.8.3";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -204,6 +204,11 @@ function yardScreen(){
 /* ===================== 信箱：作者写给玩家的信 ===================== */
 const MAIL_SVG=`<svg viewBox="0 0 40 32" class="mailIco"><rect x="2" y="4" width="36" height="25" rx="2" fill="#fff" stroke="#0d0d0d" stroke-width="3"/><path d="M3 6 L20 19 L37 6" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-linejoin="round"/><path d="M28 2 h9 v8" fill="none" stroke="#e5191c" stroke-width="3"/></svg>`;
 const TMAILS=[
+ {id:"m583",t:"5.8.3 小更新",date:"11月18日",body:[
+  "【音乐】切到后台再回来，音乐不再哑掉",
+  "【修图】暖心冰奶蛙、冰火小奶蛙两腿之间的缝补好了；冰原血兽和冰火奶蛙换了有脚的图",
+  "【剧情】冰原血兽的台词和图鉴重写",
+  "【真结局】要三条 SS 线都做完，阿岳才肯让你宽恕他"]},
  {id:"m582",t:"5.8.2 小更新",date:"11月18日",body:[
   "【主页】背景的淡紫色换成深紫色",
   "【长屏】图鉴、今日塔况这些弹出页面，深色底铺满整个屏幕，不再露出两边",
@@ -1070,7 +1075,7 @@ const FORM2={
  fallen:{n:"黑翼",say:"保佑的人太多了……翅膀，就黑透了。",tip:"让你易伤 2 回合，重击 24 点"},
  witch:{n:"魔药沸腾",say:"汪——锅开了。今晚的料，是你。",tip:"往你的牌堆和池子里塞泥巴，力气越攒越高"},
  buddha:{n:"开光",say:"金身，开光！",tip:"护盾更厚，出手时冻住你池里 2 只奶蛙"},
- bloodbeast:{n:"狂暴",say:"血……热起来了。",tip:"一回合连咬三口；重击时冻住你池里 2 只奶蛙"},
+ bloodbeast:{n:"狂暴",say:"疼……疼得我浑身冒热气！再来！",tip:"一回合连咬三口；重击时冻住你池里 2 只奶蛙"},
  iceking:{n:"永冻",say:"冰不会化的。你也留下来吧。",tip:"三连击时一次冻住 3 只奶蛙，重击 30 点"},
  snowking:{n:"雪崩",say:"越滚越大——停不下来啦！",tip:"出手就往你池里滚雪块，力气越滚越大"},
  lavagiant:{n:"熔流",say:"火，给我烧得更旺！",tip:"把你池里的奶蛙煮成泥巴，让你烫伤 5 层，重击 34 点"},
@@ -2327,7 +2332,7 @@ const BM={
  tophat:{say:"失礼，借你的牌一用。",tip:"每 2 回合从你手里偷走最贵的一张牌放进帽子。一回合打它 20 点就能抢回来",chip:e=>e.hat?`帽子里：${CARDS[e.hat.id].n}（${Math.min(e.turnDmg||0,20)}/20 抢回）`:`会偷你的牌`,hit:(e,l)=>{if(e.hat&&(e.turnDmg||0)>=20){bmHand().push(e.hat);toast(`抢回了 <b>${CARDS[e.hat.id].n}</b>`);e.hat=null;renderHand()}}},
  thunderking:{say:"雷，攒着呢。",tip:"每回合蓄 1 层雷，满 4 层劈下 25 点。你一回合打出 3 张技能牌，能让它放电失败、清空雷",chip:e=>`蓄雷 ${e.thunder||0}/4 · 技能牌 ${Math.min(3,B?B.sklN||0:0)}/3 可泄掉`,act:async e=>{if((B.sklN||0)>=3&&e.thunder){e.thunder=0;fxSay(e,"放电失败！");toast("你打出 3 张技能牌：雷霆奶蛙王<b>放电失败</b>");renderBattle();await sleep(250);return}e.thunder=(e.thunder||0)+1;if(e.thunder>=4){e.thunder=0;banner("天雷",1);stageShake();dmgPlayer(25+(e.str||0),e);renderBattle();await sleep(400)}}},
  iceking:{say:"冰不会化的。",tip:"每回合冻住你最左边的一张手牌，这回合打不出去",chip:e=>`冻住你最左边的手牌`},
- bloodbeast:{say:"……我闻到血了。",tip:"你每少 10% 的血，它力气 +1。尽量别让自己掉太多血",chip:e=>`嗅血：力气 +${e.smell||0}`,act:async e=>{const sm=Math.floor((S.max-S.hp)/S.max*10);e.str=(e.str||0)-(e.smell||0)+sm;e.smell=sm}},
+ bloodbeast:{say:"哈！我闻到热乎的了！",tip:"你每少 10% 的血，它力气 +1。尽量别让自己掉太多血",chip:e=>`嗅血：力气 +${e.smell||0}`,act:async e=>{const sm=Math.floor((S.max-S.hp)/S.max*10);e.str=(e.str||0)-(e.smell||0)+sm;e.smell=sm}},
  snowking:{say:"越滚越大——",tip:"每回合雪球变大一圈（力气 +1），被你打中一下就缩回一圈。每回合都要打它",chip:e=>`雪球 ${e.ball||0} 层`,act:async e=>{e.ball=(e.ball||0)+1;e.str=(e.str||0)+1;fxSay(e,"又大了一圈");renderBattle()},hit:(e,l)=>{if((e.ball||0)>0&&B.curType&&B.lastShrink!==B.played){B.lastShrink=B.played;e.ball--;e.str=(e.str||0)-1;fxSay(e,"缩了一圈")}}},
  lavagiant:{say:"地板，烫起来！",tip:"每回合把你池里一只奶蛙变成岩浆块；回合开始时，池里每块岩浆烫你 2 点。快点把池子消掉",chip:e=>`池里岩浆 ${B?B.pool.filter(x=>x.lava).length:0} 块`,act:async e=>{const l=B.pool.filter(x=>!x.ice&&x.f!=="mud");if(l.length){const x=pick(l);x.f="mud";x.lava=1;renderPool();toast("熔岩巨无霸把池里一只奶蛙变成了<b>岩浆块</b>")}}},
  pearlqueen:{say:"杯子们，挡着我。",tip:"场上还有奶茶杯时，奶茶壶不会受伤。先把杯子打掉",chip:e=>B&&B.alive().some(x=>x.id==="teacup")?"杯子护着它：打不动":"没有杯子了，快打！"},

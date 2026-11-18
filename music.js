@@ -4,8 +4,8 @@ const A={ctx:null,music:true,sfx:true,step:0,next:0,trk:null,cur:null};
 try{const o=JSON.parse(localStorage.getItem("nwt-audio")||"{}");if(o.music===false)A.music=false;if(o.sfx===false)A.sfx=false}catch(e){}
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 /* 4.2：手机切到后台再回来，声音常常会「哑掉」（状态显示还在播放其实没声音）。回来后第一次点屏幕时，把整套声音重新建一遍 */
-function audioRebuild(){const old=A.ctx,cur=A.cur;A.ctx=null;try{old&&old.close&&old.close().catch(()=>{})}catch(e){}A.fxRev=null;try{if(typeof SX!=="undefined")SX.ok=0}catch(e){}audioUnlock();A.cur=cur;A.step=0;if(A.ctx)A.next=A.ctx.currentTime+.1}
-function audioUnlock(){if(A.ctx){if(document.hidden)return;if(A.wasBg){A.wasBg=0;const touch=("ontouchstart" in window)||navigator.maxTouchPoints>0;if(touch||A.ctx.state!=="running"){audioRebuild();return}}if(A.ctx.state!=="running"){A.ctx.resume().catch(()=>{});clearTimeout(A._chk);A._chk=setTimeout(()=>{if(A.ctx&&A.ctx.state!=="running"&&!document.hidden)A.wasBg=1},400)}return}
+function audioRebuild(){const old=A.ctx,cur=A.cur;A.ctx=null;try{old&&old.close&&old.close().catch(()=>{})}catch(e){}A.fxRev=null;try{if(typeof SX!=="undefined")SX.ok=0}catch(e){}const st=A.step;audioUnlock();A.cur=cur;A.step=st||0;if(A.ctx)A.next=A.ctx.currentTime+.1}
+function audioUnlock(){if(A.ctx){if(document.hidden)return;if(A.wasBg){A.wasBg=0;A._sus=0;audioRebuild();return}if(A.ctx.state!=="running"){A.ctx.resume().catch(()=>{});clearTimeout(A._chk);A._chk=setTimeout(()=>{if(A.ctx&&A.ctx.state!=="running"&&!document.hidden)A.wasBg=1},400)}return}
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const c=new AC;A.ctx=c;
  const comp=c.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;comp.connect(c.destination);
  A.out=c.createGain();A.out.gain.value=.9;A.out.connect(comp);
@@ -16,9 +16,14 @@ function audioUnlock(){if(A.ctx){if(document.hidden)return;if(A.wasBg){A.wasBg=0
  d1.delayTime.value=.137;d2.delayTime.value=.211;f1.gain.value=.38;f2.gain.value=.33;lp.type="lowpass";lp.frequency.value=2600;
  A.rev.connect(lp);lp.connect(d1);lp.connect(d2);d1.connect(f1);f1.connect(d1);d2.connect(f2);f2.connect(d2);d1.connect(A.bgm);d2.connect(A.bgm);
  const b=c.createBuffer(1,c.sampleRate,c.sampleRate),dd=b.getChannelData(0);for(let i=0;i<dd.length;i++)dd[i]=Math.random()*2-1;A.noise=b;
+ c.onstatechange=()=>{if(A.ctx===c&&c.state!=="running"&&!A._sus)A.wasBg=1};
  if(c.resume)c.resume().catch(()=>{});A.next=c.currentTime+.1;if(!A.timer)A.timer=setInterval(sched,25);loadSF()}
-document.addEventListener("visibilitychange",()=>{if(!A.ctx)return;if(document.hidden){A.hidAt=Date.now();A.ctx.suspend&&A.ctx.suspend().catch(()=>{})}else{if(Date.now()-(A.hidAt||0)>800)A.wasBg=1;A.ctx.resume().catch(()=>{});A.next=Math.max(A.next,A.ctx.currentTime+.05)}});
+document.addEventListener("visibilitychange",()=>{if(!A.ctx)return;if(document.hidden){A.hidAt=Date.now();A._sus=1;A.ctx.suspend&&A.ctx.suspend().catch(()=>{})}else{if(Date.now()-(A.hidAt||0)>800)A.wasBg=1;A.ctx.resume().then(()=>{A._sus=0}).catch(()=>{});A.next=Math.max(A.next,A.ctx.currentTime+.05)}});
 addEventListener("pageshow",e=>{if(e.persisted&&A.ctx)A.wasBg=1});
+/* 5.8.3：有的手机从后台回来不发 visibilitychange，或者声音被系统打断。三种办法都盯着：页面被冻住过（计时器断了一大截）、窗口失焦再回来、声音状态被系统改掉。下一次点屏幕就整套重建 */
+setInterval(()=>{const n=Date.now();if(A.beat&&n-A.beat>2500&&A.ctx)A.wasBg=1;A.beat=n},1000);
+addEventListener("blur",()=>{A.blurAt=Date.now()});addEventListener("focus",()=>{if(A.ctx&&A.blurAt&&Date.now()-A.blurAt>800)A.wasBg=1;A.blurAt=0});
+addEventListener("pagehide",()=>{if(A.ctx)A.wasBg=1});
 ["pointerdown","touchend","click","keydown"].forEach(ev=>addEventListener(ev,audioUnlock,true));
 function audioSave(){try{localStorage.setItem("nwt-audio",JSON.stringify({music:A.music,sfx:A.sfx}))}catch(e){}if(A.bgm)A.bgm.gain.value=A.music?(A.bgmVol||.24):0;if(A.fx)A.fx.gain.value=A.sfx?.6:0}
 

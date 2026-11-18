@@ -446,7 +446,7 @@ ENEMY.cosmicegg.ai=(e,t)=>e.phase2?[{k:"atk",v:12,x:2,pool:{t:"shuffle"}},{k:"at
 Object.assign(BM.cosmicegg,{tip:"孵化之前，它受到的伤害翻倍。孵化后会放出三只星鸡，自己也更凶。趁它还是蛋，尽量多打"});
 /* 冰原血兽：冷 */
 ENEMY.bloodbeast.ai=(e,t)=>e.phase2?[{k:"atk",v:9,x:3,s:"frost",d:1},{k:"atk",v:24,pool:{t:"freeze",n:2}},{k:"debuff",s:"frost",v:3,s2:"bleed",v2:3},{k:"atkdef",v:14,b:14},{k:"atk",v:30,ult:"冰血咆哮",s:"frost",d:3}][t%5]:[{k:"atk",v:15,s:"frost",d:1},{k:"atk",v:7,x:2,pool:{t:"freeze",n:1}},{k:"debuff",s:"frost",v:2,s2:"weak",v2:1},{k:"def",v:16},{k:"atk",v:18}][t%5];
-Object.assign(BM.bloodbeast,{say:"……好冷。我闻到血了，热的。",tip:"嗅血：你每少 10% 的血，它力气 +1。它的攻击会让你冻伤；你身上冻伤 3 层以上时，它会喝冻住的血回 8 生命。冻伤每回合 -1，别让它叠起来",
+Object.assign(BM.bloodbeast,{say:"哈！我闻到热乎的了！",tip:"嗅血：你每少 10% 的血，它力气 +1。它的攻击会让你冻伤；你身上冻伤 3 层以上时，它会喝冻住的血回 8 生命。冻伤每回合 -1，别让它叠起来",
  chip:e=>`嗅血：力气 +${e.smell||0}${(B.p.frost||0)>=3?" · 要喝你的冻血了":""}`,
  act:async e=>{const sm=Math.floor((S.max-S.hp)/S.max*10);e.str=(e.str||0)-(e.smell||0)+sm;e.smell=sm;if((B.p.frost||0)>=3&&e.hp<e.max){e.hp=Math.min(e.max,e.hp+8);fxSay(e,"喝冻血 +8");renderBattle();await sleep(220)}}});
 try{BOSS_LORE.bloodbeast.td="嗅血 + 冻伤：你掉血越多它越凶；你冻伤叠到 3 层，它就喝你的血"}catch(e){}
