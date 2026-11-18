@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="5.8";
+const VER="5.8.1";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -40,7 +40,8 @@ function fit(){const vv=window.visualViewport;let W=innerWidth,H=innerHeight,ox=
  const aw=Math.max(100,W-sf.l-sf.r),ah=Math.max(100,H-sf.t-sf.b),cx=ox+sf.l+aw/2,cy=oy+sf.t+ah/2;let s;
  st.style.left=cx+"px";st.style.top=cy+"px";
  if(port){s=Math.min(aw/720,ah/1280);st.style.transform=`translate(-50%,-50%) rotate(90deg) scale(${s})`}
- else{s=Math.min(aw/1280,ah/720);st.style.transform=`translate(-50%,-50%) scale(${s})`}
+ else{const r=aw/ah;let SW=1280;if(r>1280/720+.02)SW=Math.min(Math.round(720*r),1664);s=Math.min(aw/SW,ah/720);st.style.width=SW+"px";st.style.setProperty("--ox",((SW-1280)/2)+"px");st.classList.toggle("wideS",SW>1280);st.style.transform=`translate(-50%,-50%) scale(${s})`}
+ if(port){st.style.width="1280px";st.style.setProperty("--ox","0px");st.classList.remove("wideS")}
  document.body.classList.toggle("port",port);document.body.classList.toggle("wide",!port&&aw/ah>1280/720+.02);document.body.classList.toggle("tall",!port&&aw/ah<1280/720-.02);fit._k=innerWidth+"x"+innerHeight+(vv?"|"+vv.width+"x"+vv.height:"");try{_stR=null}catch(e){}}
 function fitSoon(){[60,250,600,1200,2500].forEach(t=>setTimeout(fit,t))}
 setInterval(()=>{const vv=window.visualViewport;if(fit._k!==innerWidth+"x"+innerHeight+(vv?"|"+vv.width+"x"+vv.height:""))fit()},700);
@@ -203,6 +204,9 @@ function yardScreen(){
 /* ===================== 信箱：作者写给玩家的信 ===================== */
 const MAIL_SVG=`<svg viewBox="0 0 40 32" class="mailIco"><rect x="2" y="4" width="36" height="25" rx="2" fill="#fff" stroke="#0d0d0d" stroke-width="3"/><path d="M3 6 L20 19 L37 6" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-linejoin="round"/><path d="M28 2 h9 v8" fill="none" stroke="#e5191c" stroke-width="3"/></svg>`;
 const TMAILS=[
+ {id:"m581",t:"5.8.1 小更新",date:"11月18日",body:[
+  "【屏幕】长屏手机上画面铺满整个屏幕，不再左右两条黑边；按钮还是留在中间，手指好点",
+  "【开屏】奶蛙工作室的标志之后，加了健康游戏忠告"]},
  {id:"m58",t:"5.8 版本更新",date:"11月18日",body:[
   "【音乐】所有曲子都重新编排了：不再是十几秒就从头再来，每首一轮在 50 秒到一分半之间，有主歌、变奏、副歌和间奏，间奏里鼓会停下来",
   "【音乐】副歌换了和弦，变奏和副歌里多了一条副旋律；每个音有轻有重，强拍重、弱拍轻，听起来更像人在弹",

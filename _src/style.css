@@ -1044,7 +1044,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 5.8";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 5.8.1";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -3130,6 +3130,12 @@ html.lite body::before{filter:brightness(.35);background:radial-gradient(ellipse
 .hofE small{grid-column:2;position:static!important;display:block;font-size:12px;line-height:1.35;opacity:.75;transform:none!important}
 .hofE img{grid-row:span 2}
 .lbAsc{font-style:normal;font-size:13px;margin-left:8px;padding:1px 6px;background:var(--p5r,#e5191c);color:#fff;transform:skewX(-8deg);display:inline-block}
+
+/* ===== 5.8 宽屏手机：画面铺满整个屏幕，背景跟着变宽，按钮和内容留在中间 1280 宽的区域 ===== */
+#stage.wideS>.scr,#stage.wideS>#ov,#stage.wideS>#talk,#stage.wideS>#top{left:var(--ox);right:auto;width:1280px}
+#stage.wideS>#top{box-shadow:none}
+#stage.wideS:before{content:"";position:absolute;left:0;right:0;top:0;height:60px;background:var(--p5k);border-bottom:4px solid var(--p5r);z-index:39;display:none}
+#stage.wideS.hudOn:before{display:block}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}

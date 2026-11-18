@@ -456,3 +456,6 @@ const COMP_MEET={
  bean:{naiwa:"你也往塔顶走？顺路，帮我扛一下。",kungfu:"你力气大，帮我看着包裹。",knight:"骑士押送，包裹肯定丢不了。",mage:"你能用魔法给包裹保温吗？",vamp:"你身上好冷。离包裹远点，它要趁热。"},
  hen:{naiwa:"你瘦了，多吃点。",kungfu:"练功的孩子饿得快，来，吃口米。",knight:"这身铁皮不闷吗？脱了透透气。",mage:"看书伤眼睛，少看点。",vamp:"你脸色这么白，是不是没吃饭？"}};
 ["fire","blue","iron","bean","hen"].forEach(id=>hookOpt("c_"+id+"0",()=>true,()=>setTimeout(()=>{if(compActive()&&S.comp.id===id){const t=(COMP_MEET[id]||{})[S.hero];if(t)compSay(t)}},2600)));
+
+/* 宽屏时，顶部信息栏两边也铺上底色 */
+{const _sh=show;show=function(){const r=_sh.apply(this,arguments);try{const t=$("#top");$("#stage").classList.toggle("hudOn",!!(t&&t.classList.contains("on")))}catch(e){}return r}}
