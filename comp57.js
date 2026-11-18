@@ -46,7 +46,7 @@ function compActive(){const c=S&&S.comp;if(!c||!COMP_LINES[c.id])return false;if
 let CB_Q=[],CB_ON=0;
 // 一次只出一条，排队；同一句不会连着排两次
 function compSay(text){if(!text||!S||(!S.comp&&typeof text!=="object"))return;if(CB_Q.some(x=>x===text||(x&&x.t&&text&&x.t===text.t)))return;CB_Q.push(text);if(!CB_ON)cbNext()}
-function cbNext(){let t=CB_Q.shift();if(!t){CB_ON=0;return}CB_ON=1;let th=null;if(typeof t==="object"){th=t;t=t.t}const C=th?{img:th.img}:((S.comp&&COMP[S.comp.id])||{});document.querySelectorAll(".cmpB").forEach(x=>x.remove());const d=document.createElement("div");d.className="cmpB"+($("#event.on")?" ev":"")+(th?" think":"");d.innerHTML=`<div class="av"><img src="${IMG(C.img)}" alt=""></div><div class="bx">${th?"":`<span class="nm">${C.n}</span>`}${th?"（"+t+"）":t}</div>`;const st=$("#stage");if(!st){CB_ON=0;return}st.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));const ms=Math.max(2600,1400+t.length*120);setTimeout(()=>{d.classList.remove("on");setTimeout(()=>{d.remove();cbNext()},380)},ms)}
+function cbNext(){let t=CB_Q.shift();if(!t){CB_ON=0;return}CB_ON=1;let th=null;if(typeof t==="object"){th=t;t=t.t}const C=th?{img:th.img}:((S.comp&&COMP[S.comp.id])||{});document.querySelectorAll(".cmpB").forEach(x=>x.remove());const d=document.createElement("div");const tk=th&&!th.n;if(th&&th.n)C.n=th.n;d.className="cmpB"+($("#event.on")?" ev":"")+(tk?" think":"");d.innerHTML=`<div class="av"><img src="${IMG(C.img)}" alt=""></div><div class="bx">${tk?"":`<span class="nm">${C.n}</span>`}${tk?"（"+t+"）":t}</div>`;const st=$("#stage");if(!st){CB_ON=0;return}st.appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));const ms=Math.max(2600,1400+t.length*120);setTimeout(()=>{d.classList.remove("on");setTimeout(()=>{d.remove();cbNext()},380)},ms)}
 function compLine(kind,once){try{if(!compActive())return;const L=COMP_LINES[S.comp.id][kind];if(!L||!L.length)return;S.comp.said=S.comp.said||{};if(once){const k=kind+"_"+once;if(S.comp.said[k])return;S.comp.said[k]=1}const n=S.comp.said[kind]|0;S.comp.said[kind]=n+1;compSay(L[n%L.length])}catch(e){console.warn(e)}}
 // 酒馆：进门说一句；替它还过钱的阿蓝，前两次会抢着付酒钱
 {const _tv=tavernScreen;tavernScreen=function(){const r=_tv.apply(this,arguments);try{const c=S.comp;if(c&&c.id==="blue"&&c.blue==="paid"&&compActive()&&(c.treat|0)<2&&S.cur&&!S.cur.treated){S.cur.treated=1;c.treat=(c.treat|0)+1;S.gold+=20;renderTop();saveRun();setTimeout(()=>compSay("这次记我账上。真的记我账上。（阿蓝付了酒钱：+20 金币）"),700)}else setTimeout(()=>compLine("tav"),700)}catch(e){}return r}}
@@ -388,11 +388,11 @@ function think(kind){try{if(!S)return;const H=HERO_THINK[S.hero]||HERO_THINK.nai
 Object.assign(RELICS,{proto_box:{n:"第一任的八音盒",img:"v_proto",r:"Q",d:"一圈一圈转着。每场战斗开始获得 6 护盾，首领战再多 6"}});
 {const _sc5=startCombat;startCombat=function(kind){const r=_sc5.apply(this,arguments);try{if(S&&has("proto_box"))setTimeout(()=>{if(B&&B.p){B.block("BKFCW".includes(kind)?12:6,1);relicPulse("proto_box")}},80)}catch(e){}return r}}
 // 修好了八音盒：初号机血掉到一半，会停下来听一回合
-{const _de2=dealEnemy;dealEnemy=function(t,d){const r=_de2.apply(this,arguments);try{if(!PREV&&t&&t.id==="proto"&&S.flags.protoBox&&B&&!B.boxed&&t.hp>0&&t.hp<=t.max/2){B.boxed=1;t.waitTurns=Math.max(1,t.waitTurns||0);toast("八音盒响了一下。初号机停了下来，在听。");fxSay&&fxSay(t,"……这首……歌……");renderBattle()}}catch(e){}return r}}
+{const _de2=dealEnemy;dealEnemy=function(t,d){const r=_de2.apply(this,arguments);try{if(!PREV&&t&&t.id==="proto"&&S.flags.protoBox&&B&&!B.boxed&&t.hp>0&&t.hp<=t.max/2){B.boxed=1;t.waitTurns=Math.max(1,t.waitTurns||0);toast("八音盒在你口袋里响了一下。初号机停住了，歪着头，像在想一首很久以前的歌。");renderBattle()}}catch(e){}return r}}
 protoWin=async function(){busy=true;await sleep(600);B=null;busy=false;show("none");
  await talk(STORY.ss_proto_win);
- if(S.flags.protoDiary)await talk([["n1","","（你把那本日记拿出来，翻到第一页，念给他听。）"],["n1","","「今天坐上去了。泉水涨了一指。大家都在笑。」"],["v_proto","残破的初号奶蛙","……笑……他们……笑了……"],["n1","","后来呢？"],["v_proto","残破的初号奶蛙","……冷。"]]);
- if(S.flags.protoBox)await talk([["n1","","（八音盒在你口袋里自己转了起来。）"],["v_proto","残破的初号奶蛙","（他没有立刻倒下。齿轮慢慢地、一格一格地，跟着那首歌转。）"],["v_proto","残破的初号奶蛙","……哼……哼……"]]);
+ if(S.flags.protoDiary)await talk([["n1","","（他的铁皮一块块剥落。你想起口袋里那本日记，翻开第一页，念给他听。）"],["n1","","「今天坐上去了。泉水涨了一指。大家都在笑。」"],["v_proto","残破的初号奶蛙","……一指……"],["n1","","（他的爪子在雪上划了一下，很短的一道，像在比量那一指有多高。）"],["n1","","（你往后翻。字越来越歪，最后一页只有一个「冷」字。你没有念。）"],["v_proto","残破的初号奶蛙","……后面……写了什么？"],["n1","","写的是，谢谢你。"],["v_proto","残破的初号奶蛙","……是吗。……那就好。"]]);
+ if(S.flags.protoBox)await talk([["n1","","（八音盒还在转，最后几个音慢了下来。）"],["v_proto","残破的初号奶蛙","……这首……我会……"],["n1","","（他跟着哼。跑调得厉害，每个音都低半拍。可他一直哼到了最后一个音。）"]]);
  S.flags.protoDone=1;S.flags.clue=1;S.gold+=150;ach("proto");saveRun();
  show("event");setBg("bossice");
  const opts=[{k:"home",t:"把核心带回去，交给长老",d:"<span class='good'>得到「初号机的核心」</span>"}];if(S.flags.protoBox)opts.push({k:"box",t:"把八音盒放在他身边",d:"<span class='good'>得到「第一任的八音盒」</span>"});opts.push({k:"snow",t:"让他回冰原",d:"什么都不带走"});
@@ -408,8 +408,51 @@ protoWin=async function(){busy=true;await sleep(600);B=null;busy=false;show("non
 {const base=STORY.trueEnd;if(base)Object.defineProperty(STORY,"trueEnd",{configurable:true,get(){return S&&S.flags&&S.flags.protoEnd==="home"?base.concat([["n1","","（泉边多了一块发着冷光的石头。村里的小孩说，靠近它的时候，能听见很小很小的八音盒声。）"]]):base}})}
 // 让他回了冰原：以后的局走冰原，雪地里偶尔有一串铁爪印
 {const _om4=openMap;openMap=function(){const r=_om4.apply(this,arguments);try{if(S&&M.protoSnow&&(S.act||0)===2&&!S.junc&&!S.flags.snowPrint){S.flags.snowPrint=1;setTimeout(()=>toast("雪地里有一串铁爪印，往山下走。"),1400)}}catch(e){}return r}}
-// 诅咒师：带走了井绳
-{const base=STORY.cs_win;if(base)Object.defineProperty(STORY,"cs_win",{configurable:true,get(){if(!(S&&S.flags&&S.flags.csRope))return base;const i=base.findIndex(l=>/我有什么错/.test(l[2]));if(i<0)return base;return [...base.slice(0,i+1),["n1","","（你把那截井绳扔在它面前。）"],["v_curser","灭却诅咒师","（它看着绳头上那圈黑乎乎的指印，看了很久，没再说话。）"],...base.slice(i+1)]}})}
-{const base=STORY.cs2_in;if(base)Object.defineProperty(STORY,"cs2_in",{configurable:true,get(){return S&&S.flags&&S.flags.csRope?[base[0],["v_curser","灭却诅咒师","……那截绳子，你还留着吗。"],...base.slice(1)]:base}})}
-// 斗场：听退役的斗士讲完过故事
-{const base=STORY.dsq_win;if(base)Object.defineProperty(STORY,"dsq_win",{configurable:true,get(){if(!(S&&S.flags&&S.flags.arenaFighter))return base;const i=base.findIndex(l=>/替我/.test(l[2]));const j=i<0?base.length-2:i;return [...base.slice(0,j),["v_champ","不灭的斗士","……地道里那个缺耳朵的，还活着？替我跟他说，第四百一十二场，是他让我的。"],...base.slice(j)]}})}
+
+
+/* ---------- 18. 长老重伤、同伴死去或离开、首领特殊对话、血量过半、同伴初见 ---------- */
+// 长老挡在前面倒下：主角以为他不行了（其实只是重伤）
+const ELDER_REACT={
+ naiwa:[["n1","__HERO__","长老？……长老！你说过，等我回去，给我煮粥的。"],["n1","","（他不说话。我连他还有没有气都分不清。）"],["n1","__HERO__","你起来……我还没学会煮粥。"]],
+ kungfu:[["n1","","（长老倒下之前，摆的是一个起手式。我认得，是他教我的第一招。）"],["n1","__HERO__","……师父，这一招你没教完。你起来，教完再走。"],["n1","","（我把那个起手式摆了一遍。手在抖，怎么都摆不正。）"]],
+ knight:[["n1","","（骑士应该挡在前面的。挡在前面的，不应该是他。）"],["n1","__HERO__","长老，我的盾……慢了一步。"],["n1","","（我跪下来，把盾垫在他头底下。地上太凉了。）"]],
+ mage:[["n1","__HERO__","不对……我算过所有的可能，没有一个是这样的。"],["n1","","（他的手是凉的。我想不起任何一个能用的咒语。）"],["n1","__HERO__","你撑住。我会想出办法的。我一定会想出来。"]],
+ vamp:[["n1","__HERO__","……又是这样。"],["n1","","（每一个对我好的人，都要挡在我前面。父亲是，你也是。）"],["n1","__HERO__","你别闭眼。我还没跟你说谢谢。"]]};
+{const base=STORY.elderGone;if(base)Object.defineProperty(STORY,"elderGone",{configurable:true,get(){const L=ELDER_REACT[(S&&S.hero)||"naiwa"]||ELDER_REACT.naiwa;return base.concat(L.map(([i,n,t])=>[i,n==="__HERO__"?HN():n,t]))}})}
+// 同伴死去或离开：主角心里的话
+Object.entries({
+ dieIron:{naiwa:"昨天他还在教我出拳。今天他就不说话了。",kungfu:"他最后一刀，腰是转过来的。他做到了。",knight:"我对着他的剑行了一个骑士礼。他比我更像骑士。",mage:"我知道人会死。我只是不知道，会是在打赢以后。",vamp:"我最讨厌送人。……我把披风盖在了他身上。"},
+ leaveIron:{naiwa:"拦住他，是对的吧？……他走的时候，没回头。",kungfu:"拦住他是对的吗。师父没教过这个。",knight:"我拦下了一个骑士的决斗。这是我做过最不像骑士的事。",mage:"概率上，他会活得更久。可他想要的不是更久。",vamp:"他恨我也好。恨着的人，至少还活着。"},
+ dieFire:{naiwa:"它说要请我喝奶茶的。",kungfu:"我出拳再快，也快不过冰。",knight:"我没能保护它。这身盔甲，今天一点用都没有。",mage:"冰会化的。……可它不会醒了。",vamp:"它的围巾还是红的。只有围巾还是红的。"},
+ stayFire:{naiwa:"它把包放下了。那么大的包，它背了一路。",kungfu:"它选了自己的路，我该尊重。……还是有点难受。",knight:"留下来陪家人，也是一种守护。",mage:"两个人还债，比一个人快一倍。这道题，它算对了。",vamp:"兄弟俩。……有兄弟真好。"},
+ leaveBlue:{naiwa:"它被拖进去的时候，没喊我。它为什么不喊我？",kungfu:"见死不救，不是师父教的。……可我还是走过去了。",knight:"骑士不该从求救的人身边走过。它甚至没有求救。",mage:"它的债和我无关。我一遍一遍跟自己这么说。",vamp:"一只欠债的猫而已。……那条围巾，我还围着。"},
+ sweptBean:{naiwa:"它最后一句是「送到啊」。我会送到的。",kungfu:"我抓住了包裹，没抓住人。",knight:"我选了它托付的东西，而不是它。它会原谅我吗。",mage:"包裹送到了，送包裹的人没到。这单不完整。",vamp:"一个邮差，为了一个包裹。……真傻。真好。"},
+ henNone:{naiwa:"空篮子很轻。轻得拿不住。",kungfu:"篮子里的干草铺得很整齐。她一直在等。",knight:"一个都没救回来。骑士的誓言，今天碎了一个。",mage:"七个，零个。这个数我不想记住。",vamp:"我本来就不爱吃蛋。从今天起，更不爱了。"}
+}).forEach(([k,o])=>{for(const h in o){HERO_THINK[h]=HERO_THINK[h]||{};HERO_THINK[h][k]=[o[h]]}});
+// 在对应的选择后面接上
+function hookOpt(ev,idx,fn){const E=EVENTS[ev];if(!E)return;const o0=E.o;E.o=()=>{const L=typeof o0==="function"?o0():o0;return L.map((op,i)=>{if(!idx(op,i))return op;const f0=op.f;return Object.assign({},op,{f:async()=>{const r=await f0();try{if(r!=null)fn()}catch(e){}return r}})})}}
+hookOpt("c_blue3",op=>/自己的事/.test(op.t),()=>setTimeout(()=>think("leaveBlue"),1200));
+hookOpt("c_fire3",op=>/自己决定/.test(op.t),()=>setTimeout(()=>think("stayFire"),1200));
+hookOpt("c_bean3",op=>/抓住包裹/.test(op.t),()=>setTimeout(()=>think("sweptBean"),1200));
+hookOpt("c_hen4",op=>/篮子/.test(op.t),()=>setTimeout(()=>think("henNone"),1200));
+hookOpt("c_fire2",()=>true,()=>{if(S.comp&&S.comp.alive===0)setTimeout(()=>think("dieFire"),1200)});
+{const _ig=ironGate;ironGate=function(){const r=_ig.apply(this,arguments);try{$$("#event .evo").forEach(b=>{const k=b.dataset.k;b.addEventListener("click",()=>{if(k==="let")S.thinkAfter="dieIron";if(k==="stop")setTimeout(()=>think("leaveIron"),2500)},true)})}catch(e){}return r}}
+// 首领特殊对话：几组关系最深的，开场写成一小段
+const BOSS_SCENE={
+ count:{vamp:[["H","父亲，你……为什么要做到这种地步？"],["E","弱者撑不过下一次大旱。我把他们的力量交给塔，塔就能多护住一些人。"],["H","塔护住了谁？村里的井，一年比一年浅。"],["E","……你小时候，总问我月亮为什么不会掉下来。"],["H","你说，因为有人在上面撑着。"],["E","那个人，现在是我。让开吧，孩子。"],["H","不。这次换我撑。"]]},
+ witch:{mage:[["H","收集名字，是一种很古老的魔法。"],["E","不是魔法。是我不想忘。"],["H","可你把名字关在瓶子里，他们就永远走不了。"],["E","走了，就没人记得他们了。你们学魔法的，不懂这个。"],["H","我懂。我的魔法书第一页，写的是我妈妈的名字。"],["E","……那你来。看看你能不能，从我手里把他们放走。"]]},
+ shadow:{kungfu:[["E","（影子摆了一个起手式。）"],["H","……这是师父的起手式。你从哪里学的？"],["E","从你师父身上。他跑下山的时候，把我留在了这里。"],["H","那你学得不对。师父出这一招，后脚是虚的。他随时准备回头。"],["E","……回头？"],["H","他回头了。只是晚了很多年。"]]},
+ king:{knight:[["H","这身盔甲的主人，三十年前也从这里经过。"],["E","他没回来。没有一个人回来。"],["H","你认得这身盔甲？"],["E","认得。他在我这儿歇过脚，说要替一个叫阿岳的人，去看看塔顶有什么。"],["H","……这身盔甲，是我在山脚的旧货摊上买的。原来它走过这么远。"],["E","那你替它，把剩下的路走完。"]]},
+ iceking:{naiwa:[["H","他们……都睡着了吗？"],["E","嘘。他们在笑。你看，多好的一天。"],["H","可他们冻着，就吃不到村里的粥了。"],["E","粥会凉。笑不会。"],["H","粥凉了可以再热。长老每天都热一锅。"],["E","……长老？那个老家伙，还在煮粥？"],["H","嗯。他说，粥一直有。"]]}};
+{const _ht=heroTalk;heroTalk=function(id,img){try{const sc=(BOSS_SCENE[id]||{})[(S&&S.hero)||"naiwa"];if(sc)return sc.map(([w,t])=>w==="H"?["n1",HN(),t]:[img,ENEMY[id].n,t])}catch(e){}return _ht.apply(this,arguments)}}
+// 血量过半：这几组再说一两句（不打断战斗）
+const BOSS_HALF={count:{vamp:["你出手的样子，和你母亲一模一样。","别提她。……别在这时候提她。"]},witch:{mage:["你的魔法书第一页……让我看看。","打赢我，就给你看。"]},shadow:{kungfu:["后脚是虚的……为什么我学不会？","因为你从来没想过回头。"]},king:{knight:["这身盔甲……三十年前，也挡过我的泥。","那它今天也挡得住。"]},iceking:{naiwa:["冰……在化。为什么在化？","因为天快亮了。"]}};
+{const _de3=dealEnemy;dealEnemy=function(t,d){const r=_de3.apply(this,arguments);try{if(!PREV&&t&&B&&!B.halfTalk&&t.hp>0&&t.hp<=t.max/2){const x=(BOSS_HALF[t.id]||{})[S.hero];if(x){B.halfTalk=1;const h=HEROES.find(z=>z.id===S.hero)||HEROES[0];compSay({t:x[0],img:ENEMY[t.id].img,n:ENEMY[t.id].n});compSay({t:x[1],img:h.img,n:HN()})}}}catch(e){}return r}}
+// 同伴第一次见到不同的主角
+const COMP_MEET={
+ iron:{naiwa:"你走路的样子像个种地的。……好，种地的有力气。",kungfu:"练过的？腰还不错。",knight:"骑士？我年轻时候也是。……现在是老骑士。",mage:"会魔法的？那你走前面，我腿慢。",vamp:"吸血鬼？我这把老骨头没多少血，别惦记。"},
+ blue:{naiwa:"你看起来很好说话。……借我点钱？",kungfu:"练武的都讲义气，对吧？对吧？",knight:"骑士大人！您一定不会见死不救！",mage:"你会变金币吗？不会？那你会什么？",vamp:"哇，有钱人。……您缺跟班吗？"},
+ fire:{naiwa:"你也是村里的？那你认识我哥吗？",kungfu:"你会功夫！能教我吗？我要去救我哥！",knight:"真的盔甲！我哥也想要一套！",mage:"你能用魔法找人吗？找一只围红围巾的奶马。",vamp:"你……是好人吧？你的牙好尖。"},
+ bean:{naiwa:"你也往塔顶走？顺路，帮我扛一下。",kungfu:"你力气大，帮我看着包裹。",knight:"骑士押送，包裹肯定丢不了。",mage:"你能用魔法给包裹保温吗？",vamp:"你身上好冷。离包裹远点，它要趁热。"},
+ hen:{naiwa:"你瘦了，多吃点。",kungfu:"练功的孩子饿得快，来，吃口米。",knight:"这身铁皮不闷吗？脱了透透气。",mage:"看书伤眼睛，少看点。",vamp:"你脸色这么白，是不是没吃饭？"}};
+["fire","blue","iron","bean","hen"].forEach(id=>hookOpt("c_"+id+"0",()=>true,()=>setTimeout(()=>{if(compActive()&&S.comp.id===id){const t=(COMP_MEET[id]||{})[S.hero];if(t)compSay(t)}},2600)));
