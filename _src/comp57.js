@@ -245,7 +245,7 @@ Object.assign(EVENTS,{
   {t:"把八音盒修好",d:"<span class='bad'>失去 6 生命</span>，<span class='good'>初号机开场少 10% 生命</span>",f:()=>{S.hp=Math.max(1,S.hp-6);S.flags.protoBox=1;return"你冻得手指都不听使唤，修了很久。最后，八音盒叮叮咚咚地响完了一整首。洞的深处，齿轮声停了一下。"}},
   {t:"拆了零件",d:"<span class='good'>+50 金币</span>",f:()=>{S.gold+=50;return"零件是好零件。你把空盒子放回原处，盖子合上的时候，「咔」了一声。"}}]},
  ssl_arena1:{ss:1,n:"退役的斗士",img:"v_mcolo",t:"通往斗场的地道里，坐着一只缺了一只耳朵的老奶狗，面前摆着半碗冷掉的奶茶。「去打不灭的？」它没抬头，「我跟它打过。第四百一十二场。」<br>「它那个人……不坏。只是它的对手，上场前一晚总会病一场。」它顿了顿，「四十年前有个老骑士，也是病着上的场。打到最后一刀，都没松手。」",o:()=>[
-  {t:"听它讲完",d:"<span class='good'>随机升级 1 张牌</span>",f:()=>{const l=shuffle(S.deck.filter(c=>upOK(c))).slice(0,1);l.forEach(c=>c.u=(c.u|0)+1);if(l.length)upFx(l);return"它讲了很多场，每一场都记得对手的名字。讲完，它把那半碗奶茶推给你：「凉了。你喝吧，我喝不动了。」"}},
+  {t:"听它讲完",d:"<span class='good'>随机升级 1 张牌</span>",f:()=>{S.flags.arenaFighter=1;const l=shuffle(S.deck.filter(c=>upOK(c))).slice(0,1);l.forEach(c=>c.u=(c.u|0)+1);if(l.length)upFx(l);return"它讲了很多场，每一场都记得对手的名字。讲完，它把那半碗奶茶推给你：「凉了。你喝吧，我喝不动了。」"}},
   {t:"请它喝一碗热的（20 金币）",d:"<span class='bad'>-20 金币</span>，<span class='good'>回复 20 生命</span>",ok:S.gold>=20,f:()=>{S.gold-=20;S.hp=Math.min(S.max,S.hp+20);return"它捧着碗，捧了很久才喝。「四十年了，」它说，「头一回有人请我。」"}}]},
  ssl_cs1:{ss:1,n:"被说中的人",img:"v_mhood",t:"走廊里坐着一只奶蛙，背靠着墙，脚边积了一层灰。「它说我会在这里等一辈子。」它说，「我就等了。」<br>「等什么？」<br>它想了很久：「……忘了。」",o:()=>[
   {t:"劝它走",d:"<span class='good'>最大生命 +5</span>",f:()=>{S.max+=5;S.hp+=5;return"它站起来的时候，腿已经不会弯了。你扶着它走了几步，它就自己走了。走得很慢，但没回头。"}},
@@ -382,3 +382,34 @@ function think(kind){try{if(!S)return;const H=HERO_THINK[S.hero]||HERO_THINK.nai
 ["sc_holy","sc_antique","sc_warmer","sc_fee","sc_robber","sc_star"].forEach(k=>{const E=EVENTS[k];if(!E)return;const o1=E.o;E.o=()=>o1().map((op,i)=>{const f0=op.f;return Object.assign({},op,{f:async()=>{const r=await f0();try{if(r!=null){if(i===0&&!/真的/.test(r))setTimeout(()=>think("scam"),900);else if(/识破/.test(op.d||""))setTimeout(()=>think("caught"),900)}}catch(e){}return r}})})});
 // 快不行了（同伴不在的时候，主角自己想）
 {const _st2=startTurn;startTurn=async function(){const r=await _st2.apply(this,arguments);try{if(B&&!B.over&&S.hp>0&&S.hp<=S.max*.25&&!B.tLow&&!compActive()){B.tLow=1;think("low")}}catch(e){}return r}}
+
+
+/* ---------- 17. 初号机线的收尾 + 线索带来的对话 ---------- */
+Object.assign(RELICS,{proto_box:{n:"第一任的八音盒",img:"v_proto",r:"Q",d:"一圈一圈转着。每场战斗开始获得 6 护盾，首领战再多 6"}});
+{const _sc5=startCombat;startCombat=function(kind){const r=_sc5.apply(this,arguments);try{if(S&&has("proto_box"))setTimeout(()=>{if(B&&B.p){B.block("BKFCW".includes(kind)?12:6,1);relicPulse("proto_box")}},80)}catch(e){}return r}}
+// 修好了八音盒：初号机血掉到一半，会停下来听一回合
+{const _de2=dealEnemy;dealEnemy=function(t,d){const r=_de2.apply(this,arguments);try{if(!PREV&&t&&t.id==="proto"&&S.flags.protoBox&&B&&!B.boxed&&t.hp>0&&t.hp<=t.max/2){B.boxed=1;t.waitTurns=Math.max(1,t.waitTurns||0);toast("八音盒响了一下。初号机停了下来，在听。");fxSay&&fxSay(t,"……这首……歌……");renderBattle()}}catch(e){}return r}}
+protoWin=async function(){busy=true;await sleep(600);B=null;busy=false;show("none");
+ await talk(STORY.ss_proto_win);
+ if(S.flags.protoDiary)await talk([["n1","","（你把那本日记拿出来，翻到第一页，念给他听。）"],["n1","","「今天坐上去了。泉水涨了一指。大家都在笑。」"],["v_proto","残破的初号奶蛙","……笑……他们……笑了……"],["n1","","后来呢？"],["v_proto","残破的初号奶蛙","……冷。"]]);
+ if(S.flags.protoBox)await talk([["n1","","（八音盒在你口袋里自己转了起来。）"],["v_proto","残破的初号奶蛙","（他没有立刻倒下。齿轮慢慢地、一格一格地，跟着那首歌转。）"],["v_proto","残破的初号奶蛙","……哼……哼……"]]);
+ S.flags.protoDone=1;S.flags.clue=1;S.gold+=150;ach("proto");saveRun();
+ show("event");setBg("bossice");
+ const opts=[{k:"home",t:"把核心带回去，交给长老",d:"<span class='good'>得到「初号机的核心」</span>"}];if(S.flags.protoBox)opts.push({k:"box",t:"把八音盒放在他身边",d:"<span class='good'>得到「第一任的八音盒」</span>"});opts.push({k:"snow",t:"让他回冰原",d:"什么都不带走"});
+ $("#event").innerHTML=`<div class="evBox"><div class="phead"><span class="ribbon">第一任守泉人</span></div><div class="evPic"><img src="${IMG("v_proto")}"></div><div class="evTxt"><p id="evP">铁皮裂开了，核心还在发着冷光。他躺在雪里，齿轮偶尔动一下。<br>你要拿他怎么办？</p><div class="evOpts">${opts.map(o=>`<button class="evo" data-k="${o.k}"><b>${o.t}</b><small>${o.d}</small></button>`).join("")}</div></div></div>`;
+ $$("#event .evo").forEach(b=>b.onclick=async()=>{if(b.dataset.busy)return;$$("#event .evo").forEach(x=>x.dataset.busy=1);sfx("click");const k=b.dataset.k;S.flags.protoEnd=k;
+  if(k==="home"){await talk([["n1","","（你把核心从铁皮里取出来，用布包好。它很轻，比你想的轻得多。）"],["n1","","（包好的时候，核心闪了一下，像是在点头。）"]]);gainRelic("proto_core");toast("SS 讨伐完成：<b>+150</b> 金币，得到「初号机的核心」。带去休息处给长老看看")}
+  else if(k==="box"){await talk([["n1","","（你把八音盒上满发条，放在他手边。）"],["n1","","（八音盒一圈一圈地转。他的齿轮也一格一格地慢下来。）"],["v_proto","残破的初号奶蛙","……这首歌……是……谁……教我的……"],["n1","","（他没说完。八音盒还在转。你等它转完了，才把它收起来。）"]]);gainRelic("proto_box");toast("SS 讨伐完成：<b>+150</b> 金币，得到「第一任的八音盒」")}
+  else{await talk([["n1","","（你把他扶起来。他摇摇晃晃地站着，看了看塔顶，又看了看山下。）"],["n1","","（然后他转过身，一步一步走进了风雪里。爪印越来越浅，很快就看不见了。）"]]);M.protoSnow=1;saveMeta();toast("SS 讨伐完成：<b>+150</b> 金币")}
+  saveRun();rewardScreen("E",0,[])})};
+// 长老：没拿核心回来的话，开头那句换掉
+{const _rc=restClue;restClue=async function(){if(!S.flags.clue||S.flags.truth)return _rc.apply(this,arguments);const base=STORY.elder_clue;const e=S.flags.protoEnd;try{if(e==="box")STORY.elder_clue=[["m6","奶蛙长老","你身上有齿轮的味道……还有一首很老的歌。你见过初号了？"],...base.slice(1)];else if(e==="snow")STORY.elder_clue=[["m6","奶蛙长老","你从冰原回来，身上有铁锈味。……你见过初号了？"],...base.slice(1)];else if(e==="home")STORY.elder_clue=[...base,["m6","奶蛙长老","我把他放在泉边吧。他守了那么久的泉，让他听听水声。"]];return await _rc.apply(this,arguments)}finally{STORY.elder_clue=base}}}
+// 真结局：核心交给了长老，泉边多一块石头
+{const base=STORY.trueEnd;if(base)Object.defineProperty(STORY,"trueEnd",{configurable:true,get(){return S&&S.flags&&S.flags.protoEnd==="home"?base.concat([["n1","","（泉边多了一块发着冷光的石头。村里的小孩说，靠近它的时候，能听见很小很小的八音盒声。）"]]):base}})}
+// 让他回了冰原：以后的局走冰原，雪地里偶尔有一串铁爪印
+{const _om4=openMap;openMap=function(){const r=_om4.apply(this,arguments);try{if(S&&M.protoSnow&&(S.act||0)===2&&!S.junc&&!S.flags.snowPrint){S.flags.snowPrint=1;setTimeout(()=>toast("雪地里有一串铁爪印，往山下走。"),1400)}}catch(e){}return r}}
+// 诅咒师：带走了井绳
+{const base=STORY.cs_win;if(base)Object.defineProperty(STORY,"cs_win",{configurable:true,get(){if(!(S&&S.flags&&S.flags.csRope))return base;const i=base.findIndex(l=>/我有什么错/.test(l[2]));if(i<0)return base;return [...base.slice(0,i+1),["n1","","（你把那截井绳扔在它面前。）"],["v_curser","灭却诅咒师","（它看着绳头上那圈黑乎乎的指印，看了很久，没再说话。）"],...base.slice(i+1)]}})}
+{const base=STORY.cs2_in;if(base)Object.defineProperty(STORY,"cs2_in",{configurable:true,get(){return S&&S.flags&&S.flags.csRope?[base[0],["v_curser","灭却诅咒师","……那截绳子，你还留着吗。"],...base.slice(1)]:base}})}
+// 斗场：听退役的斗士讲完过故事
+{const base=STORY.dsq_win;if(base)Object.defineProperty(STORY,"dsq_win",{configurable:true,get(){if(!(S&&S.flags&&S.flags.arenaFighter))return base;const i=base.findIndex(l=>/替我/.test(l[2]));const j=i<0?base.length-2:i;return [...base.slice(0,j),["v_champ","不灭的斗士","……地道里那个缺耳朵的，还活着？替我跟他说，第四百一十二场，是他让我的。"],...base.slice(j)]}})}
