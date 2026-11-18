@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="5.8.1";
+const VER="5.8.2";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -204,6 +204,10 @@ function yardScreen(){
 /* ===================== 信箱：作者写给玩家的信 ===================== */
 const MAIL_SVG=`<svg viewBox="0 0 40 32" class="mailIco"><rect x="2" y="4" width="36" height="25" rx="2" fill="#fff" stroke="#0d0d0d" stroke-width="3"/><path d="M3 6 L20 19 L37 6" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-linejoin="round"/><path d="M28 2 h9 v8" fill="none" stroke="#e5191c" stroke-width="3"/></svg>`;
 const TMAILS=[
+ {id:"m582",t:"5.8.2 小更新",date:"11月18日",body:[
+  "【主页】背景的淡紫色换成深紫色",
+  "【长屏】图鉴、今日塔况这些弹出页面，深色底铺满整个屏幕，不再露出两边",
+  "【开屏】奶蛙工作室和健康游戏忠告之间的淡入淡出更顺"]},
  {id:"m581",t:"5.8.1 小更新",date:"11月18日",body:[
   "【屏幕】长屏手机上画面铺满整个屏幕，不再左右两条黑边；按钮还是留在中间，手指好点",
   "【开屏】奶蛙工作室的标志之后，加了健康游戏忠告"]},

@@ -1044,7 +1044,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 5.8.1";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 5.8.2";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -2918,10 +2918,10 @@ body{background:transparent!important}
 @keyframes pSl{0%{transform:rotate(-35deg) scaleX(0);opacity:1}60%{transform:rotate(-35deg) scaleX(1);opacity:1}100%{transform:rotate(-35deg) scaleX(1);opacity:0}}
 .mn.t-K img.gBeat{width:118px;height:118px;object-fit:contain;margin-top:-16px;filter:grayscale(1) brightness(.85)!important;opacity:.85}
 /* 5.3 主页：星空淡紫（打过真结局的还是彩色） */
-#title:not(.rb){--p5r:#a98bff}
+#title:not(.rb){--p5r:#6c48e0}
 #title:not(.rb) .p5rays{opacity:.55}
-#title:not(.rb) .tfloor{background:#3b2a78!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #a98bff!important}
-#title:not(.rb) .plat::before{background:#5b45a8!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #a98bff!important}
+#title:not(.rb) .tfloor{background:#3b2a78!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #6c48e0!important}
+#title:not(.rb) .plat::before{background:#5b45a8!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #6c48e0!important}
 .flipX{display:inline-block;transform:scaleX(-1);line-height:0}
 /* 5.4 地图打磨 */
 #map .legend{gap:16px;padding:6px 18px;white-space:nowrap;bottom:20px;right:22px}
@@ -3134,6 +3134,8 @@ html.lite body::before{filter:brightness(.35);background:radial-gradient(ellipse
 /* ===== 5.8 宽屏手机：画面铺满整个屏幕，背景跟着变宽，按钮和内容留在中间 1280 宽的区域 ===== */
 #stage.wideS>.scr,#stage.wideS>#ov,#stage.wideS>#talk,#stage.wideS>#top{left:var(--ox);right:auto;width:1280px}
 #stage.wideS>#top{box-shadow:none}
+#stage.wideS>#ov{background:none}
+#stage.wideS>#ov:before{content:"";position:absolute;top:0;bottom:0;left:calc(-1*var(--ox));right:calc(-1*var(--ox));z-index:-1;pointer-events:none;background:repeating-linear-gradient(-30deg,rgba(229,25,28,.08) 0 18px,transparent 18px 36px),rgba(13,13,13,.94)}
 #stage.wideS:before{content:"";position:absolute;left:0;right:0;top:0;height:60px;background:var(--p5k);border-bottom:4px solid var(--p5r);z-index:39;display:none}
 #stage.wideS.hudOn:before{display:block}
 /* ==LITE-AUTO== */
