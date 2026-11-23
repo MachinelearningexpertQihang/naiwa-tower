@@ -84,7 +84,7 @@ dsqStep=function(){try{const s=S.dsq,D=s&&DSQ[s.st],c=S.comp;if(D&&D.boss&&c&&c.
  if(B&&!B.over&&S.comp&&S.comp.id==="hen"&&S.comp.chick&&compActive()){B.block(2,1)}
  if(B&&!B.over&&B.turn===1&&has("comp_chick")){B.layEgg({t:1,d:5,b:0,mini:1,nw:1});relicPulse("comp_chick")}}catch(e){console.warn(e)}return r}}
 {const _dd=dsqDone;dsqDone=async function(){try{const c=S.comp;if(c&&c.id==="iron"&&c.duel==="together"&&compActive()){show("none");setBg("teaarena");await talk([["n1","","（不灭的斗士跪在地上，盾裂成了两半。他抬头看着老铁。）"],["v_champ","不灭的斗士","……你爹那场，上场前一晚也病了。他是撑着病打完的。"],["v_champ","不灭的斗士","最后一刀，也是这么砍的。"],["n1","","（老铁没说话。他把剑插在地上，对着斗士行了一个很旧的骑士礼。）"]])}
-  if(c&&c.id==="blue"&&c.blue==="fought"&&compActive()){c.bet=1;S.gold+=200;postQ([["ct","阿蓝","（阿蓝抱着一大袋金币冲进来，跑的时候袋子漏了一路。）"],["ct","阿蓝","我赢了！！我这辈子第一次赢！！"],["ct","阿蓝","我押的你，全押！庄家脸都绿了！"],["n1","","（它把一半倒在你面前，剩下一半直接甩在庄家脸上。）"],["ct","阿蓝","三年的债！连本带息！"],["n1","","（+200 金币）"]])}}catch(e){console.warn(e)}return _dd.apply(this,arguments)}}
+  if(c&&c.id==="blue"&&c.blue==="fought"&&compActive()){c.bet=1;S.gold+=200;postQ([["v_ablue","阿蓝","（阿蓝抱着一大袋金币冲进来，跑的时候袋子漏了一路。）"],["v_ablue","阿蓝","我赢了！！我这辈子第一次赢！！"],["v_ablue","阿蓝","我押的你，全押！庄家脸都绿了！"],["n1","","（它把一半倒在你面前，剩下一半直接甩在庄家脸上。）"],["v_ablue","阿蓝","三年的债！连本带息！"],["n1","","（+200 金币）"]])}}catch(e){console.warn(e)}return _dd.apply(this,arguments)}}
 
 /* ---------- 4. 阿蓝 ---------- */
 Object.assign(EVENTS,{
@@ -458,7 +458,7 @@ const COMP_MEET={
 ["fire","blue","iron","bean","hen"].forEach(id=>hookOpt("c_"+id+"0",()=>true,()=>setTimeout(()=>{if(compActive()&&S.comp.id===id){const t=(COMP_MEET[id]||{})[S.hero];if(t)compSay(t)}},2600)));
 
 /* 宽屏时，顶部信息栏两边也铺上底色 */
-{const _sh=show;show=function(){const r=_sh.apply(this,arguments);try{const t=$("#top");$("#stage").classList.toggle("hudOn",!!(t&&t.classList.contains("on")))}catch(e){}return r}}
+{const _sh=show;show=function(){const r=_sh.apply(this,arguments);try{const t=$("#top");$("#stage").classList.toggle("hudOn",!!(t&&t.classList.contains("on")));const onT=!!document.querySelector("#title.on");if(show._t!==onT){show._t=onT;fit()}}catch(e){}return r}}
 
 /* ===== 5.8.3 真结局要三条 SS 线：初号机（线索）、死斗场（奶茶杯）、诅咒师（阿岳被骗的真相） ===== */
 STORY.elder_unknown=[["m6","奶蛙长老","我只知道椅子的事。至于阿岳当年为什么会信它……我也想不明白。"]];
@@ -531,3 +531,59 @@ function compRun(kind,p){try{if(!compActive())return;S.comp.said=S.comp.said||{}
 {const _ap=API.apply;API.apply=function(t,s,v){const r=_ap.apply(this,arguments);try{if(!PREV&&t===this.p&&v>0&&["poison","frost","weak","vuln","burn","bleed","curse"].includes(s)&&!this.cDeb&&!this.over){this.cDeb=1;setTimeout(()=>compMaybe("debuff",.5),700)}}catch(e){}return r}}
 // 7. 险胜：血剩一成多一点也赢了
 {const _w5=win;win=async function(){try{if(B&&!B.over&&S.hp>0&&S.hp<=Math.max(3,S.max*.12))setTimeout(()=>{if(compActive())compLine("clutch")},900)}catch(e){}return _w5.apply(this,arguments)}}
+
+/* ===== 6.0 斗兽场：很难。第三场弓斗士，第四场盾斗士和弓斗士一起上；冠军多一个阶段 ===== */
+try{
+ DSQ.splice(0,DSQ.length,
+  {g:["porter","boilerdog"],pre:"dsq_f1",txt:"喇叭：「第一场！奶茶厂第三车间的新兵，对阵——（咔）——一只奶蛙！」"},
+  {g:["ss_shield"],pre:"dsq_f2",post:"dsq_f2w",el:1,txt:"喇叭：「第二场！守门十三年，一步没退过的——盾斗士！」"},
+  {rest:1,txt:"休息室的门自己开了。<br>墙上密密麻麻刻着划痕，你数到一半就数乱了。最后一道旁边，刻着几个歪歪扭扭的字：<b>「还差一场。」</b><br>地上丢着一只褪色的奶茶杯盖，上面画着一张笑脸。"},
+  {g:["ss_archer"],pre:"dsq_f4",el:1,txt:"喇叭：「第三场！看台上长大的孩子，冠军的头号粉丝——弓斗士！」"},
+  {g:["ss_shield","ss_archer"],pre:"dsq_f4b",post:"dsq_f4w",el:1,txt:"喇叭：「第四场！……等等，这两位刚才不是已经下场了吗？（咔）规则上……没写不行！盾斗士、弓斗士，一起上！」"},
+  {g:["ss_champ"],pre:"dsq_boss",boss:1,txt:"喇叭：「女士们……先生们……（滋……）」<br>喇叭停了很久。<br>「……第一千零一场。」"});
+ STORY.dsq_f4b=[["v_shielder","盾斗士","我守了十三年门。今天守最后一次。"],["v_archer","弓斗士","你站前面，我在你后面射。"],["v_shielder","盾斗士","……跟它当年一样。"]];
+ Object.assign(ENEMY.ss_shield,{hp:[140,146],ai:(e,t)=>[{k:"def",v:22},{k:"atk",v:18},{k:"atkdef",v:13,b:14},{k:"atk",v:8,x:2,s:"weak",d:1}][t%4]});
+ Object.assign(ENEMY.ss_archer,{hp:[128,134],ai:(e,t)=>[{k:"atk",v:6,x:3},{k:"debuff",s:"vuln",v:2},{k:"charge"},{k:"atk",v:32,ult:"满弓"}][t%4]});
+ Object.assign(ENEMY.ss_champ,{hp:[380,380],ai:(e,t)=>e.form2?[{k:"atk",v:10,x:3},{k:"debuff",s:"vuln",v:2,s2:"weak",v2:2},{k:"charge"},{k:"atk",v:30,ult:"第一千零一拳"},{k:"atkdef",v:18,b:18}][t%5]:[{k:"atk",v:16},{k:"atk",v:9,x:2},{k:"atkdef",v:14,b:16},{k:"atk",v:22}][t%4]});
+ FORM2.ss_champ={n:"砸罐",say:"……我不出去了。这一场，我要赢。",tip:"它把背后的奶茶罐砸了：力气 +3，护盾 30。看到「蓄力」，下一回合就是第一千零一拳，先叠护盾"};
+}catch(e){console.warn(e)}
+// 斗兽场里的小怪和精英都更硬；冠军砸罐时的效果；奖励翻倍
+{const _scD=startCombat;startCombat=function(kind){const r=_scD.apply(this,arguments);try{if(kind==="D"&&B&&B.enemies){B.enemies.forEach(e=>{if(e.id==="ss_champ")return;const m=Math.round(e.max*(ENEMY[e.id].elite?1:1.5));e.hp=e.max=m;e.str=(e.str||0)+2;e.str0=(e.str0||0)+2});if(B.enemies.length>1&&B.enemies.every(e=>ENEMY[e.id].elite))B.enemies.forEach(e=>{e.hp=e.max=Math.round(e.max*.85)});renderBattle()}}catch(e){console.warn(e)}return r}}
+{const _bf=bossFormSeq;bossFormSeq=async function(t,kind){const r=await _bf.apply(this,arguments);try{if(t&&t.id==="ss_champ"&&kind!=="pile"){t.form2=1;t.str=(t.str||0)+3;t.str0=(t.str0||0)+3;t.block=(t.block||0)+30;t.brkCd=99;t.tank=0;renderBattle()}}catch(e){}return r}}
+{const _dw=dsqWin;dsqWin=async function(gold){try{if(S.dsq)S.dsq.g+=25+7*S.dsq.st}catch(e){}return _dw.apply(this,arguments)}}
+try{const _ch=BM.ss_champ.chip;BM.ss_champ.chip=e=>e.form2?"罐子砸了 · 不会再被打断":_ch(e);BM.ss_champ.tip="背后的奶茶罐每回合给它灌一次，力气 +2。一回合里打它够多伤害就能打断管子。血掉到一半它会把罐子砸了，力气 +3，再也打不断"}catch(e){}
+
+/* ===== 6.0 灭却诅咒师加强：血更厚，咒爆前先「预言」一回合（蓄力），预言的那一下更痛 ===== */
+try{
+ Object.assign(ENEMY.curser,{hp:[260,260],ai:(e,t)=>{const s=csStacks();const L=e.hp<e.max/2?[{k:"debuff",s:"poison",v:7,s2:"night",v2:2},{k:"call",id:"ss_minion"},{k:"debuff",s:"burn",v:8,s2:"para",v2:1},{k:"charge"},{k:"atk",v:10+3*s,burst:2,ult:"咒爆·应验"}]:[{k:"call",id:"ss_minion"},{k:"debuff",s:"poison",v:6,s2:"weak",v2:2},{k:"debuff",s:"burn",v:7,s2:"vuln",v2:2},{k:"call",id:"ss_minion"},{k:"debuff",s:"curse",v:1,s2:"frost",v2:3},{k:"charge"},{k:"atk",v:10+3*s,burst:2,ult:"咒爆·应验"}];return L[t%L.length]}});
+ Object.assign(ENEMY.curser2,{hp:[360,360],ai:(e,t)=>{const s=csStacks();const L=[{k:"call",id:"ss_minion2"},{k:"debuff",s:"poison",v:9,s2:"vuln",v2:3},{k:"debuff",s:"burn",v:10,s2:"weak",v2:3},{k:"call",id:"ss_minion2"},{k:"debuff",s:"curse",v:1,s2:"frost",v2:4},{k:"charge"},{k:"atk",v:12+4*s,burst:3,ult:"深渊咒爆·应验"}];if(e.hp<e.max/2)L.splice(3,1,{k:"debuff",s:"night",v:3,s2:"para",v2:2});return L[t%L.length]}});
+ ENEMY.ss_minion.hp=[34,38];if(ENEMY.ss_minion2)ENEMY.ss_minion2.hp=ENEMY.ss_minion2.hp.map(v=>Math.round(v*1.3));
+ BM.curser.tip="一直给你上咒，召唤仆从，仆从活着时它只受一半伤害。它「预言」（蓄力）以后，下一回合就是「咒爆·应验」：你身上每有 1 层负面状态多挨 3 点。看到预言就赶紧解咒、叠护盾";
+ BM.curser2.tip="一次上两种咒，召唤更强的仆从，仆从活着时它只受一半伤害。它「预言」以后，下一回合是「深渊咒爆·应验」：每层负面状态多挨 4 点。半血以后每回合偷你一张牌";
+}catch(e){console.warn(e)}
+
+/* ===== 6.0 深渊龙蛙：新立绘，两个形态。第一形态打倒后，深渊里站起来的是它的真身（满血重来） ===== */
+try{
+ ENEMY.abyssdragon.hp=[420,420];
+ ENEMY.abyssdragon.ai=(e,t)=>e.form2?[{k:"atk",v:14,x:3,pool:{t:"suck",n:2,h:10}},{k:"debuff",s:"vuln",v:3,s2:"weak",v2:2},{k:"charge"},{k:"atk",v:42,ult:"深渊吐息"},{k:"atkdef",v:20,b:26}][t%5]
+  :e.phase2?[{k:"atk",v:12,x:2,pool:{t:"suck",n:2,h:8}},{k:"charge"},{k:"atk",v:32,ult:"龙尾横扫"},{k:"atkdef",v:16,b:20}][t%4]:[{k:"atk",v:18},{k:"atk",v:8,x:2,pool:{t:"suck",n:1,h:6}},{k:"def",v:20},{k:"atk",v:22}][t%4];
+ FORM2.abyssdragon={n:"真身",say:"……你以为，深渊只有这么深？",tip:"深渊龙蛙露出了真身：满血重来，连击会吸走你池里的奶蛙，「蓄力」之后是 42 点的深渊吐息，先叠护盾",life:1};
+}catch(e){console.warn(e)}
+{const _bf2=bossFormSeq;bossFormSeq=async function(t,kind){const r=await _bf2.apply(this,arguments);try{if(t&&t.id==="abyssdragon"&&kind==="revive"){t.max=400;const st=t.hp;for(let i=1;i<=12;i++){t.hp=Math.round(st+(t.max-st)*i/12);renderBattle();await sleep(60)}t.turn=0;t.str=(t.str||0)+2;t.intent=ENEMY.abyssdragon.ai(t,0);try{musicRage(1)}catch(e){}renderBattle()}}catch(e){}return r}}
+
+/* ===== 6.0 大魔王加强：更厚、更痛，大招前会蓄力 ===== */
+try{
+ ENEMY.demon.hp=[440,440];
+ ENEMY.demon.ai=(e,t)=>e.phase2?[{k:"atk",v:13,x:3,pool:{t:"junk",n:2}},{k:"buff",s:"str",v:2,pool:{t:"eat"}},{k:"charge"},{k:"atk",v:42,ult:"大魔王之锅"},{k:"atkdef",v:18,b:22,pool:{t:"freeze",n:3}}][t%5]
+  :[{k:"atk",v:20,pool:{t:"junk",n:2}},{k:"buff",s:"str",v:2,pool:{t:"eat"}},{k:"atk",v:9,x:3,pool:{t:"freeze",n:2}},{k:"charge"},{k:"atk",v:36,ult:"掀锅"},{k:"def",v:26,pool:{t:"shuffle"}}][t%6];
+}catch(e){console.warn(e)}
+
+/* ===== 6.0 阿岳的梦缩短：梦里的地图只有 8 排（原来 13 排） ===== */
+{const _gm=genMap;genMap=function(){if(S&&S.dream&&!S.fin){const o=MAPR;MAPR=8;try{return _gm.apply(this,arguments)}finally{MAPR=o}}return _gm.apply(this,arguments)}}
+
+/* ===== 6.0 支线好刷一些 ===== */
+// 1. 同伴的这一层剧情还没出现时，走进任何一个「？」都会先出同伴剧情（不用非得踩到那一格）
+{const _en6=enterNode;enterNode=function(t,resumed,cur){try{if(t==="q"&&!resumed&&S&&!S.junc&&!S.dream&&!S.fin&&S.comp&&!S.comp.gone&&COMP[S.comp.id]){const a=S.act||0,C=COMP[S.comp.id];if(S.comp.done<a&&C.beats[a]){S.cur=cur||{t,rs:S.rs};saveRun();return storyNode()}}}catch(e){console.warn(e)}return _en6.apply(this,arguments)}}
+// 2. 打完初号机，紧跟着就是一间酒馆，在这里就能接斗场的悬赏
+injectProto=function(){if(!S||S.junc||!S.flags||!S.flags.ssProto||S.flags.protoDone||S.flags.protoRoute||S.dream||S.fin||(S.act||0)!==2)return;const m="地图下半层出现了一条<b>彩色的隐藏路线</b>：SS 讨伐目标就在那里";injectRoute(["X","L","m","L","H","v"],[null,null,null,null,["proto"],null],"protoRoute",m)||injectRoute(["X","L","m","L","H"],[null,null,null,null,["proto"]],"protoRoute",m)||injectRoute(["X","H","v"],[null,["proto"],null],"protoRoute",m)||injectRoute(["X","H"],[null,["proto"]],"protoRoute",m)};
+ssArenaOk=function(){return !!(S&&S.flags&&S.flags.protoDone&&!S.flags.ssArena&&!S.flags.arenaDone&&!S.junc&&!S.dream&&!S.fin&&(((S.act||0)===3&&S.row<GROW())||(S.act||0)===2))};

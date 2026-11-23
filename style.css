@@ -1044,7 +1044,7 @@ img{-webkit-user-drag:none;pointer-events:none}
 #title .logo h1 .rn1{background:var(--p5w);color:var(--p5k);transform:rotate(4deg) translateY(16px);box-shadow:6px 6px 0 var(--p5k);font-size:92px}
 #title .logo h1 .rn2{background:var(--p5r);color:var(--p5w);transform:rotate(-3deg) translateY(-2px);box-shadow:6px 6px 0 var(--p5k);font-size:84px}
 #title .logo h1 .rn3{transform:rotate(7deg) translateY(10px);font-size:112px;border:4px solid var(--p5w)}
-#title .logo::after{content:"VER 5.8.5";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
+#title .logo::after{content:"VER 6.0";left:auto;right:-110px;top:-16px;writing-mode:horizontal-tb;font:900 26px/1 'NW Black',sans-serif;letter-spacing:3px;color:var(--p5k);background:var(--p5w);padding:8px 14px;border-radius:0;box-shadow:5px 5px 0 var(--p5r);transform:rotate(-8deg)}
 #title .tsub{margin:30px 0 0 4px}
 #title .tsub .ribbon{font-family:'NW Black';font-weight:900;font-size:20px;letter-spacing:6px;color:var(--p5k);background:var(--p5w);border:0;padding:6px 18px;transform:skewX(-12deg);box-shadow:5px 5px 0 var(--p5r)}
 #title .tmenu{top:330px;gap:14px}
@@ -2918,10 +2918,10 @@ body{background:transparent!important}
 @keyframes pSl{0%{transform:rotate(-35deg) scaleX(0);opacity:1}60%{transform:rotate(-35deg) scaleX(1);opacity:1}100%{transform:rotate(-35deg) scaleX(1);opacity:0}}
 .mn.t-K img.gBeat{width:118px;height:118px;object-fit:contain;margin-top:-16px;filter:grayscale(1) brightness(.85)!important;opacity:.85}
 /* 5.3 主页：星空淡紫（打过真结局的还是彩色） */
-#title:not(.rb){--p5r:#6c48e0}
-#title:not(.rb) .p5rays{opacity:.55}
-#title:not(.rb) .tfloor{background:#3b2a78!important;box-shadow:0 -4px 0 #fff,10px 10px 0 #6c48e0!important}
-#title:not(.rb) .plat::before{background:#5b45a8!important;box-shadow:0 0 0 4px #fff,8px 8px 0 4px #6c48e0!important}
+#title:not(.rb){--p5r:#e5191c}
+
+
+
 .flipX{display:inline-block;transform:scaleX(-1);line-height:0}
 /* 5.4 地图打磨 */
 #map .legend{gap:16px;padding:6px 18px;white-space:nowrap;bottom:20px;right:22px}
@@ -3138,6 +3138,79 @@ html.lite body::before{filter:brightness(.35);background:radial-gradient(ellipse
 #stage.wideS>#ov:before{content:"";position:absolute;top:0;bottom:0;left:calc(-1*var(--ox));right:calc(-1*var(--ox));z-index:-1;pointer-events:none;background:repeating-linear-gradient(-30deg,rgba(229,25,28,.08) 0 18px,transparent 18px 36px),rgba(13,13,13,.94)}
 #stage.wideS:before{content:"";position:absolute;left:0;right:0;top:0;height:60px;background:var(--p5k);border-bottom:4px solid var(--p5r);z-index:39;display:none}
 #stage.wideS.hudOn:before{display:block}
+/* 6.0 深渊龙蛙真身 */
+.f2-abyssdragon .body img{filter:drop-shadow(0 0 22px #b04dff) drop-shadow(0 0 8px #ff2a4d) saturate(1.35) brightness(.88) hue-rotate(-18deg)}
+.f2-abyssdragon .body{transform:scale(1.08);transform-origin:50% 100%}
+/* 6.0 大魔王：一直带着一圈暗红的气 */
+.en[data-id="demon"] .body img{filter:drop-shadow(0 0 14px #ff1a2e) drop-shadow(0 0 30px #5a0010) contrast(1.12) saturate(1.15)}
+.en[data-id="demon"] .body{transform:scale(1.12);transform-origin:50% 100%}
+/* 6.0 蛊师出手：举起玻璃球，往后一仰再往前一送 */
+@keyframes atkGu{0%{transform:none}30%{transform:translateX(-18px) translateY(-10px) rotate(-6deg)}55%{transform:translateX(34px) translateY(-4px) rotate(5deg)}100%{transform:none}}
+.guBug{position:absolute;left:0;top:0;width:14px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 40%,#e9c8ff,#9b4dff 55%,#3a1060);box-shadow:0 0 10px #b46bff;pointer-events:none;z-index:60}
+/* 6.0 状态飘字用各自的颜色 */
+.fnum.txt.st-frog{color:#7bd06b!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #7bd06b88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-horse{color:#f0a54a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #f0a54a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-chick{color:#ffd23f!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ffd23f88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-cat{color:#ff8fb1!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff8fb188,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pal{color:#b392ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b392ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-magic{color:#7d8cff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #7d8cff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-mud{color:#8a6a3c!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #8a6a3c88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-none{color:#b7b0c9!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b7b0c988,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-P{color:#b392ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b392ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-G{color:#f7c948!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #f7c94888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-S{color:#b8b3c8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b8b3c888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-C{color:#9aa6bb!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #9aa6bb88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-R{color:#3d8bff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #3d8bff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-E{color:#9b5cff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #9b5cff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-L{color:#ff9a1f!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff9a1f88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-X{color:#6fc7c0!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #6fc7c088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-K{color:#4a3d5c!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #4a3d5c88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-T{color:#6b7080!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #6b708088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-atk{color:#e2546a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #e2546a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-skl{color:#3aa3e0!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #3aa3e088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pow{color:#e8a400!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #e8a40088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-cur{color:#5b4b72!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #5b4b7288,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-sts{color:#6b7080!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #6b708088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pstr{color:#ff6b6b!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff6b6b88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pheal{color:#ff8fb1!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff8fb188,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pdraw{color:#6fc3ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #6fc3ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pen{color:#ffd23f!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ffd23f88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pblock{color:#9ad7ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #9ad7ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pice{color:#bfefff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #bfefff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-str{color:#ff6b6b!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff6b6b88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-dex{color:#6fc3ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #6fc3ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-vuln{color:#ff9a1f!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff9a1f88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-weak{color:#a98bff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #a98bff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-mana{color:#8b6bff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #8b6bff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-thorn{color:#4fa86a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #4fa86a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-burn{color:#ff7a3a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff7a3a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-mirror{color:#5a4b7a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #5a4b7a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-bomb{color:#ff7a3a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff7a3a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-caltrop{color:#9aa6b8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #9aa6b888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-dart{color:#e8e8f0!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #e8e8f088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-charm{color:#ffd23f!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ffd23f88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-needle{color:#ff3a6a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff3a6a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-smoke{color:#b7b0c9!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b7b0c988,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-boomer{color:#c8901e!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #c8901e88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-candy{color:#ff8fd0!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff8fd088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-cracker{color:#e02020!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #e0202088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-mudball{color:#8a6038!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #8a603888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-inj{color:#8a3ab8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #8a3ab888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-brk{color:#b8864a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b8864a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-frost{color:#6fd3ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #6fd3ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-para{color:#ffd23f!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ffd23f88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-wet{color:#4a8ad8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #4a8ad888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-poison{color:#5ac84a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #5ac84a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-night{color:#5a3a8a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #5a3a8a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-evade{color:#9ad8ff!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #9ad8ff88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-curse{color:#a01a5a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #a01a5a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-brittle{color:#a8a8b8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #a8a8b888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pantidote{color:#5ac84a!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #5ac84a88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-pcalm{color:#b8a8e8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #b8a8e888,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-bleed{color:#c81e3c!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #c81e3c88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-dodge{color:#9a7bd0!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #9a7bd088,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-warm{color:#ff9a3c!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #ff9a3c88,3px 3px 0 #0d0d0d!important}
+.fnum.txt.st-rest{color:#8c8ca8!important;-webkit-text-stroke:2px #0d0d0d;paint-order:stroke fill;text-shadow:0 0 12px #8c8ca888,3px 3px 0 #0d0d0d!important}
 /* ==LITE-AUTO== */
 html.lite #mapSvg path.next{animation:none!important}
 html.lite .card.r-L .cf{animation:none!important}

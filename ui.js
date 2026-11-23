@@ -198,7 +198,7 @@ function p5TitleSVGRainbow(){
  <g fill="#ffd84a"><rect x="808" y="460" width="8" height="14"/><rect x="806" y="560" width="8" height="14"/></g>
  <path d="M380 720 L1280 560 L1280 720 Z" fill="#0d0d0d"/>
  ${shards}</svg>`}
-function p5TitleSVG(){try{if(typeof M!=="undefined"&&M&&(M.trueEnds||[]).length)return p5TitleSVGRainbow()}catch(e){}return p5TitleSVGPurple()}
+function p5TitleSVG(){try{if(typeof M!=="undefined"&&M&&(M.trueEnds||[]).length)return p5TitleSVGRainbow()}catch(e){}return p5TitleSVGRed()}
 function sceneSVG(kind,moon){if(kind==="title")return p5TitleSVG();const P=PAL[kind]||PAL.swamp,I=INK;
  const mx={factory:1060,pipes:220,bossfac:640,snowfield:1000,belltower:220,bellE:1060,bossice:640,demon:640,castle:1040,gate:200,boss1:1030,cosmos:980,summit:640,boss2:640,swamp:1040,reed:640,ruin:300,elite:1000,boss:640,title:760,rest:1060,event:980,shop:1100}[kind]||1000,mr={bossfac:120,bossice:120,demon:150,boss:96,title:84,reed:84,boss1:110,boss2:120,summit:70}[kind]||56,my={bossfac:170,bossice:170,demon:190,boss:150,reed:200,boss1:140,boss2:170}[kind]||118;
  let stars="";for(let i=0;i<56;i++){const x=(i*277)%1280,y=(i*131)%340,r=i%7===0?2.4:1.2;stars+=`<circle class="${i%3?"":"tw"}" style="animation-delay:${i%5*.6}s" cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${.35+(i%4)*.18}"/>`}

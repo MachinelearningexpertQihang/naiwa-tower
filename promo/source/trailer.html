@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts/noto-sans-sc/900.css">
+<link rel="stylesheet" href="title-font.css">
+<style>
+:root{--r:#e5191c;--k:#0d0d0d;--w:#fff;--y:#ffd23f}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
+#v{position:absolute;inset:0;overflow:hidden;font-family:'Noto Sans SC',sans-serif;font-weight:900;color:#fff}
+.L{position:absolute;inset:0;opacity:0;will-change:transform,opacity}
+.full{position:absolute;inset:0;background-size:cover;background-position:center}
+.stripes{position:absolute;inset:-200px;background:repeating-linear-gradient(-30deg,rgba(229,25,28,.16) 0 26px,transparent 26px 52px)}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,.35) 2.2px,transparent 2.6px);background-size:14px 14px}
+.slash{position:absolute;left:-400px;width:2800px;height:260px;background:var(--r);transform-origin:50% 50%}
+.stamp{position:absolute;white-space:nowrap;line-height:1}
+.box{display:inline-block;padding:.08em .32em .14em;background:var(--k);color:#fff;box-shadow:.09em .09em 0 var(--r)}
+.boxR{display:inline-block;padding:.08em .32em .14em;background:var(--r);color:#fff;box-shadow:.09em .09em 0 var(--k)}
+.boxW{display:inline-block;padding:.08em .32em .14em;background:#fff;color:var(--k);box-shadow:.09em .09em 0 var(--r)}
+.title{font-family:'NW Title','Noto Sans SC';font-weight:400}
+.cut{position:absolute;filter:drop-shadow(0 0 0 #fff) drop-shadow(7px 0 0 #fff) drop-shadow(-7px 0 0 #fff) drop-shadow(0 7px 0 #fff) drop-shadow(0 -7px 0 #fff) drop-shadow(18px 18px 0 rgba(0,0,0,.55))}
+.frame{position:absolute;border:12px solid #fff;box-shadow:22px 22px 0 var(--r),0 30px 60px rgba(0,0,0,.6);background:#000}
+.frame img{display:block;width:100%;height:100%;object-fit:cover}
+.cap{position:absolute;font-size:72px}
+.new{position:absolute;font-size:44px;padding:6px 22px 10px;background:var(--y);color:var(--k);transform:rotate(-12deg);box-shadow:6px 6px 0 var(--k)}
+.flash{position:absolute;inset:0;background:#fff;opacity:0}
+.vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55))}
+.grain{position:absolute;inset:-50%;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style></head><body><div id="v"></div>
+<script>
+const FPS=30,DUR=30;
+const V=document.getElementById('v');
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild};
+const add=(h,p=V)=>{const e=el(h);p.appendChild(e);return e};
+// 缓动
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const lin=(t,a,b)=>cl((t-a)/(b-a));
+const oBack=x=>{const c=1.70158,c3=c+1;return 1+c3*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const oCub=x=>1-Math.pow(1-x,3);
+const iCub=x=>x*x*x;
+// 拼贴的手作感：动作按 12 帧/秒走，加一点点抖
+const step=t=>Math.floor(t*12)/12;
+const jit=(t,k,amp=2)=>{const s=Math.sin((Math.floor(t*12)+k*7.3)*12.9898)*43758.5453;return (s-Math.floor(s)-.5)*2*amp};
+const IMGS={};
+function img(src,cls,style){return `<img src="${src}" class="${cls||''}" style="${style||''}">`}
+
+/* ---------- 场景 ---------- */
+const scenes=[];
+function scene(a,b,build,draw){const root=add('<div class="L"></div>');build(root);scenes.push({a,b,root,draw})}
+
+// 1. 0–2.8：肉鸽卡牌天花板？
+scene(0,2.85,r=>{
+ r.innerHTML=`<div class="full" style="background:#0d0d0d"></div><div class="stripes"></div><div class="slash" id="s1" style="top:300px"></div><div class="slash" id="s2" style="top:560px;background:#fff;height:40px"></div>
+ <div class="stamp" id="t1" style="left:250px;top:250px;font-size:230px"><span class="box">肉鸽卡牌</span></div>
+ <div class="stamp" id="t2" style="left:620px;top:560px;font-size:290px"><span class="boxR">天花板？</span></div><div class="flash" id="f1"></div>`},
+ (r,t)=>{const q=r.querySelector.bind(r);
+ q('#s1').style.transform=`rotate(-8deg) translateX(${(1-oCub(lin(t,0,.35)))*-2800}px)`;
+ q('#s2').style.transform=`rotate(-8deg) translateX(${(1-oCub(lin(t,.2,.5)))*2800}px)`;
+ const a=lin(t,.35,.55),b=lin(t,1.05,1.25);
+ q('#t1').style.cssText+=`;opacity:${a>0?1:0};transform:rotate(-4deg) scale(${a<1?2.2-1.2*oBack(a):1}) translate(${jit(t,1)}px,${jit(t,2)}px)`;
+ q('#t2').style.cssText+=`;opacity:${b>0?1:0};transform:rotate(-6deg) scale(${b<1?2.6-1.6*oBack(b):1}) translate(${jit(t,3,3)}px,${jit(t,4,3)}px)`;
+ q('#f1').style.opacity=Math.max(0,1-lin(t,1.05,1.3))*(t>1.05?.7:0);
+ r.style.transform=`translate(${t>1.05&&t<1.35?jit(t*3,9,14):0}px,${t>1.05&&t<1.35?jit(t*3,8,10):0}px)`});
+
+// 2. 2.8–4.4：奶蛙之塔 6.0
+scene(2.8,4.45,r=>{
+ r.innerHTML=`<div class="full" style="background:var(--r)"></div><div class="stripes" style="filter:brightness(.4)"></div><div class="dots" style="opacity:.25"></div>
+ <div class="stamp title" id="lg" style="left:0;right:0;top:230px;text-align:center;font-size:330px;color:#fff;text-shadow:14px 14px 0 #0d0d0d,0 0 60px rgba(0,0,0,.3)">奶蛙之塔</div>
+ <div class="stamp" id="sub" style="left:0;right:0;top:690px;text-align:center;font-size:84px"><span class="box">6.0 · 最终版</span></div>`},
+ (r,t)=>{const q=r.querySelector.bind(r);const a=lin(t,2.8,3.15),b=lin(t,3.25,3.5);
+ q('#lg').style.transform=`scale(${1.6-.6*oBack(a)}) rotate(${(1-a)*-6}deg)`;q('#lg').style.opacity=a>0?1:0;
+ q('#sub').style.transform=`translateY(${(1-oBack(b))*120}px)`;q('#sub').style.opacity=b;
+ r.style.transform=`scale(${1+.03*lin(t,2.8,4.45)})`});
+
+// 3. 4.4–10.4：六个主角
+const HEROES=[["n1","功夫奶蛙","快手连击","#e5191c"],["nw","奶蛙","厚肚皮","#0d0d0d"],["kn","骑士奶蛙","一身铁甲","#e5191c"],["mg","奶蛙魔法师","法术无视护盾","#0d0d0d"],["v_vamp","吸血鬼奶蛙","打人就回血","#e5191c"],["v_gushi","蛊师奶蛙","下蛊，不出拳","#0d0d0d"]];
+const HT=4.4,HD=1;
+scene(HT,HT+HD*6+.05,r=>{
+ r.innerHTML=`<div class="full" id="hbg"></div><div class="stripes" id="hst"></div>`+HEROES.map((h,i)=>`<div class="L" id="h${i}" style="opacity:1;visibility:hidden">
+ <div style="position:absolute;left:-200px;top:0;width:1300px;height:1080px;background:${h[3]==='#e5191c'?'#0d0d0d':'#e5191c'};transform:skewX(-14deg)" class="pan"></div>
+ ${img(h[0]+'.webp','cut hc','height:860px;right:160px;bottom:40px')}
+ <div class="stamp hn" style="left:110px;top:330px;font-size:150px"><span class="${h[3]==='#e5191c'?'boxW':'boxR'}">${h[1]}</span></div>
+ <div class="stamp ht" style="left:150px;top:560px;font-size:78px"><span class="box">${h[2]}</span></div>
+ ${i===5?'<div class="new" style="left:880px;top:250px">新主角</div>':''}
+ <div class="stamp" style="left:120px;top:150px;font-size:60px;opacity:.9">${['一','二','三','四','五','六'][i]}号主角</div></div>`).join('')},
+ (r,t)=>{const k=Math.min(5,Math.floor((t-HT)/HD));const lt=t-HT-k*HD;
+ r.querySelector('#hbg').style.background=HEROES[k][3];
+ HEROES.forEach((h,i)=>{const e=r.querySelector('#h'+i);e.style.visibility=i===k?'visible':'hidden';if(i!==k)return;
+  const a=oBack(lin(lt,0,.28)),b=oBack(lin(lt,.12,.38)),c=oBack(lin(lt,.22,.46));const ts=step(lt);
+  e.querySelector('.pan').style.transform=`skewX(-14deg) translateX(${(1-oCub(lin(lt,0,.2)))*-1400}px)`;
+  e.querySelector('.hc').style.transform=`translate(${(1-a)*700+jit(ts,i)}px,${jit(ts,i+3)}px) rotate(${(1-a)*12+Math.sin(ts*3)*1.2}deg) scale(${1+.04*lt})`;
+  e.querySelector('.hn').style.transform=`translateX(${(1-b)*-900}px) rotate(-4deg)`;
+  e.querySelector('.ht').style.transform=`translateX(${(1-c)*-900}px) rotate(-3deg)`;})});
+
+// 4. 10.4–17.0：实机画面快剪
+const CUTS=[["s_b_kungfu","凑齐奶蛙 · 连锁爆发",-3],["s_map2","五层塔 · 每一层都不一样",3],["s_b_gushi","下蛊 · 潮湿 · 蒸汽 · 雷击",-2],["s_b_count","首领会蓄力放大招",2.5],["s_b_dragon","深渊龙蛙 · 第二形态",-3],["s_b_demon","塔顶 · 奶蛙大魔王",2]];
+const CT=10.4,CD=1.1;
+scene(CT,CT+CD*6+.05,r=>{
+ r.innerHTML=`<div class="full" style="background:#0d0d0d"></div><div class="stripes"></div>`+CUTS.map((c,i)=>`<div class="L" id="c${i}" style="opacity:1;visibility:hidden">
+ <div class="full bgb" style="background-image:url(${c[0]}.jpg);filter:blur(18px) brightness(.35)"></div><div class="stripes"></div>
+ <div class="frame fr" style="left:250px;top:120px;width:1420px;height:799px"><img src="${c[0]}.jpg"></div>
+ <div class="stamp cp" style="left:150px;top:860px;font-size:88px"><span class="boxR">${c[1]}</span></div></div>`).join('')+`<div class="flash" id="cf"></div>`},
+ (r,t)=>{const k=Math.min(5,Math.floor((t-CT)/CD));const lt=t-CT-k*CD;
+ CUTS.forEach((c,i)=>{const e=r.querySelector('#c'+i);e.style.visibility=i===k?'visible':'hidden';if(i!==k)return;
+  const a=oBack(lin(lt,0,.25)),b=oBack(lin(lt,.15,.4));
+  e.querySelector('.fr').style.transform=`rotate(${c[2]*(.4+.6*a)}deg) scale(${(.75+.25*a)*(1+.05*lt)}) translateX(${(1-a)*(i%2?1:-1)*500}px)`;
+  e.querySelector('.cp').style.transform=`translateY(${(1-b)*200}px) rotate(-3deg)`;e.querySelector('.cp').style.opacity=b>0?1:0});
+ r.querySelector('#cf').style.opacity=lt<.1?(1-lt/.1)*.6:0});
+
+// 5. 17.0–21.6：首领一个比一个狠
+const BOSS=[["xch",[0,240],560,-4],["v_champ",[330,120],640,3],["v_curser",[770,230],560,-3],["bx",[1040,150],620,4],["v_bdragon2",[1320,10],830,0]];
+const BT=17,BD=.62;
+scene(BT,21.65,r=>{
+ r.innerHTML=`<div class="full" style="background-image:url(final.jpg);filter:brightness(.4) saturate(1.3)"></div><div class="stripes"></div><div class="dots" style="opacity:.3"></div>`+
+ BOSS.map((b,i)=>img(b[0]+'.webp','cut bs" id="b'+i,`height:${b[2]}px;left:${b[1][0]}px;top:${b[1][1]}px;opacity:0`)).join('')+
+ `<div class="stamp" id="bt" style="left:0;right:0;bottom:90px;text-align:center;font-size:128px"><span class="boxR">首领 · 一个比一个狠</span></div><div class="flash" id="bf"></div>`},
+ (r,t)=>{const lt=t-BT;BOSS.forEach((b,i)=>{const e=r.querySelector('#b'+i);const a=lin(lt,i*BD,i*BD+.22);e.style.opacity=a>0?1:0;
+  e.style.transform=`scale(${a<1?1.8-.8*oBack(a):1+.02*(lt-i*BD)}) rotate(${b[3]}deg) translate(${jit(step(lt),i,2)}px,${jit(step(lt),i+5,2)}px)`});
+ const k=Math.floor(lt/BD),p=lt-k*BD;r.querySelector('#bf').style.opacity=k<5&&p<.08?.55:0;
+ const c=lin(lt,3.1,3.4);r.querySelector('#bt').style.cssText+=`;opacity:${c>0?1:0};transform:scale(${1.8-.8*oBack(c)}) rotate(-3deg)`;
+ r.style.transform=`translate(${p<.15&&k<5?jit(t*4,k,10):0}px,0)`});
+
+// 6. 21.6–25.4：无尽之塔
+scene(21.6,25.45,r=>{
+ r.innerHTML=`<div class="full" style="background:radial-gradient(ellipse at center,#1d1d26,#030305)"></div>
+ <div class="full" id="inf" style="font-size:900px;line-height:1080px;text-align:center;color:rgba(160,255,60,.07)">∞</div>
+ ${img('v_twin_white.webp','cut tw" id="tw1','height:820px;left:130px;top:150px')}
+ ${img('v_twin_black.webp','cut tw" id="tw2','height:820px;right:130px;top:150px;transform:scaleX(-1)')}
+ <div class="stamp" id="et" style="left:0;right:0;top:300px;text-align:center;font-size:200px"><span class="boxW">无尽之塔</span></div>
+ <div class="stamp" id="es" style="left:0;right:0;top:560px;text-align:center;font-size:76px"><span class="box">通关以后 · 一轮又一轮往上爬</span></div>`},
+ (r,t)=>{const lt=t-21.6;const a=oBack(lin(lt,0,.4)),b=oBack(lin(lt,.5,.8)),c=oBack(lin(lt,.75,1.05));
+ r.querySelector('#tw1').style.transform=`translateX(${(1-a)*-900}px) translateY(${Math.sin(lt*2)*10}px)`;
+ r.querySelector('#tw2').style.transform=`scaleX(-1) translateX(${(1-a)*-900}px) translateY(${Math.cos(lt*2)*10}px)`;
+ r.querySelector('#inf').style.transform=`rotate(${lt*6}deg) scale(${1+.04*lt})`;
+ r.querySelector('#et').style.cssText+=`;opacity:${b>0?1:0};transform:scale(${1.6-.6*b}) rotate(-3deg)`;
+ r.querySelector('#es').style.cssText+=`;opacity:${c>0?1:0};transform:translateY(${(1-c)*100}px) rotate(-2deg)`});
+
+// 7. 25.4–28.0：数字
+const NUMS=[["6","个主角"],["5","层塔 · 外加一场梦"],["5","个结局 · 还藏着真结局"],["∞","无尽模式"]];
+scene(25.4,28.05,r=>{
+ r.innerHTML=`<div class="full" style="background:var(--r)"></div><div class="stripes" style="filter:brightness(.35)"></div>`+NUMS.map((n,i)=>`<div class="stamp nm" id="n${i}" style="left:${260+i*90}px;top:${70+i*245}px;font-size:84px"><span style="font-size:200px;color:#fff;text-shadow:10px 10px 0 #0d0d0d;vertical-align:-30px">${n[0]}</span> <span class="box">${n[1]}</span></div>`).join('')},
+ (r,t)=>{const lt=t-25.4;NUMS.forEach((n,i)=>{const a=lin(lt,i*.35,i*.35+.25);const e=r.querySelector('#n'+i);e.style.opacity=a>0?1:0;e.style.transform=`scale(${a<1?2-oBack(a):1}) rotate(${i%2?2:-2}deg)`})});
+
+// 8. 28.0–30：片尾
+scene(28,30.01,r=>{
+ r.innerHTML=`<div class="full" style="background:#0d0d0d"></div><div class="stripes"></div>
+ <div class="slash" id="es1" style="top:330px;height:330px"></div>
+ <div class="stamp title" id="el" style="left:0;right:0;top:300px;text-align:center;font-size:300px;color:#fff;text-shadow:12px 12px 0 #0d0d0d">奶蛙之塔</div>
+ <div class="stamp" id="ec" style="left:0;right:0;top:760px;text-align:center;font-size:80px"><span class="boxW">B站搜索「奶蛙之塔」· 点开就玩</span></div>
+ <div class="stamp" style="right:60px;bottom:40px;font-size:40px;opacity:.75">奶蛙工作室</div>`},
+ (r,t)=>{const lt=t-28;const a=oBack(lin(lt,0,.35)),b=oBack(lin(lt,.35,.65));
+ r.querySelector('#es1').style.transform=`rotate(-6deg) translateX(${(1-oCub(lin(lt,0,.25)))*2800}px)`;
+ r.querySelector('#el').style.transform=`scale(${1.5-.5*a})`;r.querySelector('#el').style.opacity=a>0?1:0;
+ r.querySelector('#ec').style.cssText+=`;opacity:${b>0?1:0};transform:translateY(${(1-b)*80}px)`;
+ r.style.opacity=lt>1.6?1-lin(lt,1.6,2):1});
+
+add('<div class="vig"></div>');const G=add('<div class="grain"></div>');
+
+window.DEMO={width:1920,height:1080,fps:FPS,duration:DUR};
+window.renderAt=async t=>{for(const s of scenes){const on=t>=s.a&&t<s.b;s.root.style.opacity=on?1:0;if(on)s.draw(s.root,t)}
+ G.style.transform=`translate(${jit(t,1,40)}px,${jit(t,2,40)}px)`};
+Promise.all([document.fonts.ready,...[...document.images].map(i=>i.decode().catch(()=>{}))]).then(()=>{window.renderAt(0);window.__ready=true});
+</script></body></html>

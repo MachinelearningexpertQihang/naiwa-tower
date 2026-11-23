@@ -8,7 +8,7 @@ console.log('tr',await p.evaluate(()=>S.tr));
 await p.evaluate(()=>{closeOv();S.act=4;S.hp=S.max=200;chairStart()});await talkThrough(30);await p.waitForTimeout(2500);
 await p.screenshot({path:S+'te_chair.png'});console.log('kind',await p.evaluate(()=>B&&B.kind));
 // end turns until chairEnd
-for(let k=0;k<8;k++){const st=await p.evaluate(()=>{if(!B)return 'noB';if(B.myTurn&&!busy){B.endWarn=B.turn;endTurn();return 'end'+B.turn}return 'wait'});if(st==='noB')break;await p.waitForTimeout(2500)}
+for(let k=0;k<20;k++){const st=await p.evaluate(()=>{if(!B)return 'noB';if(B.myTurn&&!busy){const e=B.alive()[0];if(e){e.block=0;dealEnemy(e,99999)}afterAction();return 'kill'}return 'wait'});if(st==='noB')break;await p.waitForTimeout(1500)}
 await talkThrough(40);await p.waitForTimeout(600);await p.screenshot({path:S+'te_dream.png'});console.log('dream',await p.evaluate(()=>S.dream+' relics '+S.relics.join(',')));
 await p.click('#eNext').catch(()=>{});await talkThrough(20);await p.waitForTimeout(900);await p.screenshot({path:S+'te_dreammap.png'});
 await p.evaluate(()=>{S.cur={t:'s'};shopScreen()});await p.waitForTimeout(500);await p.screenshot({path:S+'te_dreamshop.png'});

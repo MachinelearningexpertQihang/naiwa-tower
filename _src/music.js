@@ -5,6 +5,8 @@ try{const o=JSON.parse(localStorage.getItem("nwt-audio")||"{}");if(o.music===fal
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 /* 4.2：手机切到后台再回来，声音常常会「哑掉」（状态显示还在播放其实没声音）。回来后第一次点屏幕时，把整套声音重新建一遍 */
 function audioRebuild(){const old=A.ctx,cur=A.cur;A.ctx=null;try{old&&old.close&&old.close().catch(()=>{})}catch(e){}A.fxRev=null;try{if(typeof SX!=="undefined")SX.ok=0}catch(e){}const st=A.step;audioUnlock();A.cur=cur;A.step=st||0;if(A.ctx)A.next=A.ctx.currentTime+.1}
+/* 6.0：iPhone/iPad 静音或系统把网页声音当成「铃声」时会没声音。告诉系统这是要播放的音乐 */
+try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
 function audioUnlock(){if(A.ctx){if(document.hidden)return;if(A.wasBg){A.wasBg=0;A._sus=0;audioRebuild();return}if(A.ctx.state!=="running"){A.ctx.resume().catch(()=>{});clearTimeout(A._chk);A._chk=setTimeout(()=>{if(A.ctx&&A.ctx.state!=="running"&&!document.hidden)A.wasBg=1},400)}return}
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const c=new AC;A.ctx=c;
  const comp=c.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;comp.connect(c.destination);
@@ -224,10 +226,10 @@ for(const k in ORCH)if(TR[k])TR[k].s=ORCH[k];
 /* ---- 5.5 SS 线专属曲 ---- */
 Object.assign(TR,{
  // 死斗场「空看台」：号角、重鼓，像对着空场子报幕
- dsq:{bpm:138,sw:0,lead:"brass",bass:"heavy",dr:"boss",pad:.03,ch:[[45,"m"],[43,"M"],[41,"M"],[40,"7"],[45,"m"],[43,"M"],[41,"M"],[40,"7"]],
+ dsq:{bpm:156,sw:0,lead:"brass",bass:"drive",dr:"epic",pad:.03,ch:[[45,"m"],[43,"M"],[41,"M"],[40,"7"],[45,"m"],[43,"M"],[41,"M"],[40,"7"]],
   mel:[69,0,69,72,0,76,0,0, 74,0,72,0,71,0,69,0, 69,0,69,72,0,77,0,0, 76,-1,-1,0,0,0,0,0, 81,0,79,0,77,0,76,0, 77,0,76,0,74,0,72,0, 71,0,72,0,74,0,71,0, 69,-1,-1,-1,0,0,0,0]},
  // 不灭的斗士「第一千零一场」：机器一样的低音，铜管一下一下往下砸
- champ:{bpm:112,sw:0,lead:"brass",bass:"heavy",dr:"factory",pad:.04,ch:[[40,"m"],[40,"m"],[48,"M"],[47,"7"],[40,"m"],[45,"m"],[48,"M"],[47,"7"]],
+ champ:{bpm:148,sw:0,lead:"brass",bass:"drive",dr:"epic",pad:.04,ch:[[40,"m"],[40,"m"],[48,"M"],[47,"7"],[40,"m"],[45,"m"],[48,"M"],[47,"7"]],
   mel:[64,0,0,64,0,0,67,0, 66,0,0,64,0,0,62,0, 64,0,0,64,0,0,71,0, 70,-1,-1,0,0,0,0,0, 76,0,0,74,0,0,72,0, 71,0,0,72,0,0,74,0, 76,0,79,0,78,0,75,0, 76,-1,-1,-1,0,0,0,0]},
  // 预言家「已告知影」：八音盒，慢，半音往下滑
  curser:{bpm:84,sw:0,lead:"celesta",bass:"soft",dr:"waltz",pad:.06,bell:1,ch:[[50,"m"],[46,"M"],[43,"m"],[45,"7"],[50,"m"],[46,"M7"],[43,"m"],[45,"7"]],
@@ -325,8 +327,8 @@ Object.assign(ORCH,{battle0:{lead:"flute",dbl:"orchestral_harp",ctr:"cello",bass
  backdoor:{lead:"marimba",dbl:"trumpet",bass:"acoustic_bass",stab:"string_ensemble_1",perc:"taiko"},
  homemain:{lead:"flute",dbl:"music_box",bass:"cello",pad:"string_ensemble_1",arp:"orchestral_harp",bells:1},
  victory:{lead:"trumpet",dbl:"orchestral_harp",bass:"acoustic_bass",pad:"string_ensemble_1",arp:"acoustic_guitar_nylon"},
- dsq:{lead:"trumpet",dbl:"french_horn",bass:"cello",stab:"string_ensemble_1",perc:"taiko"},
- champ:{lead:"french_horn",dbl:"cello",bass:"cello",pad:"string_ensemble_1",perc:"timp"},
+ dsq:{lead:"trumpet",dbl:"trumpet",bass:"cello",stab:"string_ensemble_1",perc:"taiko"},
+ champ:{lead:"trumpet",dbl:"french_horn",bass:"cello",stab:"string_ensemble_1",perc:"taiko"},
  curser:{lead:"harpsichord",dbl:"celesta",bass:"cello",pad:"string_ensemble_1",bells:1},
  curser2:{lead:"church_organ",dbl:"french_horn",bass:"cello",pad:"string_ensemble_1",perc:"timp",bells:1}});
 for(const k in ORCH)if(TR[k])TR[k].s=ORCH[k];
