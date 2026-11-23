@@ -475,3 +475,59 @@ try{Object.assign(BOSS_LORE.bloodbeast,{lore:["冰原上最吵的那只。老远
  who:"它以前也是一只爬塔的奶蛙。到了冰原，同伴都下山了，它说再往上一点就到了。一个冬天过去，雪把路埋了，它下不去，也上不去。",
  why:"冰原上什么都是冻的，它只能抢别的冰原怪身上那一点热来活。打赢一只，就把那只的骨头和冰甲披在身上，越披越厚。胸口那几道红，是它最后一点没冻住的血。它一个人待太久了，有活的东西走上来，它是真高兴。",
  end:"冷。又只剩我一个了。"})}catch(e){}
+
+/* ===== 5.8.5 同伴吐槽扩充：打法、天气月相、精英和宝箱怪、拿到好牌、塔里的熟人、中招、险胜 ===== */
+const COMP_EXTRA={
+ iron:{combo:["慢点。……行，不慢也行。","我年轻时一口气也就打三下。你跟谁学的？"],idle:["不出手？也行。我年轻时也这么等过。"],potion:["喝吧。别喝太急，呛着。"],fat:["包里东西太多，走不快。我年轻时就是这么输的。"],
+  elite:["这个不一样。站稳了。"],mimic:["……箱子长牙了。往后退。"],
+  wx_rain:["下雨。脚底下滑，别往前扑。"],wx_wind:["风大。眯着眼打。"],wx_snow:["雪天。我膝盖疼。……不碍事。"],wx_fog:["雾里看不清。听声音。"],wx_storm:["打雷了。别站高处。……我们就在高处。"],
+  moon_full:["满月。我第一次上塔，也是满月。"],moon_new:["没月亮。看不见它，它也看不见你。"],
+  rare:["这张好。收好，别显摆。"],shopk:["这老板……我年轻时他就在这儿了。他怎么不老？"],tavk:["老板，还是老样子。……他不记得我了。"],elder:["那老头……还活着啊。替我问声好。……算了，别问。"],
+  debuff:["中招了？忍着，回去再说。","别抓。越抓越难受。"],clutch:["……刚才那一下，我以为你要倒了。","站着就好。站着，就还没输。"]},
+ blue:{combo:["你这一回合打了几下？我数到第五下就数不清了。","再来再来！这么打要是押注，我早发了。"],idle:["一张都不出？你这是在诈它吧？……是吧？"],potion:["这瓶多少钱买的？……喝都喝了，别心疼。"],fat:["你这牌，跟我欠的账一样厚。"],
+  elite:["这个看着不好惹。先说好，我只负责喊。"],mimic:["先给我看一眼！……它咬我！它咬我！"],
+  wx_rain:["下雨天，赌场关门。……我怎么又想到赌场了。"],wx_wind:["风把我的骰子都吹跑了！"],wx_snow:["冷死了。我的毛都炸了。"],wx_fog:["雾天好。债主找不着我。"],wx_storm:["打雷！我躲你后面！"],
+  moon_full:["满月！今天手气肯定好。"],moon_new:["黑漆漆的……正好，适合跑路。"],
+  rare:["这张能卖不少钱！……我就说说。"],shopk:["……我先出去一下。他认得我。"],tavk:["老板，这顿记他账上！"],elder:["那老头看我的眼神，好像知道我欠钱。"],
+  debuff:["你脸都绿了！……我不是嫌弃你。","中招了？要不咱们跑吧？"],clutch:["吓死我了！我连跑路的方向都选好了！","赢了？赢了！我就知道我押对了！"]},
+ fire:{combo:["哇！再来一次！","好快！我哥也没你这么快！……应该没有。"],idle:["你怎么不打啊？你在想好办法吗？"],potion:["好喝吗？我能尝一口吗？"],fat:["你的牌好多！借我几张背着玩？"],
+  elite:["它比刚才那些都大！……我不怕！"],mimic:["箱子会动！它是不是也在找它哥哥？"],
+  wx_rain:["下雨了！我哥说下雨天火会小，可我不会！"],wx_wind:["风好大！我的鬃毛！"],wx_snow:["下雪了！打完能堆雪人吗？"],wx_fog:["你在哪？……哦，你在这儿。"],wx_storm:["打雷了……我、我不怕！"],
+  moon_full:["月亮好圆！我哥说满月的时候许愿最灵。"],moon_new:["月亮去哪了？它是不是也走丢了？"],
+  rare:["这个好亮！"],shopk:["老板，你见过一匹红鬃毛的奶马吗？比我高一点。"],tavk:["老板！你见过我哥吗？他喝奶茶要加三勺糖！"],elder:["长老爷爷，你见过我哥吗？……你摸我头干嘛？"],
+  debuff:["你怎么了？哪里疼？","我给你吹吹！……吹吹有用吗？"],clutch:["你吓死我了！！","我刚才都想哭了……没哭！我没哭！"]},
+ bean:{combo:["效率不错。我送件也是这么一单接一单。"],idle:["这回合不出件？也是，有时候得等收件人在家。"],potion:["这瓶没过保质期吧？"],fat:["你这包超重了，要补运费的。"],
+  elite:["这是加急件。小心点拆。"],mimic:["这个包裹会咬人。拒签。"],
+  wx_rain:["下雨。包裹得包两层。"],wx_wind:["风大，单子别吹飞了。"],wx_snow:["雪天路滑，延误不算我的。"],wx_fog:["雾太大，门牌号都看不清。"],wx_storm:["打雷天不送件。……今天例外。"],
+  moon_full:["满月。夜班的时候，月亮最亮。"],moon_new:["没月亮。夜里送件最怕这种天。"],
+  rare:["这张包装得好。签收。"],shopk:["老板，你这店能代收快递吗？"],tavk:["老板，有个叫小七的来过吗？有她的件。"],elder:["长老，有您的件。……没有？那我记错了。"],
+  debuff:["你这是被退件了？","伤口要处理。别跟包裹一样放着发霉。"],clutch:["差点就要退回寄件人了。","这一单，险。"]},
+ hen:{combo:["慢点打，别累着！……好吧，打得好！"],idle:["歇一回合也好。喝口水。"],potion:["苦不苦？苦就对了，苦的才管用。"],fat:["你这包装得也太满了，我给你理理？"],
+  elite:["这个一看就不是好东西。离它远点！……好吧，打吧。"],mimic:["哎哟！这箱子里怎么不是吃的！"],
+  wx_rain:["下雨了，衣服都湿了。回头给你烤干。"],wx_wind:["风这么大，把领子竖起来。"],wx_snow:["下雪了！你穿得太少了！"],wx_fog:["雾这么大，别跑远，跟着我。"],wx_storm:["打雷了，别怕，嫂子在。"],
+  moon_full:["满月了……我那七个蛋，也该孵出来了。"],moon_new:["天这么黑，早点打完早点睡。"],
+  rare:["好东西！收好，别弄丢了。"],shopk:["老板，我丢的那几个蛋，是不是让你收走了？我就问问。"],tavk:["老板，给孩子来碗热的。不要酒！"],elder:["老长老，你又瘦了。回头我给你煮碗汤。"],
+  debuff:["哎呀，伤着了？来，手伸过来，我给你搓搓。","中毒了？吐出来！……吐不出来？那忍着，嫂子在。"],clutch:["我的天，我的天……你吓死我了。","没事了，没事了。来，先吃一口。"]}};
+for(const k in COMP_EXTRA)Object.assign(COMP_LINES[k],COMP_EXTRA[k]);
+function compRun(kind,p){try{if(!compActive())return;S.comp.said=S.comp.said||{};const k="r_"+kind;if(S.comp.said[k])return;if(p!=null&&rnd()>=p)return;S.comp.said[k]=1;compLine(kind)}catch(e){}}
+// 1. 打法：一回合连打 6 张、一张不出就结束回合、喝药水、牌组太厚
+{const _pc=playCard;playCard=function(){const r=_pc.apply(this,arguments);try{if(B&&!B.over&&(B.played|0)>=6&&!B.cCombo){B.cCombo=1;setTimeout(()=>compMaybe("combo",.6),500)}}catch(e){}return r}}
+{const _et=endTurn;endTurn=function(){const p0=B&&B.myTurn&&!B.over?(B.played|0):-1;const r=_et.apply(this,arguments);try{if(p0===0&&B&&!B.myTurn&&!B.cIdle){B.cIdle=1;setTimeout(()=>compMaybe("idle",.6),400)}}catch(e){}return r}}
+{const _up=usePotion;usePotion=function(){const inB=B&&!B.over;const r=_up.apply(this,arguments);try{if(inB&&B&&!B.cPot){B.cPot=1;setTimeout(()=>compMaybe("potion",.5),500)}}catch(e){}return r}}
+// 2+3. 进战斗：宝箱怪、精英、天气、月相、牌组太厚（首领有自己的话，不在这里说）
+{const _sc5=startCombat;startCombat=function(kind){const r=_sc5.apply(this,arguments);try{setTimeout(()=>{try{if(!B||B.over||!compActive())return;
+ if(kind==="M")return compLine("mimic");if(kind==="E")return compMaybe("elite",.6);if(!"mN".includes(kind)&&kind!=="m")return;
+ const L=COMP_LINES[S.comp.id];S.comp.said=S.comp.said||{};
+ if(B.wx&&L["wx_"+B.wx]&&!S.comp.said["r_wx_"+B.wx])return compRun("wx_"+B.wx,.7);
+ if((B.moon==="full"||B.moon==="new")&&!S.comp.said["r_moon_"+B.moon])return compRun("moon_"+B.moon,.6);
+ if(S.deck&&S.deck.length>=28)compRun("fat",.6)}catch(e){}},1700)}catch(e){}return r}}
+// 4. 拿到好牌
+{const _ac=addCard;addCard=function(c){const r=_ac.apply(this,arguments);try{const D=c&&CARDS[c.id];if(D&&!(B&&!B.over)&&(c.sh||c.g||"ELG".includes(D.r)))setTimeout(()=>compMaybe("rare",.6),600)}catch(e){}return r}}
+// 5. 塔里的熟人：商店老板、酒馆老板、长老（每局各一次）
+{const _ss5=shopScreen;shopScreen=function(){const r=_ss5.apply(this,arguments);setTimeout(()=>compRun("shopk",.8),1900);return r}}
+{const _tv5=tavernScreen;tavernScreen=function(){const r=_tv5.apply(this,arguments);setTimeout(()=>compRun("tavk",.8),2000);return r}}
+{const _rc5=restClue;restClue=async function(){const need=S&&S.flags&&S.flags.clue&&!S.flags.truth;const r=await _rc5.apply(this,arguments);if(need)setTimeout(()=>compRun("elder"),600);return r}}
+// 6. 中了负面状态（每场一次）
+{const _ap=API.apply;API.apply=function(t,s,v){const r=_ap.apply(this,arguments);try{if(!PREV&&t===this.p&&v>0&&["poison","frost","weak","vuln","burn","bleed","curse"].includes(s)&&!this.cDeb&&!this.over){this.cDeb=1;setTimeout(()=>compMaybe("debuff",.5),700)}}catch(e){}return r}}
+// 7. 险胜：血剩一成多一点也赢了
+{const _w5=win;win=async function(){try{if(B&&!B.over&&S.hp>0&&S.hp<=Math.max(3,S.max*.12))setTimeout(()=>{if(compActive())compLine("clutch")},900)}catch(e){}return _w5.apply(this,arguments)}}

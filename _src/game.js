@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="5.8.4";
+const VER="5.8.5";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -40,7 +40,7 @@ function fit(){const vv=window.visualViewport;let W=innerWidth,H=innerHeight,ox=
  const aw=Math.max(100,W-sf.l-sf.r),ah=Math.max(100,H-sf.t-sf.b),cx=ox+sf.l+aw/2,cy=oy+sf.t+ah/2;let s;
  st.style.left=cx+"px";st.style.top=cy+"px";
  if(port){s=Math.min(aw/720,ah/1280);st.style.transform=`translate(-50%,-50%) rotate(90deg) scale(${s})`}
- else{const r=aw/ah;let SW=1280,colX=0;if(r>1280/720+.02){s=Math.min(aw/1280,ah/720);/* 5.8.3：刘海、圆角那两条安全区也铺上画面，按钮那一列仍然留在安全区里 */SW=Math.min(Math.ceil(W/s)+2,1900);if(SW<Math.round(720*r))SW=Math.min(Math.round(720*r),1900);st.style.left=(ox+W/2)+"px";colX=(sf.l-sf.r)/2/s}else s=Math.min(aw/SW,ah/720);st.style.width=SW+"px";st.style.setProperty("--ox",((SW-1280)/2+colX)+"px");st.classList.toggle("wideS",SW>1280);st.style.transform=`translate(-50%,-50%) scale(${s})`}
+ else{const r=aw/ah;let SW=1280;if(r>1280/720+.02)SW=Math.min(Math.round(720*r),1664);s=Math.min(aw/SW,ah/720);st.style.width=SW+"px";st.style.setProperty("--ox",((SW-1280)/2)+"px");st.classList.toggle("wideS",SW>1280);st.style.transform=`translate(-50%,-50%) scale(${s})`}
  if(port){st.style.width="1280px";st.style.setProperty("--ox","0px");st.classList.remove("wideS")}
  document.body.classList.toggle("port",port);document.body.classList.toggle("wide",!port&&aw/ah>1280/720+.02);document.body.classList.toggle("tall",!port&&aw/ah<1280/720-.02);fit._k=innerWidth+"x"+innerHeight+(vv?"|"+vv.width+"x"+vv.height:"");try{_stR=null}catch(e){}}
 function fitSoon(){[60,250,600,1200,2500].forEach(t=>setTimeout(fit,t))}
@@ -204,6 +204,12 @@ function yardScreen(){
 /* ===================== 信箱：作者写给玩家的信 ===================== */
 const MAIL_SVG=`<svg viewBox="0 0 40 32" class="mailIco"><rect x="2" y="4" width="36" height="25" rx="2" fill="#fff" stroke="#0d0d0d" stroke-width="3"/><path d="M3 6 L20 19 L37 6" fill="none" stroke="#0d0d0d" stroke-width="3" stroke-linejoin="round"/><path d="M28 2 h9 v8" fill="none" stroke="#e5191c" stroke-width="3"/></svg>`;
 const TMAILS=[
+ {id:"m585",t:"5.8.5 更新",date:"11月18日",body:[
+  "【屏幕】画面尺寸改回 5.8.2 的样子",
+  "【同伴】老铁、阿蓝、小火、豆子、桂嫂话更多了：你一回合连打好几张、一张不出就结束回合、喝药水、牌组塞太厚，他们都会说两句",
+  "【同伴】下雨刮风下雪、满月新月、碰到精英和宝箱怪、拿到好牌，也会有反应",
+  "【同伴】见到商店老板、酒馆老板、长老，各有各的旧账",
+  "【同伴】你中毒冻伤的时候、血剩一点还打赢的时候，他们说的话不一样"]},
  {id:"m584",t:"5.8.4 小更新",date:"11月18日",body:[
   "【屏幕】有刘海的手机横屏时，左右两边不再留黑边，画面铺满整个屏幕；按钮还是留在中间好点的地方"]},
  {id:"m583",t:"5.8.3 小更新",date:"11月18日",body:[
