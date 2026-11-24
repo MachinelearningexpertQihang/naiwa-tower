@@ -514,7 +514,16 @@ try{ACH.forEach(a=>{const k=a.id.replace(/^ce_/,"");if(a.id.startsWith("ce_")&&C
 
 /* ===================== 6.1.5：蛊师更容易拿到奶猫牌 =====================
    蛊师自己的牌不属于任何家族，不进奶蛙池、不能三连；她要回血，就靠奶猫家族（三连：回复 4 生命、抽 2 张）。
-   选牌奖励里每张非蛊师的牌，有 25% 换成同稀有度的奶猫牌 */
-{const _oc=offerCards;offerCards=function(n,kind,force,shinyFirst){const out=_oc.apply(this,arguments);try{if(isGu()&&!force){out.forEach((c,i)=>{const D=CARDS[c.id];if(!D||D.hero==="gushi"||D.fam==="cat"||rnd()>=.25)return;
+   选牌奖励里每张非蛊师的牌，有 8% 换成同稀有度的奶猫牌：三选一里出现奶猫牌的机会从约 14% 变成约 25% */
+{const _oc=offerCards;offerCards=function(n,kind,force,shinyFirst){const out=_oc.apply(this,arguments);try{if(isGu()&&!force){out.forEach((c,i)=>{const D=CARDS[c.id];if(!D||D.hero==="gushi"||D.fam==="cat"||rnd()>=.08)return;
   const pool=POOL_HERO.filter(x=>CARDS[x].fam==="cat"&&!CARDS[x].hero&&CARDS[x].r===D.r&&!out.some(o=>o.id===x));if(pool.length){const nc=mk(pick(pool),0);if(c.sh)nc.sh=c.sh;out[i]=nc}})}}catch(e){console.warn(e)}return out}}
 try{const m=TMAILS.find(x=>x.id==="m613");if(m){m.id="m615";m.t="6.1.5 · 蛊师更容易拿到奶猫牌 + 同伴结局提示";m.body.splice(m.body.length-1,0,"【6.1.5】蛊师自己的牌不进奶蛙池、不能三连，回血全靠奶猫家族。现在蛊师选牌时更容易拿到奶猫牌（凑奶猫三连：回复 4 生命、抽 2 张）")}}catch(e){}
+
+/* ===================== 6.1.5：蛊师有了「蛊」家族 =====================
+   以前蛊师专属牌是「无家族」，不进奶蛙池、凑不了三连（魔法师的法术牌本来就会往池里放魔法符文，不用改）。现在：
+   · 蛊师专属牌 → 蛊家族。三连爆发：所有敌人各加 1 种随机的蛊 3 层，你回复 3 生命（连锁越高越多）
+   和其他主角一样，开局的蛊牌也算蛊家族 */
+FAM.gu={n:"蛊",c:"#7fae3e"};
+try{Object.values(CARDS).forEach(D=>{if(D.hero==="gushi"&&D.fam==="none")D.fam="gu"})}catch(e){console.warn(e)}
+try{FAMINFO.gu="蛊家族：蛊师奶蛙专属。三连爆发：所有敌人各加 1 种随机的蛊 3 层，你回复 3 生命。"}catch(e){}
+{const _pf=API.poolFx;API.poolFx=function(f,lv=1,n=3){const r=_pf.apply(this,arguments);try{if(f==="gu"&&!PREV&&!this.over){const k=lv||1;const ks=["burn","bleed","poison","frost","wet","mud"];this.alive().forEach(e=>this.apply(e,pick(ks),3*k));this.heal(3*k);renderBattle()}}catch(e){console.warn(e)}return r}}
