@@ -511,3 +511,10 @@ try{ACH.forEach(a=>{const k=a.id.replace(/^ce_/,"");if(a.id.startsWith("ce_")&&C
 {const _as6=achScreen;achScreen=async function(){const r=_as6.apply(this,arguments);try{const g=$("#achGrid");if(g&&!g.dataset.h613){g.dataset.h613=1;g.addEventListener("click",()=>{const d=[...document.querySelectorAll("#stage .tipBox")].pop();if(!d||!d.querySelector(".achHint"))return;const L=d.textContent.length;if(L>70){const w0=(L>160?460:360)+"px";d.style.setProperty("width",w0,"important");d.style.setProperty("max-width",w0,"important")}
   const h=d.offsetHeight,w=d.offsetWidth;let x=parseFloat(d.style.left)||10,y=parseFloat(d.style.top)||10;x=Math.max(10,Math.min(1270-w,x));y=Math.max(10,Math.min(710-h,y));d.style.left=x+"px";d.style.top=y+"px";
   try{clearTimeout(TIP_T);TIP_T=setTimeout(closeTip,Math.max(3500,L*120))}catch(e){}})}}catch(e){}return r}}
+
+/* ===================== 6.1.5：蛊师更容易拿到奶猫牌 =====================
+   蛊师自己的牌不属于任何家族，不进奶蛙池、不能三连；她要回血，就靠奶猫家族（三连：回复 4 生命、抽 2 张）。
+   选牌奖励里每张非蛊师的牌，有 25% 换成同稀有度的奶猫牌 */
+{const _oc=offerCards;offerCards=function(n,kind,force,shinyFirst){const out=_oc.apply(this,arguments);try{if(isGu()&&!force){out.forEach((c,i)=>{const D=CARDS[c.id];if(!D||D.hero==="gushi"||D.fam==="cat"||rnd()>=.25)return;
+  const pool=POOL_HERO.filter(x=>CARDS[x].fam==="cat"&&!CARDS[x].hero&&CARDS[x].r===D.r&&!out.some(o=>o.id===x));if(pool.length){const nc=mk(pick(pool),0);if(c.sh)nc.sh=c.sh;out[i]=nc}})}}catch(e){console.warn(e)}return out}}
+try{const m=TMAILS.find(x=>x.id==="m613");if(m){m.id="m615";m.t="6.1.5 · 蛊师更容易拿到奶猫牌 + 同伴结局提示";m.body.splice(m.body.length-1,0,"【6.1.5】蛊师自己的牌不进奶蛙池、不能三连，回血全靠奶猫家族。现在蛊师选牌时更容易拿到奶猫牌（凑奶猫三连：回复 4 生命、抽 2 张）")}}catch(e){}
