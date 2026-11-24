@@ -411,9 +411,71 @@ const GU_SELF=["poison","burn","bleed","frost","weak","vuln"];
   saveRun();return _ss61.apply(this,arguments)}}catch(e){console.warn(e)}return r}}
 
 /* ---------- 3. 信箱：6.1 ---------- */
-try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m611";m.t="6.1.1 · 存档找回 + 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
+try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m612";m.t="6.1.2 · 存档找回 + 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
  "【新天赋 8 个】赌徒、背水一战、断舍离、囤积癖、第二口气、连环套、吃一堑、养宠物",
  "【新塔况 8 个】镜像塔、反着来、限时塔、满载而归、一张不留、猫猫塔、夜市、蛊雾弥漫",
  "【首领】最终之地的五位首领和深渊龙蛙都稍微加强了一点（生命 +12%、力气 +1，龙蛙真身 450 血）",
  "【修复】刚开局还没打过一场就退出，不再给记忆碎片和熟练度",
+ "【6.1.2】隐藏成就的提示写详细了：在哪一层、哪个事件、选哪个都写清楚了。老铁和小火多了「不救」的同伴结局（名人堂里能看到）。设置里加了「从云端找回存档」",
  "【6.1.1 紧急修复】6.1 的安装包漏了 B站 的连接组件，导致云存档和排行榜都连不上、看起来像存档没了。存档其实一直都在，这一版打开就能找回来。对不起大家")}}catch(e){}
+
+/* ===================== 6.1.1：隐藏成就的提示写详细一点（在哪一层、哪个事件、选哪个） ===================== */
+const ACH_HINT2={
+ jailbreak:"走岔路（.5 层）时会路过「岔路检查站」。被关进牢房后选「越狱」：一半机会溜出去（还顺走一件遗物），一半会被抓回来。没成功就下次再试",
+ sweet:"第四层「沸腾奶茶厂」的「？」里有个「传送带」事件，选「喝一杯」（最大生命 +8，但会拿到诅咒「沉重」）",
+ seven:"任何一层的「？」都可能遇到「布娃娃」事件（背后绣着「七」），选「带上它」，然后一直带着它打败大魔王登顶",
+ isekai:"第二层起，每次走进「？」都有很小的几率（约 4%，一局最多一次）推开「异世界之门」。多走「？」格子",
+ isekai2:"进了「异世界之门」以后，门里那只奶蛙可以抓。进门前把抓捕机会留着，用网把它抓住",
+ pipe3:"死斗场最后一场的「不灭的斗士」背后有奶茶管：一回合里打它足够多的伤害就能打断，管子修好后还能再断。它半血会砸掉罐子，之后就打不断了——所以要在它半血之前，在同一场里打断 3 次",
+ champnobreak:"打「不灭的斗士」时，一次都不要打断它背后的奶茶管（一回合别打出太高伤害），让它一直喝，然后照样把它打倒",
+ dsqfull:"死斗场五连战打完的那一刻，生命要是满的。中间的休息室选「坐下歇一会儿」，不要选「对着墙上的划痕练拳」（选了这一局就拿不到），最后一场一滴血都别掉",
+ hornclick:"在死斗场里，屏幕上有一只报幕员的喇叭，点它。累计点 10 次就行（每次会说一句话）",
+ debuff8:"身上同时挂着 8 种不同的负面状态（中毒、烫伤、虚弱、易伤、冻伤、梦魇、麻痹、诅咒……）。第五层隐藏路线尽头的「灭却诅咒师」最会上咒，打它时什么解药都别用，撑几回合",
+ truth:"三条 SS 线做完后：在「预言家的书房」里把写着阿岳名字的本子带走（得到「阿岳的本子」），然后在塔顶打倒阿岳时选「宽恕」",
+ prophet:"先救出迷你奶茶杯（死斗场），第五层地图会出现一条隐藏路线，尽头是「灭却诅咒师」，打败它。再走真结局路线：塔顶宽恕阿岳 → 打碎魔椅的意志，就会看到预言家",
+ noDebuff:"打倒「灭却诅咒师」的那一刻，身上一个负面状态都没有。最后一下之前喝解毒剂、安神茶，或者带着「清心铃」清掉",
+ nopot:"打「灭却诅咒师」那一整场，一瓶药水都不喝",
+ hv_bottle:"先在寂静之海打败「守墓者」（这一局或以前打过都算），然后第四层奶茶厂的「？」里会出现「管子里的漂流瓶」，两个选项随便选一个",
+ hv_bones:"第四层奶茶厂的「？」里会出现「会哼歌的骨头」，选「跟着哼一遍」或「把骨头搬到凉快的地方」都行",
+ hv_ticket:"死斗场还没打完的时候，第四层奶茶厂的「？」里会出现「旧门票」，选哪个都行",
+ hv_bookie:"死斗场还没打完的时候，第四层奶茶厂的「？」里有「地下赌档」（戴绿眼罩的庄家），选「押冠军（押 50）」",
+ bookie:"在第四层的「地下赌档」选「押挑战者」（押你自己），然后去死斗场把冠军「不灭的斗士」打倒，会多拿 150 金币",
+ hv_cheer:"第四层奶茶厂的「？」里会出现「空看台」，两个选项随便选",
+ hv_robes:"第五层星空之顶的「？」里会出现「一柜子黑袍子」，翻口袋或者穿上一件都行",
+ hv_apprentice:"第五层星空之顶的「？」里会出现「抄写的小学徒」，两个选项随便选",
+ hv_bridge:"第五层星空之顶的「？」里会出现「第三座桥」（有人在锯桥墩），拦住他或者在旁边看都行",
+ hv_crystal:"第五层星空之顶的「？」里会出现「碎掉的水晶球」，看一眼或者踩碎都行",
+ hv_conch:"先在寂静之海打败「守墓者」，然后从第四层起，「？」里会出现「海螺」，两个选项随便选",
+ hv_cupdream:"先在死斗场救出「迷你奶茶杯」，之后的「？」里会出现「奶茶杯睡着了」，两个选项随便选",
+ hv_seaguard:"这一局在寂静之海打败「守墓者」以后，第五层星空之顶的「？」里会出现「没寄出去的信」（倒在路边的邮筒）",
+ dice66:"在酒馆和客人掷骰子（一次押 30 金币），掷出两个 6。多掷几次就有",
+ dice11:"在酒馆掷骰子，掷出两个 1",
+ diceBroke:"在酒馆掷骰子输掉以后，身上剩不到 30 金币",
+ relic25:"身上同时带着 25 件遗物：遗物都别卖、别换，精英和宝箱的遗物都拿，无尽之塔里每一轮还会送一件",
+ hit10k:"一下打出 10000 点以上伤害：力气叠高 + 敌人易伤 + 金卡多次触发 + 顿悟 / 通透世界 / 星之力，全压在一张牌上",
+ hit1m:"一下打出 100 万点以上伤害。无尽之塔后面几轮，把所有加成叠在同一下",
+ eggs30:"场上同时有 30 枚蛋：多带奶蛋牌，「暖窝」「蛋雨」「鸡生蛋」一起用，先别用「催孵」「破壳」",
+ greedy:"地图中间几排有时会出现「秘密房间」格子（大约一半的地图有）。如果是「睡着的宝库」，连续选「再抓一把」5 次（越抓越容易吵醒它，有点赌运气）",
+ teamaster:"走进「秘密房间」，如果是「没人的奶茶厨房」：先选「先放珍珠」，再选「放糖」"};
+try{Object.assign(ACH_HINT,ACH_HINT2);ACH.forEach(a=>{if(ACH_HINT2[a.id])a.h=ACH_HINT2[a.id]})}catch(e){console.warn(e)}
+
+/* ===================== 6.1.1：同伴的「不救」结局 =====================
+   老铁：锅炉炸开时可以不回头；小火：冻在冰里没救、或者在奶茶厂顾不上兄弟俩，到台阶下都会记一个结局 */
+try{
+ const I3=EVENTS.c_iron3;if(I3){const o0=I3.o;I3.o=()=>{const L=o0();L.push({t:"顾不上它，继续往前跑",d:"<span class='bad'>老铁不会再跟上来</span>",f:()=>{const c=cp();c.gone=1;c.left=1;compEnd("iron","left");saveRun();return"你跑出去很远才回头。锅炉房的蒸汽里，老铁还站在原地，盔甲烫得通红。它没有喊你。<br>后来，星空之顶的台阶下没有人等你。"}});return L}}
+ const F3=EVENTS.c_fire3;if(F3){const o3=F3.o;F3.o=()=>{const L=o3();if(cp().alive)L.push({t:"现在顾不上",d:"<span class='bad'>兄弟俩会留在奶茶厂</span>",f:()=>{cp().left3=1;return"小火拉着哥哥的袖子，看着你走远。它没有喊你，只是把那个比它还大的包，又往背上提了提。"}});return L}}
+ const F4=EVENTS.c_fire4;if(F4){const o4=F4.o;F4.o=()=>{const c=cp();if(!c.freed&&!c.scarf&&!c.stay)return[{t:"继续往上",d:"",f:()=>{if(c.alive)compEnd("fire","left");else compEnd("fire","ice");return c.alive?"台阶很长。你想起传送带边那两只奶马，大的在搬箱子，小的在帮他扶着。":"你把手伸进包里，摸到了那条红围巾。它还是软的。"}}];return o4()}}
+ const ADD=[["iron","left","没回头","锅炉炸开时，你没有回头扶老铁","奶茶厂的锅炉炸开时，你可以不回头"],["fire","left","还在搬箱子","把小火和哥哥留在了奶茶厂","奶茶厂的传送带边，也可以说「现在顾不上」"],["fire","ice","冰里的围巾","没有把小火从冰里救出来","冰原上那块奇怪的冰，也可以不管"]];
+ ADD.forEach(x=>{if(!CE_LIST.some(y=>y[0]===x[0]&&y[1]===x[1])){CE_LIST.push(x);ACH.push({id:"ce_"+x[0]+"_"+x[1],n:x[2],d:x[3],ic:"star",hid:1,h:x[4]})}});
+}catch(e){console.warn(e)}
+
+/* ===================== 6.1.1：设置里加「从云端找回存档」 =====================
+   本机看不到进度时（换了设备、换了打开的地方），可以手动从 B站 云存档拉回来 */
+async function cloudRecover(){sfx("click");if(!(window.toy&&toy.getCloudStorage)){toast("要在 B站 里打开游戏，才能用云存档");return}
+ toast("正在读取云存档……");let o=null;
+ try{const r=await TOY.timeout(toy.getCloudStorage(["tw_m"]),8000);const mt=r&&r.tw_m?JSON.parse(r.tw_m):null;if(mt&&mt.n&&mt.n<=120){const ks=[...Array(mt.n)].map((_,i)=>"tw_"+i);const r2=await TOY.timeout(toy.getCloudStorage(ks),10000);o=JSON.parse(ks.map(k=>(r2&&r2[k])||"").join(""))}}catch(e){toast("云存档暂时连不上，稍后再试（请确认已经登录 B站）");return}
+ if(!o||!o.m){toast("云端还没有你的存档");return}
+ const m=o.m,f=x=>(x||0).toLocaleString();const cmp=`<table style="margin:10px auto;font-size:18px;border-spacing:16px 6px"><tr><td></td><td><b>云端</b></td><td><b>这台设备</b></td></tr><tr><td>通关</td><td>${f(m.wins)} 次</td><td>${f(M.wins)} 次</td></tr><tr><td>记忆碎片</td><td>${f(m.shards)}</td><td>${f(M.shards)}</td></tr><tr><td>游玩时长</td><td>${fmtPlay(m.playMs)}</td><td>${fmtPlay(M.playMs)}</td></tr></table>`;
+ const ok=await shopConfirm(`<div style="padding:6px 10px"><h3 style="margin:0 0 6px">从云端找回存档</h3><p>找回后，这台设备上的进度会和云端的合在一起（取两边更多的那份）。</p>${cmp}</div>`,0,"找回");
+ if(!ok)return;try{if(S&&!S.noSave){toast("请先回到主页再找回");return}CLOUD.apply(o)}catch(e){toast("找回失败："+e.message)}}
+{const _sx=settings;settings=function(){const r=_sx.apply(this,arguments);try{const row=document.querySelector("#ov .modal .row");if(row&&!document.getElementById("sCloud")&&(!S||S.noSave)){const b=document.createElement("button");b.className="btn sm ghost";b.id="sCloud";b.style.minWidth="240px";b.textContent="从云端找回存档";b.onclick=cloudRecover;row.insertBefore(b,row.lastElementChild)}}catch(e){}return r}}
