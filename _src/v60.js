@@ -411,8 +411,9 @@ const GU_SELF=["poison","burn","bleed","frost","weak","vuln"];
   saveRun();return _ss61.apply(this,arguments)}}catch(e){console.warn(e)}return r}}
 
 /* ---------- 3. 信箱：6.1 ---------- */
-try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m61";m.t="6.1 · 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
+try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m611";m.t="6.1.1 · 存档找回 + 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
  "【新天赋 8 个】赌徒、背水一战、断舍离、囤积癖、第二口气、连环套、吃一堑、养宠物",
  "【新塔况 8 个】镜像塔、反着来、限时塔、满载而归、一张不留、猫猫塔、夜市、蛊雾弥漫",
  "【首领】最终之地的五位首领和深渊龙蛙都稍微加强了一点（生命 +12%、力气 +1，龙蛙真身 450 血）",
- "【修复】刚开局还没打过一场就退出，不再给记忆碎片和熟练度")}}catch(e){}
+ "【修复】刚开局还没打过一场就退出，不再给记忆碎片和熟练度",
+ "【6.1.1 紧急修复】6.1 的安装包漏了 B站 的连接组件，导致云存档和排行榜都连不上、看起来像存档没了。存档其实一直都在，这一版打开就能找回来。对不起大家")}}catch(e){}
