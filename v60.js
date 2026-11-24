@@ -411,11 +411,12 @@ const GU_SELF=["poison","burn","bleed","frost","weak","vuln"];
   saveRun();return _ss61.apply(this,arguments)}}catch(e){console.warn(e)}return r}}
 
 /* ---------- 3. 信箱：6.1 ---------- */
-try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m612";m.t="6.1.2 · 存档找回 + 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
+try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m613";m.t="6.1.3 · 同伴结局提示 + 存档找回 + 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
  "【新天赋 8 个】赌徒、背水一战、断舍离、囤积癖、第二口气、连环套、吃一堑、养宠物",
  "【新塔况 8 个】镜像塔、反着来、限时塔、满载而归、一张不留、猫猫塔、夜市、蛊雾弥漫",
  "【首领】最终之地的五位首领和深渊龙蛙都稍微加强了一点（生命 +12%、力气 +1，龙蛙真身 450 血）",
  "【修复】刚开局还没打过一场就退出，不再给记忆碎片和熟练度",
+ "【6.1.3】20 个同伴结局成就的提示也写细了：哪一层遇到、每一步选哪个、和同一个同伴的其他结局差在哪，在成就页里能看到",
  "【6.1.2】隐藏成就的提示写详细了：在哪一层、哪个事件、选哪个都写清楚了。老铁和小火多了「不救」的同伴结局（名人堂里能看到）。设置里加了「从云端找回存档」",
  "【6.1.1 紧急修复】6.1 的安装包漏了 B站 的连接组件，导致云存档和排行榜都连不上、看起来像存档没了。存档其实一直都在，这一版打开就能找回来。对不起大家")}}catch(e){}
 
@@ -479,3 +480,34 @@ async function cloudRecover(){sfx("click");if(!(window.toy&&toy.getCloudStorage)
  const ok=await shopConfirm(`<div style="padding:6px 10px"><h3 style="margin:0 0 6px">从云端找回存档</h3><p>找回后，这台设备上的进度会和云端的合在一起（取两边更多的那份）。</p>${cmp}</div>`,0,"找回");
  if(!ok)return;try{if(S&&!S.noSave){toast("请先回到主页再找回");return}CLOUD.apply(o)}catch(e){toast("找回失败："+e.message)}}
 {const _sx=settings;settings=function(){const r=_sx.apply(this,arguments);try{const row=document.querySelector("#ov .modal .row");if(row&&!document.getElementById("sCloud")&&(!S||S.noSave)){const b=document.createElement("button");b.className="btn sm ghost";b.id="sCloud";b.style.minWidth="240px";b.textContent="从云端找回存档";b.onclick=cloudRecover;row.insertBefore(b,row.lastElementChild)}}catch(e){}return r}}
+
+/* ===================== 6.1.3：同伴结局的成就提示写细 =====================
+   同伴是随机遇到的（最近三局没见过的优先）。每层第一次走进「？」（或带蓝圈的「路遇」格）就会碰到它的这一段；
+   这一层一个「？」都不进，这一段就跳过了。 */
+const CE_PRE="（同伴是随机遇到的，每层第一次进「？」会碰到它）";
+const CE_HINT2={
+ iron_let:"第一层遇到老奶狗「老铁」，选「一起走」。第三层打完初号机 SS 后，在第四层酒馆任务板接下 SS 悬赏「地底下的号子声」，走彩色隐藏路线进死斗场。打到最后一场「不灭的斗士」前，老铁会站在门口——选「不拦他」。之后在第五层星空之顶进「？」拿到老铁的剑",
+ iron_stop:"第一层遇到「老铁」选「一起走」，带着它进第四层的死斗场（要先在第三层打完初号机 SS，再在第四层酒馆任务板接「地底下的号子声」）。最后一场「不灭的斗士」前，老铁站在门口——选「拦住他」，自己上场。选完当场就记下",
+ iron_tog:"第一层遇到「老铁」选「一起走」，带着它进第四层的死斗场（先打完第三层初号机 SS，再在第四层酒馆任务板接「地底下的号子声」）。最后一场前选「跟他一起上」（老铁每回合帮你砍一刀），打赢不灭的斗士，然后在第五层星空之顶进「？」见它最后一面",
+ iron_base:"第一层遇到「老铁」选「一起走」，第四层锅炉炸开时选「扶住它」，这一局不要去死斗场。一路带着它到第五层星空之顶，进「？」就能看到",
+ iron_left:"第一层遇到「老铁」选「一起走」。第四层沸腾奶茶厂里，锅炉炸开、老铁替你挡住滚烫的奶茶时，选「顾不上它，继续往前跑」。选完当场就记下",
+ blue_paid:"遇到蓝色奶猫「阿蓝」（借不借它 30 金币都行）。第四层沸腾奶茶厂门口，债主把它按在墙上时，选「替它还 100 金币」（身上要有 100）。然后在第五层星空之顶进「？」",
+ blue_bet:"遇到「阿蓝」。第四层奶茶厂门口债主来时选「打跑它们」。然后同一层去死斗场把五连战打完（先在第三层打完初号机 SS，再在第四层酒馆任务板接「地底下的号子声」）——阿蓝会押你赢。最后在第五层星空之顶进「？」",
+ blue_hide:"遇到「阿蓝」。第四层奶茶厂门口债主来时选「打跑它们」，这一局不去死斗场（或者没打完）。然后在第五层星空之顶进「？」",
+ blue_left:"遇到「阿蓝」。第四层奶茶厂门口债主把它按在墙上时，选「这是它自己的事」。之后在第五层星空之顶进「？」，台阶下会放着它的骰子",
+ fire_home:"第一层遇到背大包的小奶马「小火」，选「一起走吧」。第三层冰原它被冻在冰里时救它（「用体温把冰焐化」或「花 60 金币买火炭」）。第四层奶茶厂找到它哥哥时，选「打工头，把他抢出来」并打赢，或者「花 100 金币替他还债」。最后在第五层星空之顶进「？」",
+ fire_stay:"第一层遇到「小火」选「一起走吧」，第三层冰原把它从冰里救出来。第四层奶茶厂找到它哥哥时，选「让小火自己决定」。选完当场就记下",
+ fire_scarf:"第一层遇到「小火」选「一起走吧」。第三层冰原它被冻在冰里时选「来不及了，继续往上」（你会收下它的红围巾）。第四层奶茶厂传送带边碰到那只大奶马，选「把红围巾交给它」。最后在第五层星空之顶进「？」",
+ fire_left:"第一层遇到「小火」选「一起走吧」，第三层冰原把它从冰里救出来。第四层奶茶厂找到它哥哥时，选「现在顾不上」。最后在第五层星空之顶进「？」",
+ fire_ice:"第一层遇到「小火」选「一起走吧」。第三层冰原它被冻在冰里时选「来不及了，继续往上」；第四层传送带边碰到那只大奶马时选「什么都不说」。最后在第五层星空之顶进「？」",
+ bean_ok:"第一层遇到陷在泥里的邮差「豆子」（先拉谁都行）。第三层冰原钟楼里它问能不能拆包裹，选「别拆」；第四层奶茶厂它掉上传送带时，选「抓住豆子」。最后在第五层星空之顶进「？」",
+ bean_cold:"第一层遇到邮差「豆子」。第三层冰原钟楼里它问能不能拆包裹，选「打开看看」；第四层奶茶厂它掉上传送带时，选「抓住豆子」。最后在第五层星空之顶进「？」",
+ bean_self:"第一层遇到邮差「豆子」。第四层奶茶厂它掉上传送带、喊「先抓包裹」时，选「抓住包裹」（第三层拆没拆都行）。最后在第五层星空之顶进「？」，替它把包裹送到",
+ hen_full:"第一层遇到丢了蛋的奶鸡「桂嫂」，选「一起找」。要找回至少 5 个蛋：第二层古堡选「追」（+1），第三层冰原选「把冰敲开」（+1）或「连冰带蛋抱着走」（第四层孵出来 +1，还送一只小鸡），第四层茶叶蛋车间选「冲进去」并打赢精英（+4）。最后在第五层星空之顶进「？」",
+ hen_some:"第一层遇到奶鸡「桂嫂」选「一起找」，一路只找回 1～4 个蛋：比如第四层茶叶蛋车间选「你一个人进去」（+2）或「来不及了」，不要打那场精英。最后在第五层星空之顶进「？」",
+ hen_none:"第一层遇到奶鸡「桂嫂」选「一起找」，然后一个蛋都别找回：第二层选「别追了，先歇口气」，第三层一个「？」都不进（冰里的蛋不管怎么选都会找回来），第四层茶叶蛋车间选「来不及了」。最后在第五层星空之顶进「？」"};
+try{ACH.forEach(a=>{const k=a.id.replace(/^ce_/,"");if(a.id.startsWith("ce_")&&CE_HINT2[k])a.h=CE_PRE+CE_HINT2[k]})}catch(e){console.warn(e)}
+// 成就提示变长了：提示框放宽、整个留在屏幕里，并且多停一会儿（够读完）
+{const _as6=achScreen;achScreen=async function(){const r=_as6.apply(this,arguments);try{const g=$("#achGrid");if(g&&!g.dataset.h613){g.dataset.h613=1;g.addEventListener("click",()=>{const d=[...document.querySelectorAll("#stage .tipBox")].pop();if(!d||!d.querySelector(".achHint"))return;const L=d.textContent.length;if(L>70){const w0=(L>160?460:360)+"px";d.style.setProperty("width",w0,"important");d.style.setProperty("max-width",w0,"important")}
+  const h=d.offsetHeight,w=d.offsetWidth;let x=parseFloat(d.style.left)||10,y=parseFloat(d.style.top)||10;x=Math.max(10,Math.min(1270-w,x));y=Math.max(10,Math.min(710-h,y));d.style.left=x+"px";d.style.top=y+"px";
+  try{clearTimeout(TIP_T);TIP_T=setTimeout(closeTip,Math.max(3500,L*120))}catch(e){}})}}catch(e){}return r}}
