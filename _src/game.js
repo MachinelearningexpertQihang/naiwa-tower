@@ -175,7 +175,7 @@ function bossCodex(){const ids=Object.keys(BOSS_LORE);const rec=M.boss||{};const
   $("#bcxD").innerHTML=k?`<img src="${IMG(ENEMY[id].img)}"><h3>${ENEMY[id].n}</h3><div class="bt"><b>${L.t}</b>${L.td}</div><div class="lore">${[["初见",L.lore,1],["为什么",L.lore2,2],["阿岳与长老",L.lore3,3]].filter(x=>x[1]).map(([h,l,n])=>k>=n?`<h4>${h}</h4>${l.map(x=>`<p>${x}</p>`).join("")}`:`<h4 class="lk">${h}</h4><p class="sp">再打败它 ${n-k} 次解锁</p>`).join("")}</div><small>击败 ${k} 次</small>`:`<img class="sil" src="${IMG(ENEMY[id].img)}"><h3>？？？</h3><p class="bcxHint">还没有打败过它。</p>`});
  $("#bcxX").onclick=()=>codex()}
 const mlvRaw=id=>((M.up||{})[id]||0);const mlv=id=>(M.upOff||{})[id]?0:mlvRaw(id);
-function earnShards(win){if(!S)return{n:0};LB.onRunEnd(win);const mx=mastGain(win);const rooms=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;
+function earnShards(win){if(!S)return{n:0};/* 6.1：一场都没打、一步都没走就退出，不给碎片和熟练度 */if(!win&&!(S.act||0)&&(S.row|0)<1&&!(S.stats&&S.stats.kills))return{n:0,none:1};LB.onRunEnd(win);const mx=mastGain(win);const rooms=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;
  const n=Math.max(1,Math.round((1+Math.floor(rooms/8)+Math.floor((S.elites||0)/3)+Math.floor((S.stats.endb||0)/2)+(win?3:0)+Math.floor(asc()/3))*({easy:.7,normal:1,hard:1.5}[S.diff||"normal"]||1)));
  M.shards=(M.shards||0)+n;M.shardsAll=(M.shardsAll||0)+n;saveMeta();return{n}}
 function villageTale(){M.seenT=M.seenT||[];const un=VILLAGE_TALES.filter(t=>!M.seenT.includes(t.t));const T=pick(un.length?un:VILLAGE_TALES);if(!M.seenT.includes(T.t))M.seenT.push(T.t);if(VILLAGE_TALES.every(t=>M.seenT.includes(t.t)))ach("tales");saveMeta();return T}
@@ -1496,7 +1496,7 @@ function gameOver(quit){setTimeout(()=>CLOUD.up(true),500);const heroName=HN(),h
  <p class="wsLead">${quit?"塔还在那里，随时可以再爬。":heroName+"被抬回了村里。长老什么也没问。"+pick(fails)}</p>
  <div class="wsStats"><div><b>${fl}/${ACTS.length*(ROWS+1)}</b><small>走过的房间</small></div><div><b>${st.kills}</b><small>击败敌人</small></div><div><b>${st.endb||0}</b><small>层末首领</small></div><div><b>${st.chain||0}</b><small>最长连锁</small></div><div><b>${st.maxHit||0}</b><small>单次最高伤害</small></div></div>
  ${roast.length?`<div class="wsQuote"><img src="${IMG("m6")}"><div>${roast.map(t=>`<p>「${t}」</p>`).join("")}</div></div>`:""}
- <div class="wsFoot"><div class="wsShard">${ICON.star}<span>记忆碎片</span><b>+${SR.n}</b></div><div class="wsBtns"><button class="wsBtn red" id="eAgain">再爬一次</button><button class="wsBtn" id="eShare">分享图</button><button class="wsBtn" id="eHome">回到主页</button></div></div></div></div>`;
+ <div class="wsFoot"><div class="wsShard">${ICON.star}<span>记忆碎片</span><b>+${SR.n}</b>${SR.none?`<small style="margin-left:8px;opacity:.75">（还没打过一场，不算）</small>`:""}</div><div class="wsBtns"><button class="wsBtn red" id="eAgain">再爬一次</button><button class="wsBtn" id="eShare">分享图</button><button class="wsBtn" id="eHome">回到主页</button></div></div></div></div>`;
  $("#eAgain").onclick=heroSelect;$("#eHome").onclick=titleScreen;$("#eShare").onclick=()=>shareCard(SHARE)}
 const END_NAME={true:"真结局 · 泉水回来了",base:"新的大魔王",doll:"小七的歌",lone:"一个人的王座",mage:"画了一半的法阵"};
 const END_LEAD={true:"深渊的水退回了地底。你回到村口的时候，泉水已经漫过了石阶，月亮在水里一晃一晃的。小七站在泉边唱歌，唱的是你从来没听过的调子。村口那棵枣树底下，有一根埋了很多年的鱼竿。你把它挖出来，坐在泉边，钓了一整个下午。什么都没钓到，但你觉得，这样就很好。",base:"长老一个人下了山。他说村里的晚饭不能没人吃。你坐在塔顶，泉水的声音一直在耳边，很近，很好听。山脚下的泉，确实不再往下掉了——可它也没有涨回来。每天傍晚，村口都会亮起一盏小小的灯，你知道那是长老点的。你想，再坐一阵子，等泉水满了，就下去。",
@@ -1547,7 +1547,7 @@ async function actClear(){if(S){S.rageUsed=0;S.rage=S.rage||0}setTimeout(()=>CLO
  <div class="wsStats"><div><b>${st.kills}</b><small>击败敌人</small></div><div><b>${st.endb||0}</b><small>层末首领</small></div><div><b>${st.chain||0}</b><small>最长连锁</small></div><div><b>${st.maxHit||0}</b><small>单次最高伤害</small></div><div><b>${deckN}</b><small>最终牌组</small></div></div>
  <div class="wsQuote"><img src="${IMG("m6")}"><div>${roast.map(t=>`<p>「${t}」</p>`).join("")}</div></div>
  <div class="wsTale"><em>后来 · ${T.t}</em><p>${T.l.join("")}</p></div>
- <div class="wsFoot"><div class="wsShard">${ICON.star}<span>记忆碎片</span><b>+${SR.n}</b></div><div class="wsBtns"><button class="wsBtn red" id="eAgain">再爬一次</button><button class="wsBtn" id="eShare">分享图</button><button class="wsBtn" id="eHome">回到主页</button></div></div></div></div>`;
+ <div class="wsFoot"><div class="wsShard">${ICON.star}<span>记忆碎片</span><b>+${SR.n}</b>${SR.none?`<small style="margin-left:8px;opacity:.75">（还没打过一场，不算）</small>`:""}</div><div class="wsBtns"><button class="wsBtn red" id="eAgain">再爬一次</button><button class="wsBtn" id="eShare">分享图</button><button class="wsBtn" id="eHome">回到主页</button></div></div></div></div>`;
  sparks(640,200,"#ffd23f",40);$("#eAgain").onclick=heroSelect;$("#eHome").onclick=titleScreen;$("#eShare").onclick=()=>shareCard(SHARE)}
 
 
