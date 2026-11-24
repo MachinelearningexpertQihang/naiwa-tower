@@ -527,3 +527,33 @@ FAM.gu={n:"蛊",c:"#7fae3e"};
 try{Object.values(CARDS).forEach(D=>{if(D.hero==="gushi"&&D.fam==="none")D.fam="gu"})}catch(e){console.warn(e)}
 try{FAMINFO.gu="蛊家族：蛊师奶蛙专属。三连爆发：所有敌人各加 1 种随机的蛊 3 层，你回复 3 生命。"}catch(e){}
 {const _pf=API.poolFx;API.poolFx=function(f,lv=1,n=3){const r=_pf.apply(this,arguments);try{if(f==="gu"&&!PREV&&!this.over){const k=lv||1;const ks=["burn","bleed","poison","frost","wet","mud"];this.alive().forEach(e=>this.apply(e,pick(ks),3*k));this.heal(3*k);renderBattle()}}catch(e){console.warn(e)}return r}}
+
+/* ===================== 6.1.6 =====================
+   1. 卡牌说明太长时字自动缩小，从上往下排，不再顶到「攻击 / 家族」小标签下面
+   2. 设置里加「手机震动」「震屏」两个开关
+   3. 成就「浑身是病」：8 种负面状态实测打不到，改成 6 种
+   4. 信箱：奶蛙工作室第三部《奶蛙牌》已发布 */
+{const _ch=cardHTML;cardHTML=function(c,cls){let h=_ch.apply(this,arguments);try{const m=/<div class="ds"><span>([\s\S]*?)<\/span><\/div>/.exec(h);if(m){const n=m[1].replace(/<[^>]*>/g,"").length;const k=n>66?"l3":n>50?"l2":n>36?"l1":"";if(k)h=h.replace('<div class="ds">',`<div class="ds ${k}">`)}}catch(e){}return h}}
+// 开关存在本机
+const VIB=(()=>{let v={vib:1,shake:1};try{Object.assign(v,JSON.parse(localStorage.getItem("nwt-fx")||"{}"))}catch(e){}return v})();
+const vibSave=()=>{try{localStorage.setItem("nwt-fx",JSON.stringify(VIB))}catch(e){}};
+try{if(navigator.vibrate){const _v=navigator.vibrate.bind(navigator);navigator.vibrate=function(){return VIB.vib?_v.apply(null,arguments):false}}}catch(e){}
+{const _sk=stageShake;stageShake=function(){if(!VIB.shake)return;return _sk.apply(this,arguments)}}
+{const _se=settings;settings=function(){const r=_se.apply(this,arguments);try{const row=document.querySelector("#ov .modal .row");if(row&&!document.getElementById("sVib")){
+  const mk=(id,t,on)=>{const b=document.createElement("button");b.className="btn sm "+(on?"":"ghost");b.id=id;b.style.minWidth="240px";b.textContent=t+"："+(on?"开":"关");return b};
+  const bv=mk("sVib","手机震动",VIB.vib),bs=mk("sShk","震屏",VIB.shake);bv.style.minWidth=bs.style.minWidth="116px";const pair=document.createElement("div");pair.style.cssText="display:flex;gap:8px;justify-content:center";pair.appendChild(bv);pair.appendChild(bs);const after=document.getElementById("sSpeed");if(after)after.after(pair);else row.appendChild(pair)
+  bv.onclick=()=>{VIB.vib=VIB.vib?0:1;vibSave();sfx("click");bv.textContent="手机震动："+(VIB.vib?"开":"关");bv.classList.toggle("ghost",!VIB.vib)};
+  bs.onclick=()=>{VIB.shake=VIB.shake?0:1;vibSave();sfx("click");bs.textContent="震屏："+(VIB.shake?"开":"关");bs.classList.toggle("ghost",!VIB.shake)}}}catch(e){console.warn(e)}return r}}
+// 成就：8 种 → 6 种
+try{const a=ACH.find(x=>x.id==="debuff8");if(a){a.d="身上同时有 6 种负面状态";a.h="身上同时挂着 6 种不同的负面状态（中毒、烫伤、虚弱、易伤、冻伤、梦魇、麻痹、诅咒……）。第五层隐藏路线尽头的「灭却诅咒师」最会上咒，打它时先别解，撑几回合"}if(typeof ACH_HINT!=="undefined")ACH_HINT.debuff8=a&&a.h}catch(e){}
+{const _ap6=API.apply;API.apply=function(t,s,v){const r=_ap6.apply(this,arguments);try{if(t===this.p&&negKinds(this.p).length>=6)ach("debuff8")}catch(e){}return r}}
+// 信箱
+try{TMAILS.unshift({id:"m616pai",t:"奶蛙工作室的第三部作品《奶蛙牌》已发布！",date:"11月24日",body:[
+ "爬塔的各位，好久不见！奶蛙工作室的第三部作品《奶蛙牌》已经发布啦。",
+ "这次是一款卡牌肉鸽：用掼蛋的牌型来打——凑对子、顺子、炸弹，压住对手的牌，攒一队奶蛙伙伴，从打 2 一路打到打 A。",
+ "塔里的老朋友们也都在：奶蛙、奶猫、奶马、奶鸡，还有好几位被你打败过的首领，这次换了个身份在牌桌上等你。",
+ "不会掼蛋也没关系，第一局长老会手把手教你。",
+ "——奶蛙工作室",
+ "【6.1.6】卡牌说明太长时字会自动缩小，不再被卡面上的小标签挡住；设置里加了「手机震动」「震屏」开关；成就「浑身是病」改成同时 6 种负面状态（8 种实测打不到）"]})}catch(e){}
+// 主页 logo 旁边的版本号跟着 VER 走（以前写死在样式里是 6.0）
+try{const s=document.createElement("style");s.textContent=`#title .logo::after{content:"VER ${VER}"!important}`;document.head.appendChild(s)}catch(e){}

@@ -3324,3 +3324,7 @@ html.lite .en.hitBig .body img{animation:hitLB .55s cubic-bezier(.2,.8,.3,1)!imp
 @keyframes hitL{0%{transform:none;opacity:.45}10%{transform:translateX(30px) scale(.92,1.06) rotate(6deg);opacity:.7}30%{transform:translateX(14px) rotate(3deg);opacity:1}100%{transform:none;opacity:1}}
 @keyframes hitLB{0%{transform:none;opacity:.35}12%{transform:translateX(56px) scale(.84,1.14) rotate(11deg);opacity:.6}35%{transform:translateX(26px) rotate(5deg);opacity:1}100%{transform:none;opacity:1}}
 html.lite .fnum{-webkit-text-stroke-width:6px}
+/* 6.1.6：说明太长时字缩小，并且从上往下排（不会往上顶到小标签） */
+.card .ds{align-items:safe center}
+.card .ds.l1 span{font-size:.7em}.card .ds.l2 span{font-size:.63em;line-height:1.28}.card .ds.l3 span{font-size:.56em;line-height:1.24}
+#ov .modal{max-height:calc(100% - 16px);overflow-y:auto}
