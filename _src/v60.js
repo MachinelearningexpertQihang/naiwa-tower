@@ -110,20 +110,20 @@ const isGu=()=>S&&S.hero==="gushi";
 function guKinds(e){return GU_KEYS.filter(k=>(e[k]||0)>0).length}
 function guAll(e){return GU_KEYS.reduce((s,k)=>s+(e[k]||0),0)}
 // 层数上限 12（只在蛊师这一局）
-{const _ap=API.apply;API.apply=function(t,s,v){const r=_ap.apply(this,arguments);try{if(isGu()&&t!==this.p&&GU_KEYS.includes(s)&&t[s]>12)t[s]=12}catch(e){}return r}}
+{const _ap=API.apply;API.apply=function(t,s,v){const r=_ap.apply(this,arguments);try{if(isGu()&&t!==this.p&&GU_KEYS.includes(s)&&t[s]>20)t[s]=20}catch(e){}return r}}
 // 养蛊：回合结束时发作
-{const _et=endTurn;endTurn=function(){const was=B&&B.myTurn&&!B.over;const r=_et.apply(this,arguments);try{if(was&&B&&!B.myTurn&&isGu()&&!PREV){B.enemies.forEach(e=>{if(e.hp<=0)return;const n=guKinds(e);if(n>0){dealEnemy(e,2*n);fxSay(e,`蛊发作 ×${n}`)}});renderBattle()}}catch(e){console.warn(e)}return r}}
+{const _et=endTurn;endTurn=function(){const was=B&&B.myTurn&&!B.over;const r=_et.apply(this,arguments);try{if(was&&B&&!B.myTurn&&isGu()&&!PREV){B.enemies.forEach(e=>{if(e.hp<=0)return;const n=guKinds(e);if(n>0){const per=3+(S.act||0)+(has("qz_gu_heart")?2:0);dealEnemy(e,per*n);fxSay(e,`蛊发作 ×${n}`)}});renderBattle()}}catch(e){console.warn(e)}return r}}
 
 /* 蛊师的牌 */
 const guT=(B,t)=>t&&t.hp>0?t:B.alive()[0];
 const GU_CARD=(o)=>Object.assign({fam:"none",img:"v_gushi",hero:"gushi"},o);
 Object.assign(CARDS,{
- gu_frost:GU_CARD({n:"寒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人冻伤 ${U(u,3,4)}、潮湿 1`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"frost",U(u,3,4));B.apply(x,"wet",1)}}}),
- gu_fire:GU_CARD({n:"火蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人烫伤 ${U(u,5,7)}。敌人潮湿的话，变成蒸汽：烫伤 ×1.5`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"burn",Math.round(U(u,5,7)*((x.wet||0)>0?1.5:1)))}}),
- gu_poison:GU_CARD({n:"毒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人中毒 ${U(u,4,6)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"poison",U(u,4,6))}}),
- gu_bleed:GU_CARD({n:"血蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人流血 ${U(u,4,6)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"bleed",U(u,4,6))}}),
- gu_guard:GU_CARD({n:"护身蛊",cost:1,type:"skl",r:"S",d:u=>`获得 ${U(u,6,9)} 护盾`,fx:(B,u)=>{B.block(U(u,6,9))}}),
- gu_devour:GU_CARD({n:"噬心",cost:2,type:"atk",r:"S",tgt:1,d:u=>`吃掉一个敌人身上所有的蛊，每 1 层造成 ${u?"1.5":"1"} 伤害，每种不同的蛊再加 3`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const n=guKinds(x),all=guAll(x);GU_KEYS.forEach(k=>{x[k]=0});x.poisonT=0;B.hit(x,Math.round(all*(u?1.5:1))+3*n,1,1)}}),
+ gu_frost:GU_CARD({n:"寒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人冻伤 ${U(u,4,6)}、潮湿 1`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"frost",U(u,4,6));B.apply(x,"wet",1)}}}),
+ gu_fire:GU_CARD({n:"火蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人烫伤 ${U(u,7,9)}。敌人潮湿的话，变成蒸汽：烫伤 ×1.5`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"burn",Math.round(U(u,7,9)*((x.wet||0)>0?1.5:1)))}}),
+ gu_poison:GU_CARD({n:"毒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人中毒 ${U(u,6,8)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"poison",U(u,6,8))}}),
+ gu_bleed:GU_CARD({n:"血蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人流血 ${U(u,6,8)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"bleed",U(u,6,8))}}),
+ gu_guard:GU_CARD({n:"护身蛊",cost:1,type:"skl",r:"S",d:u=>`获得 ${U(u,8,11)} 护盾`,fx:(B,u)=>{B.block(U(u,8,11))}}),
+ gu_devour:GU_CARD({n:"噬心",cost:2,type:"atk",r:"S",tgt:1,d:u=>`吃掉一个敌人身上所有的蛊，每 1 层造成 ${u?3:2} 伤害，每种不同的蛊再加 5`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const n=guKinds(x),all=guAll(x);GU_KEYS.forEach(k=>{x[k]=0});x.poisonT=0;B.hit(x,all*(u?3:2)+5*n,1,1)}}),
  gu_mud:GU_CARD({n:"泥蛊",cost:0,type:"skl",r:"C",tgt:1,d:u=>`敌人泥巴 ${U(u,3,5)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"mud",U(u,3,5))}}),
  gu_rain:GU_CARD({n:"雨蛊",cost:1,type:"skl",r:"C",d:u=>`所有敌人潮湿 ${U(u,2,3)}，抽 1 张`,fx:(B,u)=>{B.alive().forEach(e=>B.apply(e,"wet",U(u,2,3)));B.draw(1)}}),
  gu_steam:GU_CARD({n:"蒸蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人潮湿 1，再烫伤 ${U(u,6,8)}（潮湿的敌人被火烧会变蒸汽，×1.5）`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;B.apply(x,"wet",1);B.apply(x,"burn",Math.round(U(u,6,8)*1.5))}}),
@@ -135,9 +135,9 @@ Object.assign(CARDS,{
  gu_soft:GU_CARD({n:"软骨蛊",cost:0,type:"skl",r:"C",tgt:1,d:u=>`敌人虚弱 2、易伤 ${U(u,1,2)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"weak",2);B.apply(x,"vuln",U(u,1,2))}}}),
  gu_spread:GU_CARD({n:"引蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`把这个敌人身上每种蛊的${u?"全部":"一半"}，分给其他所有敌人`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const o=B.alive().filter(e=>e!==x);GU_KEYS.forEach(k=>{const v=x[k]||0;if(v>0){const g=u?v:Math.ceil(v/2);o.forEach(e=>B.apply(e,k,g))}})}}),
  gu_feed:GU_CARD({n:"养蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`一个敌人身上已有的蛊，层数最多的 4 种各 +${U(u,2,3)} 层`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;GU_KEYS.filter(k=>(x[k]||0)>0).sort((a,b)=>x[b]-x[a]).slice(0,4).forEach(k=>B.apply(x,k,U(u,2,3)))}}),
- gu_shell:GU_CARD({n:"蛊甲",cost:1,type:"skl",r:"C",d:u=>`获得护盾：所有敌人身上蛊的种类加起来 × ${U(u,3,4)}（至少 5）`,fx:(B,u)=>{const n=B.alive().reduce((s,e)=>s+guKinds(e),0);B.block(Math.max(5,n*U(u,3,4)))}}),
+ gu_shell:GU_CARD({n:"蛊甲",cost:1,type:"skl",r:"C",d:u=>`获得护盾：所有敌人身上蛊的种类加起来 × ${U(u,4,5)}（至少 7）`,fx:(B,u)=>{const n=B.alive().reduce((s,e)=>s+guKinds(e),0);B.block(Math.max(7,n*U(u,4,5)))}}),
  gu_seek:GU_CARD({n:"寻蛊",cost:0,type:"skl",r:"C",exh:1,d:u=>`抽 ${U(u,2,3)} 张`,fx:(B,u)=>{B.draw(U(u,2,3))}}),
- gu_nest:GU_CARD({n:"蛊巢",cost:2,type:"pow",r:"E",d:u=>`每回合开始，给所有敌人随机一种蛊 ${U(u,2,3)} 层`,fx:(B,u)=>{PW(B,"gunest",U(u,2,3))}}),
+ gu_nest:GU_CARD({n:"蛊巢",cost:2,type:"pow",r:"E",d:u=>`每回合开始，给所有敌人随机一种蛊 ${U(u,3,4)} 层`,fx:(B,u)=>{PW(B,"gunest",U(u,3,4))}}),
  gu_all:GU_CARD({n:"万蛊归宗",cost:3,type:"skl",r:"E",exh:1,d:u=>`所有敌人烫伤、流血、泥巴、中毒、冻伤各 ${U(u,3,4)}`,fx:(B,u)=>{B.alive().forEach(e=>["burn","bleed","mud","poison","frost"].forEach(k=>B.apply(e,k,U(u,3,4))))}})});
 POOL_HERO.push("gu_mud","gu_rain","gu_steam","gu_icebind","gu_thunder","gu_night","gu_numb","gu_bone","gu_soft","gu_spread","gu_feed","gu_shell","gu_seek","gu_nest","gu_all");
 // 蛊巢
@@ -145,9 +145,9 @@ POOL_HERO.push("gu_mud","gu_rain","gu_steam","gu_icebind","gu_thunder","gu_night
 const GU_STARTER=["gu_frost","gu_frost","gu_fire","gu_fire","gu_poison","gu_bleed","gu_guard","gu_guard","gu_guard","gu_devour"];
 
 /* 主角列表：打败过一次大魔王才解锁 */
-HEROES.push({id:"gushi",n:"蛊师奶蛙",img:"v_gushi",tag:"六号主角 · 养蛊",d:"不出拳，靠下蛊。敌人身上蛊的种类越多，每回合扣的血越多。「噬心」吃掉全部蛊，打一大下。",hp:68,get on(){return !!(typeof M!=="undefined"&&M&&(M.guUnlock||(M.wins||0)>0||(M.ach||{}).win))}});
+HEROES.push({id:"gushi",n:"蛊师奶蛙",img:"v_gushi",tag:"六号主角 · 养蛊",d:"不出拳，靠下蛊。敌人身上蛊的种类越多，每回合扣的血越多。「噬心」吃掉全部蛊，打一大下。",hp:74,get on(){return !!(typeof M!=="undefined"&&M&&(M.guUnlock||(M.wins||0)>0||(M.ach||{}).win))}});
 {const _hs=heroSelect;heroSelect=function(){const r=_hs.apply(this,arguments);try{const i=HEROES.findIndex(h=>h.id==="gushi");const el=document.querySelectorAll(".hcard")[i];if(el&&!HEROES[i].on){const lk=el.querySelector(".lk");if(lk)lk.textContent="打败大魔王解锁";const p=el.querySelector("p");if(p)p.textContent="打败过一次奶蛙大魔王就能解锁";el.onclick=()=>toast("蛊师奶蛙：打败过一次<b>奶蛙大魔王</b>就能解锁")}}catch(e){}return r}}
-try{TRAIN_HERO.gushi={t:"蛊师奶蛙：养蛊",l:["你几乎没有攻击牌。烫伤、流血、泥巴、中毒、内伤、冻伤、麻痹、梦魇、潮湿、易伤、虚弱，这些都是你的蛊。先上潮湿再上烫伤会变蒸汽，潮湿还能被「雷蛊」一口气引爆。","回合结束时，敌人身上每有 1 种不同的蛊，就发作一次扣 2 点血。比起一种蛊叠很多层，种类多更痛。每种蛊最多 12 层。","「噬心」把一个敌人身上的蛊全部吃掉，每层 1 点伤害，每种再加 3。吃完要重新养。"],c:"gu_devour"}}catch(e){}
+try{TRAIN_HERO.gushi={t:"蛊师奶蛙：养蛊",l:["你几乎没有攻击牌。烫伤、流血、泥巴、中毒、内伤、冻伤、麻痹、梦魇、潮湿、易伤、虚弱，这些都是你的蛊。先上潮湿再上烫伤会变蒸汽，潮湿还能被「雷蛊」一口气引爆。","回合结束时，敌人身上每有 1 种不同的蛊，就发作一次，扣「3 + 第几层」点血（第一层 3，第五层 7）。比起一种蛊叠很多层，种类多更痛。每种蛊最多 20 层。","「噬心」把一个敌人身上的蛊全部吃掉，每层 2 点伤害，每种再加 5。吃完要重新养。"],c:"gu_devour"}}catch(e){}
 try{BIO.gushi="醒来的时候就在塔脚下，披着一件破斗篷，手里一根杖、一颗里面有东西在动的玻璃球。不记得自己是谁，只知道这些小虫听它的话。胸口挂着一只眼睛。"}catch(e){}
 // 以蛊护身：每回合开始，按蛊种类最多的那个敌人，每种 +2 护盾
 {const _st3=startTurn;startTurn=async function(){const r=await _st3.apply(this,arguments);try{if(isGu()&&B&&!B.over&&!PREV){const n=Math.max(0,...B.alive().map(guKinds));if(n>0){B.block(2*n,1);renderBattle()}}}catch(e){}return r}}
@@ -241,3 +241,177 @@ function guSwarm(t,n){try{if(PREV||!t)return;try{const n0=performance.now();if(n
  try{if(go){const pl=$("#player");if(pl)anim(pl,"atkGu");const tg=(target&&target.hp>0)?target:null;if(D.type==="pow"||D.n==="护身蛊"||D.n==="蛊甲"||D.n==="寻蛊"){}else if(tg&&D.tgt)guSwarm(tg,D.type==="atk"?10:6);else B.alive().forEach(e=>guSwarm(e,4))}}catch(e){}return r}}
 // 普通攻击动作也换成蛊师自己的
 {const _af=atkFx;atkFx=function(D,t){if(isGu()){const pl=$("#player");if(pl)anim(pl,"atkGu");return}return _af.apply(this,arguments)}}
+
+/* ===================== 6.0.1 ===================== */
+/* ---------- 1. 无尽之塔：每进一轮，三条 SS 线和真结局的进度清零，酒馆重新贴悬赏，每一轮都能再走一次真结局 ---------- */
+const SS_FLAGS=["protoDone","curserDone","arenaDone","ssProto","truth","ssArena","clue","clue2","protoRoute","protoBox","protoEnd","protoDiary","csRoute","csRope","arenaRoute","betChal","betChamp","arenaFighter","cupFriend","dThrone","elderGone","guTake","guChose","ayNote"];
+{const _en2=endlessNext;endlessNext=async function(){try{if(S&&S.flags)SS_FLAGS.forEach(k=>{delete S.flags[k]});if(S){S.quest=null;S.mside=null;S.endKey=null}}catch(e){}return _en2.apply(this,arguments)}}
+
+/* ---------- 2. 蛊师奶蛙的专属遗物 ---------- */
+Object.assign(RELICS,{
+ mr_gujar:{n:"蛊母罐",img:"v_gushi",r:"S",d:"蛊师熟练度奖励：每场战斗开始，所有敌人随机 2 种蛊各 3 层"},
+ qz_gu_heart:{n:"本命蛊",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：养蛊发作时，每种蛊多扣 2 点血"},
+ qz_gu_jar:{n:"万蛊瓮",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：敌人倒下时，它身上每种蛊的一半，分给其他所有敌人"},
+ qz_cicada:{n:"春秋蝉",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：倒下时满血复活，所有牌升一级；但身上所有遗物（包括它自己）都会消失"}});
+const GU_START=["burn","bleed","mud","poison","frost","wet"];
+{const _scG=startCombat;startCombat=function(kind){const r=_scG.apply(this,arguments);try{if(B&&!PREV){
+  if(has("mr_gujar")){B.alive().forEach(e=>shuffle(GU_START.slice()).slice(0,2).forEach(k=>B.apply(e,k,3)));relicPulse("mr_gujar")}
+  const gs=perk("guStart");if(gs)B.alive().forEach(e=>B.apply(e,pick(GU_START),3*gs));
+  const es=perk("eggStart");for(let i=0;i<es;i++)B.layEgg({t:1,d:10,b:0,nw:1});
+  if(perk("wxGo")){const ws=Object.keys(WX).filter(w=>w!=="clear"&&w!==B.wx);if(ws.length)B.setWx(pick(ws));B.wxGoE=1}
+  renderBattle()}}catch(e){console.warn(e)}return r}}
+// 万蛊瓮
+{const _ke=killEnemy;killEnemy=function(t){const snap={};try{if(B&&!PREV&&has("qz_gu_jar"))GU_KEYS.forEach(k=>{if((t[k]||0)>0)snap[k]=Math.ceil(t[k]/2)})}catch(e){}const r=_ke.apply(this,arguments);try{if(Object.keys(snap).length){const o=B.alive().filter(e=>e!==t);if(o.length){o.forEach(e=>Object.entries(snap).forEach(([k,v])=>B.apply(e,k,v)));relicPulse("qz_gu_jar");renderBattle()}}}catch(e){}return r}}
+// 春秋蝉
+{const _lo2=lose;lose=async function(){try{if(S&&B&&!B.over&&S.hp<=0&&has("qz_cicada")&&!S.dummy&&!S.arena&&B.kind!=="R"){
+  [...S.relics].forEach(id=>dropRelic(id));S.relics=[];S.hp=S.max;let n=0;
+  S.deck.forEach(c=>{if(upOK(c)){c.u=(c.u|0)+1;n++}});["dp","hand","disc"].forEach(k=>(B[k]||[]).forEach(c=>{if(upOK(c))c.u=(c.u|0)+1}));
+  banner("春秋蝉 · 蝉蜕",1);try{stageShake();sparks(640,300,"#9be36b",40)}catch(e){}toast(`春秋蝉脱了一层壳：<b>满血复活</b>，${n} 张牌升了一级。身上的遗物全没了`);sfx("levelup");renderTop();renderBattle();return}}catch(e){console.warn(e)}return _lo2.apply(this,arguments)}}
+// 奇招牌：蛊王
+Object.assign(CARDS,{qz_gu_king:GU_CARD({n:"蛊王",cost:1,type:"skl",r:"Q",tgt:1,exh:1,d:u=>`一个敌人身上每种蛊的层数翻倍${u?"，抽 1 张":""}。消耗`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;GU_KEYS.forEach(k=>{const v=x[k]||0;if(v>0)B.apply(x,k,v)});if(u)B.draw(1)}})});
+
+/* ---------- 3. 更多天赋：奶蛋流、气象流、蛊师专属 ---------- */
+Object.assign(PSCH,{egg:{n:"奶蛋流",f:"egg"},eggStart:{n:"奶蛋流",f:"egg"},eggWarm:{n:"奶蛋流",f:"egg"},
+ wxB:{n:"气象流",c:"#7fd4ff",k:"天"},wxGo:{n:"气象流",c:"#7fd4ff",k:"天"},wxShield:{n:"气象流",c:"#7fd4ff",k:"天"},
+ guB:{n:"养蛊",c:"#b06bff",k:"蛊"},guStart:{n:"养蛊",c:"#b06bff",k:"蛊"}});
+Object.assign(PERKS,{
+ eggStart:{n:"多子多福",ic:"heart",max:2,d:"每场战斗开始下 1 枚蛋（下回合孵化，随机敌人 10 伤害）"},
+ eggWarm:{n:"暖巢",ic:"shield",max:2,d:"每回合开始，场上每有 1 枚蛋，获得 2 护盾"},
+ wxB:{n:"看天吃饭",ic:"boom",max:3,d:"天气每变一次，所有敌人受到 4 伤害"},
+ wxGo:{n:"呼风唤雨",ic:"wind",max:1,d:"每场战斗开始随机变一次天（不会是晴天），第一回合奶力 +1"},
+ wxShield:{n:"风雨无阻",ic:"shield",max:2,d:"不是晴天时，每回合开始获得 4 护盾"},
+ guB:{n:"蛊毒入骨",ic:"skull",max:3,hero:"gushi",d:"养蛊发作时，每种蛊多扣 1 点血"},
+ guStart:{n:"先下手",ic:"swirl",max:2,hero:"gushi",d:"每场战斗开始，每个敌人身上随机 1 种蛊 3 层"}});
+// 看天吃饭
+{const _swP=API.setWx;API.setWx=function(w){const old=this.wx;const r=_swP.apply(this,arguments);try{const lv=perk("wxB");if(lv&&!PREV&&B&&old!==w){B.alive().forEach(e=>B.hit(e,4*lv,1,1));setTimeout(()=>{try{if(B&&!B.alive().length&&!B.over)win()}catch(e){}},50)}}catch(e){}return r}}
+// 每回合开始：呼风唤雨的奶力、暖巢、风雨无阻
+{const _stP=startTurn;startTurn=async function(){const r=await _stP.apply(this,arguments);try{if(B&&!B.over&&!PREV){
+  if(B.wxGoE&&B.turn===1){B.wxGoE=0;B.gainEnergy(1)}
+  const ew=perk("eggWarm"),n=(B.eggs||[]).length;if(ew&&n)B.block(2*ew*n,1);
+  const ws=perk("wxShield");if(ws&&B.wx&&B.wx!=="clear")B.block(4*ws,1);
+  renderBattle()}}catch(e){}return r}}
+// 蛊毒入骨：发作额外伤害（在原来的发作之后补上）
+{const _etP=endTurn;endTurn=function(){const was=B&&B.myTurn&&!B.over;const before=was&&isGu()?B.alive().map(e=>[e,guKinds(e)]):null;const r=_etP.apply(this,arguments);try{const lv=perk("guB");if(before&&lv&&B&&!B.myTurn&&!PREV){before.forEach(([e,n])=>{if(e.hp>0&&n>0)dealEnemy(e,lv*n)});renderBattle()}}catch(e){}return r}}
+
+/* ---------- 4. 奶蛋流新牌 ---------- */
+Object.assign(CARDS,{
+ e_detonate:{n:"炸蛋",cost:1,type:"atk",r:"R",fam:"egg",img:"egx",d:u=>`把场上的蛋全部炸掉：每枚蛋对所有敌人造成 ${U(u,4,5)} 伤害`,fx:(B,u)=>{const n=(B.eggs||[]).length;if(!PREV){B.eggs=[];renderEggs()}if(n)B.alive().forEach(e=>B.hit(e,n*U(u,4,5)))}},
+ e_diary:{n:"孵化日记",cost:1,cu:0,type:"pow",r:"R",fam:"egg",img:"egq",d:u=>`每回合第一次有蛋孵化时，力气 +1${u?"，抽 1 张":""}`,fx:(B,u)=>{PW(B,"eggdiary",u?2:1)}},
+ e_ducks:{n:"一窝鸭蛋",cost:2,cu:1,type:"skl",r:"C",fam:"egg",img:"egy",d:u=>`下 3 枚蛋，2 回合后孵化：每枚随机敌人 ${U(u,8,10)} 伤害，你得 3 护盾`,fx:(B,u)=>{for(let i=0;i<3;i++)B.layEgg({t:2,d:U(u,8,10),b:3})}},
+ e_fry:{n:"煎蛋",cost:1,type:"atk",r:"C",fam:"egg",img:"eg",tgt:1,d:u=>`造成 ${U(u,8,11)} 伤害。场上最快的那枚蛋立刻孵化`,fx:(B,u,t)=>{B.hit(t,U(u,8,11));if(PREV||!(B.eggs||[]).length)return;const e=B.eggs.slice().sort((a,b)=>a.t-b.t)[0];const rest=B.eggs.filter(x=>x!==e),had=rest.filter(x=>x.nw);rest.forEach(x=>{x.nw=1});e.t=1;delete e.nw;setTimeout(()=>{try{hatchEggs().then(()=>{had.forEach(x=>{x.nw=1});renderEggs()})}catch(err){}},260)}},
+ e_phoenix:{n:"不死鸟蛋",cost:2,cu:1,type:"skl",r:"E",fam:"egg",img:"egx",exh:1,d:u=>`下 1 枚不死鸟蛋，3 回合后孵化：所有敌人 ${U(u,30,38)} 伤害、烫伤 5，你回复 10 生命。消耗`,fx:(B,u)=>{B.layEgg({t:3,d:U(u,30,38),all:1,st:"burn",sv:5,h:10,gold:1})}},
+ e_henguard:{n:"母鸡护巢",cost:1,type:"skl",r:"C",fam:"egg",img:"egh",d:u=>`获得 ${U(u,6,9)} 护盾。下 1 枚蛋，下回合孵化：随机敌人 6 伤害`,fx:(B,u)=>{B.block(U(u,6,9));B.layEgg({t:1,d:6,b:0})}}});
+["e_detonate","e_diary","e_ducks","e_fry","e_phoenix","e_henguard"].forEach(k=>{if(!POOL_HERO.includes(k))POOL_HERO.push(k)});
+// 孵化日记：每回合第一次孵化
+{const _hE=hatchEggs;hatchEggs=async function(){const n0=(S&&S.stats&&S.stats.hatch)||0;const r=await _hE.apply(this,arguments);try{const v=B&&B.p.pw2&&B.p.pw2.eggdiary;if(v&&!PREV&&!B.over&&((S.stats.hatch||0)>n0)&&B.diaryT!==B.turn){B.diaryT=B.turn;B.p.str+=1;toast("孵化日记：力气 +1");if(v>1)B.draw(1);renderBattle()}}catch(e){}return r}}
+
+/* ---------- 5. 气象流新牌 ---------- */
+const wxSeenN=B=>Object.keys(Object.assign({[B.wx0||B.wx]:1},B.wxSeen||{})).length;
+Object.assign(CARDS,{
+ w_shift:{n:"风云突变",cost:0,type:"skl",r:"C",fam:"none",img:"c7",d:u=>`天气随机变成另一种（不会是晴天），抽 ${U(u,1,2)} 张`,fx:(B,u)=>{const ws=Object.keys(WX).filter(w=>w!=="clear"&&w!==B.wx);B.setWx(pick(ws));B.draw(U(u,1,2))}},
+ w_dual:{n:"晴雨两用",cost:1,type:"skl",r:"C",fam:"none",img:"c3",d:u=>`获得 ${U(u,5,7)} 护盾，再看天气：晴/大雾抽 2 张；下雨/雷雨所有敌人潮湿 2；大风奶力 +1；下雪再 +8 护盾`,fx:(B,u)=>{B.block(U(u,5,7));const w=B.wx;if(w==="clear"||w==="fog")B.draw(2);else if(w==="rain"||w==="storm")B.alive().forEach(e=>B.apply(e,"wet",2));else if(w==="wind")B.gainEnergy(1);else if(w==="snow")B.block(8)}},
+ w_station:{n:"气象站",cost:1,cu:0,type:"pow",r:"R",fam:"none",img:"m5",d:u=>`每回合第一次变天时，奶力 +1${u?"，抽 1 张":""}`,fx:(B,u)=>{PW(B,"wxstation",u?2:1)}},
+ w_seasons:{n:"四季轮转",cost:2,type:"atk",r:"R",fam:"none",img:"m5",tgt:1,d:u=>`造成 ${U(u,6,8)} 伤害，这场战斗经历过几种天气就打几下`,fx:(B,u,t)=>{B.hit(t,U(u,6,8),Math.max(1,wxSeenN(B)))}},
+ w_chainbolt:{n:"连环闪电",cost:1,type:"atk",r:"C",fam:"none",img:"c7",d:u=>`随机敌人 ${U(u,7,10)} 伤害；雷雨时改成所有敌人，再打一次`,fx:(B,u)=>{if(!PREV)try{lightning()}catch(e){}if(B.wx==="storm")B.alive().forEach(e=>B.hit(e,U(u,7,10),2));else{const t=pick(B.alive());if(t)B.hit(t,U(u,7,10))}}},
+ w_umbrella:{n:"撑伞",cost:1,type:"skl",r:"C",fam:"none",img:"c3",d:u=>`获得 ${U(u,7,10)} 护盾；下雨、下雪或雷雨时护盾翻倍`,fx:(B,u)=>{B.block(U(u,7,10)*(["rain","snow","storm"].includes(B.wx)?2:1))}}});
+["w_shift","w_dual","w_station","w_seasons","w_chainbolt","w_umbrella"].forEach(k=>{if(!POOL_HERO.includes(k))POOL_HERO.push(k)});
+// 气象站
+{const _swS=API.setWx;API.setWx=function(w){const old=this.wx;const r=_swS.apply(this,arguments);try{const v=B&&B.p.pw2&&B.p.pw2.wxstation;if(v&&!PREV&&old!==w&&B.wxStT!==B.turn){B.wxStT=B.turn;B.gainEnergy(1);if(v>1)B.draw(1)}}catch(e){}return r}}
+
+/* ---------- 6. 信箱：6.0.1 更新说明 ---------- */
+try{TMAILS.unshift({id:"m601",t:"6.1 · 蛊师加强、奶蛋和气象补完",date:"11月24日",body:[
+ "谢谢大家的反馈！这一版给蛊师奶蛙撑腰，把奶蛋流和气象流补完，还加了一批新天赋和新塔况。",
+ "【蛊师加强】养蛊发作：每种蛊扣「3 + 第几层」点血（原来固定 2 点）；每种蛊最多 20 层（原来 12）；噬心每层 2 伤害、每种再 +5；初始的寒蛊、火蛊、毒蛊、血蛊、护身蛊数值提高；蛊甲、蛊巢加强；生命 68 → 74",
+ "【蛊师专属】熟练度 4 级开局自带「蛊母罐」；新奇招遗物「本命蛊」「万蛊瓮」「春秋蝉」（倒下时满血复活、所有牌升一级，但遗物全部消失）；新奇招牌「蛊王」",
+ "【新天赋】奶蛋流：多子多福、暖巢（孵蛋高手也归到奶蛋流）；气象流：看天吃饭、呼风唤雨、风雨无阻；蛊师专属：蛊毒入骨、先下手",
+ "【新牌】奶蛋 6 张：炸蛋、孵化日记、一窝鸭蛋、煎蛋、不死鸟蛋、母鸡护巢；气象 6 张：风云突变、晴雨两用、气象站、四季轮转、连环闪电、撑伞",
+ "【修复】无尽之塔第二轮起，酒馆不再贴 SS 悬赏、走不了真结局：现在每一轮都会重新出悬赏，每一轮都能再打一次真结局",
+ "——奶蛙工作室"]})}catch(e){}
+
+/* ===================== 6.1 ===================== */
+/* ---------- 1. 更多天赋 ---------- */
+Object.assign(PSCH,{gamble:{n:"运气",c:"#ffd23f",k:"赌"},lastStand:{n:"体魄",c:"#ff5a5d",k:"拼"},minimal:{n:"修行",c:"#b392ff",k:"简"},hoard:{n:"财运",c:"#ffd23f",k:"囤"},secondWind:{n:"体魄",c:"#ff5a5d",k:"喘"},combo:{n:"节奏",c:"#4fc3ff",k:"连"},grudge:{n:"体魄",c:"#ff5a5d",k:"仇"},pet:{n:"伙伴",c:"#7bd06b",k:"宠"}});
+Object.assign(PERKS,{
+ gamble:{n:"赌徒",ic:"star",max:1,d:"每场战斗开始掷一次骰子：1–3 点力气 -1，4–6 点力气 +2"},
+ lastStand:{n:"背水一战",ic:"sword",max:1,d:"生命低于 30% 时，你造成的伤害 +40%"},
+ minimal:{n:"断舍离",ic:"deck",max:1,d:"牌组每比 15 张少 1 张，每回合开始多 2 护盾"},
+ hoard:{n:"囤积癖",ic:"coin",max:1,d:"每场战斗结束，金币每有 50，最大生命 +1（一局最多 +15）"},
+ secondWind:{n:"第二口气",ic:"heart",max:1,d:"每场战斗第一次掉到半血以下时，奶力 +2、抽 2 张"},
+ combo:{n:"连环套",ic:"boom",max:1,d:"每回合打出的第 5 张牌，会再生效一次（能力牌除外）"},
+ grudge:{n:"吃一堑",ic:"shield",max:1,d:"同一个敌人每打中你 3 次，你对它造成 10 伤害"},
+ pet:{n:"养宠物",ic:"net",max:1,d:"每场战斗多抓 1 只；抓到的伙伴卡打完这场自动升一级"}});
+
+/* ---------- 2. 更多塔况 ---------- */
+Object.assign(MODS,{
+ mirror:{n:"镜像塔",d:"敌人会学你上一回合打出的最后一张牌，但每场战斗多给一次选牌"},
+ flip:{n:"反着来",d:"攻击牌费用 -1，技能牌费用 +1"},
+ timer:{n:"限时塔",d:"每场战斗第 6 回合起，敌人每回合力气 +2；6 回合内打完多拿 30 金币"},
+ loaded:{n:"满载而归",d:"精英和首领多掉一件遗物，但每拿到一件遗物，最大生命 -3"},
+ dump:{n:"一张不留",d:"每回合多抽 2 张，但回合结束时手里每剩 1 张牌，失去 1 生命"},
+ cats:{n:"猫猫塔",d:"敌人学会了猫的身法，你的攻击有 15% 被闪开；但每场战斗多给一次奶猫牌三选一"},
+ night:{n:"夜市",d:"商店晚上才开：每家店多一张稀有牌和一件遗物，但价格在 -30% 到 +30% 之间浮动"},
+ gufog:{n:"蛊雾弥漫",d:"每场战斗开始，每个敌人和你都随机中一种蛊 3 层"}});
+Object.assign(MOD_GB,{
+ mirror:["每场战斗多给一次选牌","敌人会学你上一回合打出的最后一张牌"],
+ flip:["攻击牌费用 -1","技能牌费用 +1"],
+ timer:["6 回合内打完多拿 30 金币","第 6 回合起，敌人每回合力气 +2"],
+ loaded:["精英和首领多掉一件遗物","每拿到一件遗物，最大生命 -3"],
+ dump:["每回合多抽 2 张","回合结束时手里每剩 1 张，失去 1 生命"],
+ cats:["每场战斗多一次奶猫牌三选一","你的攻击有 15% 被闪开"],
+ night:["每家店多一张稀有牌和一件遗物","价格在 -30% 到 +30% 之间浮动"],
+ gufog:["每个敌人开场随机中一种蛊 3 层","你开场也随机中一种 3 层"]});
+
+const GU_SELF=["poison","burn","bleed","frost","weak","vuln"];
+// 战斗开始
+{const _sc61=startCombat;startCombat=function(kind){const r=_sc61.apply(this,arguments);try{if(B&&!PREV&&kind!=="R"){
+  B.cardsT=0;B.cardsTurn=-1;
+  if(perk("gamble")){const d=1+ri(6);if(d<=3){B.p.str-=1;toast(`赌徒：掷出 <b>${d}</b> 点，力气 -1`)}else{B.p.str+=2;toast(`赌徒：掷出 <b>${d}</b> 点，力气 +2！`)}}
+  if(perk("pet"))B.catchLeft=(B.catchLeft||0)+1;
+  if(S.mod==="gufog"){B.alive().forEach(e=>B.apply(e,pick(GU_START),3));B.apply(B.p,pick(GU_SELF),3)}
+  if(S.mod==="mirror")B.lootCards=(B.lootCards||[]).concat([offerCards(3,"C")]);
+  if(S.mod==="cats"){const pool=shuffle(POOL_HERO.filter(k=>CARDS[k].fam==="cat"&&(!CARDS[k].hero||CARDS[k].hero===S.hero))).slice(0,3).map(k=>mk(k));if(pool.length)B.lootCards=(B.lootCards||[]).concat([pool])}
+  if(S.mod==="loaded"&&"EBKMF".includes(kind))B.lootRelic2=1;
+  // 最终之地：首领都稍微强一点
+  if(S.fin)B.enemies.forEach(e=>{e.max=Math.round(e.max*1.12);e.hp=e.max;e.str=(e.str||0)+1;e.str0=(e.str0||0)+1});
+  renderBattle()}}catch(e){console.warn(e)}return r}}
+// 最终之地的深渊龙蛙真身也厚一点
+{const _bf61=bossFormSeq;bossFormSeq=async function(t,kind){const r=await _bf61.apply(this,arguments);try{if(S&&S.fin&&t&&t.id==="abyssdragon"&&kind==="revive"){t.max=450;t.hp=450;renderBattle()}}catch(e){}return r}}
+// 每回合开始
+{const _st61=startTurn;startTurn=async function(){const r=await _st61.apply(this,arguments);try{if(B&&!B.over&&!PREV){
+  const mn=perk("minimal")&&S.deck.length<15?2*(15-S.deck.length):0;if(mn)B.block(mn,1);
+  if(S.mod==="timer"&&B.turn>=6){B.alive().forEach(e=>{e.str=(e.str||0)+2});toast("限时塔：敌人越打越急，力气 +2")}
+  if(S.mod==="dump")B.draw(2);
+  if(S.mod==="mirror"&&B.mirrorId&&B.turn>1){const D=CARDS[B.mirrorId],e=pick(B.alive());B.mirrorId=null;if(D&&e){fxSay(e,"学你：「"+D.n+"」");if(D.type==="atk"){const v=5+2*(S.act||0)+(e.str||0);setTimeout(()=>{try{if(!B||B.over)return;dmgPlayer(v,e);renderBattle();if(S.hp<=0)lose()}catch(err){}},400)}else if(D.type==="pow")e.str=(e.str||0)+1;else e.block=(e.block||0)+6+2*(S.act||0)}}
+  renderBattle()}}catch(e){console.warn(e)}return r}}
+// 打牌：连环套、镜像塔记牌
+{const _pc61=playCard;playCard=async function(c,target){const id=c&&c.id,u=c&&(c.u|0);const r=await _pc61.apply(this,arguments);try{if(B&&!B.over&&!PREV&&id&&CARDS[id]){
+  if(B.cardsTurn!==B.turn){B.cardsTurn=B.turn;B.cardsT=0}B.cardsT++;B.mirrorId=id;
+  if(perk("combo")&&B.cardsT===5&&CARDS[id].type!=="pow"&&CARDS[id].fx&&B.alive().length){toast(`连环套：<b>${CARDS[id].n}</b> 再来一次！`);const t=target&&target.hp>0?target:B.alive()[0];B.curType=CARDS[id].type;B.curFam=CARDS[id].fam;try{CARDS[id].fx(B,u,t)}finally{B.curType=null}renderBattle();if(!B.alive().length&&!B.over)win()}}}catch(e){console.warn(e)}return r}}
+// 受伤：第二口气、吃一堑
+{const _dp61=dmgPlayer;dmgPlayer=function(v,src,raw){const h0=S?S.hp:0;const r=_dp61.apply(this,arguments);try{if(B&&!PREV&&!B.over&&S.hp<h0){
+  if(perk("secondWind")&&!B.swUsed&&S.hp>0&&S.hp<S.max/2){B.swUsed=1;if(B.myTurn){B.gainEnergy(2);B.draw(2)}else{B.p.nextEnergy=(B.p.nextEnergy||0)+2;B.p.nextDraw=(B.p.nextDraw||0)+2}toast("第二口气：奶力 +2，抽 2 张")}
+  if(perk("grudge")&&src&&src.hp>0&&B.enemies.includes(src)){src.grudgeN=(src.grudgeN||0)+1;if(src.grudgeN>=3){src.grudgeN=0;setTimeout(()=>{try{if(B&&!B.over&&src.hp>0){dealEnemy(src,10);fxSay(src,"吃一堑 10");renderBattle();if(!B.alive().length)win()}}catch(e){}},200)}}}}catch(e){}return r}}
+// 造成伤害：背水一战、猫猫塔闪避
+{const _de61=dealEnemy;dealEnemy=function(t,d,i){try{if(B&&!PREV&&B.curType&&d>0){if(S.mod==="cats"&&B.curType==="atk"&&rnd()<.15){fxSay(t,"闪开了！");return}if(perk("lastStand")&&S.hp<S.max*.3)d=Math.round(d*1.4)}}catch(e){}return _de61.call(this,t,d,i)}}
+// 回合结束：一张不留
+{const _et61=endTurn;endTurn=function(){const was=B&&B.myTurn&&!B.over;const n=was&&S.mod==="dump"?B.hand.filter(c=>!["cur","sts"].includes(CARDS[c.id].type)).length:0;const r=_et61.apply(this,arguments);try{if(was&&n&&B&&!B.myTurn&&!PREV){dmgPlayer(n,null,true);toast(`一张不留：手里剩 ${n} 张，失去 <b>${n}</b> 生命`);if(S.hp<=0)lose()}}catch(e){}return r}}
+// 赢了：囤积癖、养宠物、限时塔
+{const _w61=win;win=async function(){try{if(B&&!B.over&&B.kind!=="R"&&!B.alive().length){
+  if(perk("hoard")){S.hoardN=S.hoardN||0;const a=Math.min(Math.floor(S.gold/50),15-S.hoardN);if(a>0){S.hoardN+=a;S.max+=a;S.hp+=a;toast(`囤积癖：最大生命 +${a}`)}}
+  if(S.mod==="timer"&&B.turn<=6){S.gold+=30;toast("限时塔：6 回合内打完，<b>+30</b> 金币")}
+  if(perk("pet"))S.deck.forEach(c=>{if(CARDS[c.id]&&CARDS[c.id].r==="P"&&!c.u&&upOK(c))c.u=1})}}catch(e){}return _w61.apply(this,arguments)}}
+// 反着来：费用
+{const _bc61=baseCost;baseCost=function(c){const v=_bc61.apply(this,arguments);try{if(S&&S.mod==="flip"&&v>=0){const t=CARDS[c.id].type;if(t==="atk")return Math.max(0,v-1);if(t==="skl")return v+1}}catch(e){}return v}}
+// 满载而归：拿遗物掉最大生命
+{const _gr61=gainRelic;gainRelic=function(id){const n=S?S.relics.length:0;const r=_gr61.apply(this,arguments);try{if(S&&S.mod==="loaded"&&S.relics.length>n){S.max=Math.max(10,S.max-3);S.hp=Math.min(S.hp,S.max);toast("满载而归：背包又重了，最大生命 -3");renderTop()}}catch(e){}return r}}
+// 夜市
+{const _ss61=shopScreen;shopScreen=function(mode){const fresh=S&&S.cur&&!S.cur.shop;const r=_ss61.apply(this,arguments);try{if(fresh&&S.mod==="night"&&S.cur.shop&&!S.cur.shop.night){const sh=S.cur.shop;sh.night=1;const jit=p=>Math.max(5,Math.round(p*(.7+rnd()*.6)));
+  (sh.cards||[]).forEach(x=>x.p=jit(x.p));(sh.relics||[]).forEach(x=>x.p=jit(x.p));(sh.pots||[]).forEach(x=>x.p=jit(x.p));
+  const rc=offerCards(1,"R",1)[0];if(rc&&sh.cards)sh.cards.push({c:rc,p:jit(95)});const rl=randRelic("R");if(rl&&sh.relics&&!sh.relics.some(x=>x.id===rl))sh.relics.push({id:rl,p:jit(280)});
+  saveRun();return _ss61.apply(this,arguments)}}catch(e){console.warn(e)}return r}}
+
+/* ---------- 3. 信箱：6.1 ---------- */
+try{const m=TMAILS.find(x=>x.id==="m601");if(m){m.id="m61";m.t="6.1 · 蛊师加强、新天赋、新塔况";m.body.splice(m.body.length-1,0,
+ "【新天赋 8 个】赌徒、背水一战、断舍离、囤积癖、第二口气、连环套、吃一堑、养宠物",
+ "【新塔况 8 个】镜像塔、反着来、限时塔、满载而归、一张不留、猫猫塔、夜市、蛊雾弥漫",
+ "【首领】最终之地的五位首领和深渊龙蛙都稍微加强了一点（生命 +12%、力气 +1，龙蛙真身 450 血）")}}catch(e){}

@@ -1,6 +1,6 @@
 /* ===================== 奶蛙之塔 · 主程序 ===================== */
 "use strict";
-const VER="6.0";
+const VER="6.1";
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 /* 图片：把内嵌的 base64 一次性转成 blob 地址，之后每次渲染只传一个短链接，切页面和出牌都快很多 */
 const IMG_CACHE={};
@@ -596,7 +596,7 @@ const HERO=()=>HEROES.find(h=>h.id===(S&&S.hero))||HEROES[0],HI=()=>HERO().img,H
 /* ===================== 角色熟练度 ===================== */
 const MAST_LV=[0,60,180,400,800,1500];
 const MAST_REW=["开局从 3 张专属牌里挑 1 张（可以不拿）","选角卡片换上星夜卡框","解锁角色小传","开局自带专属遗物","起始牌组随机 1 张升级，获得金色称号"];
-const MAST_RELIC={naiwa:"mr_pillow",kungfu:"mr_glove",knight:"mr_mirror",mage:"mr_notes",vamp:"mr_watch"};
+const MAST_RELIC={naiwa:"mr_pillow",kungfu:"mr_glove",knight:"mr_mirror",mage:"mr_notes",vamp:"mr_watch",gushi:"mr_gujar"};
 const BIO={vamp:"吸血鬼奶蛙在古堡里长大。他小时候以为父亲是全世界最温柔的人，会给他讲星星的故事。直到有一天，他看见父亲把一只迷路的小奶蛙领进地窖，然后锁上了门。那天晚上他没睡，第二天一早就离开了古堡。",naiwa:"奶蛙是在泉边被捡到的。那年冬天特别冷，长老抱它回家，它一整晚都在打嗝。它长大以后什么都不太会，就是特别能扛。村里谁家搬东西，都喊它。",kungfu:"功夫奶蛙七岁拜师，第一天就被长老罚站。长老说：拳要收得回来。它站了一下午，没想明白。后来有一次，它一拳打出去，看见对面是个小孩，硬生生收了回来，手腕扭了半个月。那天它想明白了。",knight:"骑士奶蛙的盔甲，原来属于一个叫阿青的人。阿青是铁匠的哥哥，三十年前穿着它进了塔。后来只有盔甲被冲下了山。铁匠把盔甲擦了三十年，直到有一天，一只小奶蛙说它想穿。",mage:"奶蛙魔法师是长老的第二个徒弟。长老送它去山那边学星星，是想让它离塔远一点。它学了十年，每天晚上都在看同一片星空。它在一本旧书里读到：塔顶的王座，是用魔法做的。"};
 const mastLv=h=>{const x=((M.mast||{})[h]||0);let l=0;for(let i=1;i<MAST_LV.length;i++)if(x>=MAST_LV[i])l=i;return l};
 function mastGain(win){if(!S)return 0;const fl=(S.act||0)*(ROWS+1)+Math.max(0,S.row)+1;const x=Math.round(Math.max(3,fl+5*(S.stats.endb||0)+(win?25:0)+3*asc())*(1+.15*asc()));M.mast=M.mast||{};const h=S.hero||"naiwa";const before=mastLv(h);M.mast[h]=(M.mast[h]||0)+x;const after=mastLv(h);saveMeta();if(after>before)setTimeout(()=>toast(`${HN()} 熟练度升到 <b>Lv.${after}</b>：${MAST_REW[after-1]}`),1200);return x}
@@ -1611,7 +1611,7 @@ function perkCard(k,i){const P=PERKS[k],sc=PSCH[k]||{n:"通用",c:"#fff"},fc=sc.
  const d=P.d.replace(/([+-]?\d+%?|×[\d.]+)/g,"<em>$1</em>");
  const pips=mx>1?`<span class="pLv">${[...Array(Math.min(mx,9))].map((_,j)=>`<i class="${j<cur?"on":j===cur?"nx":""}"></i>`).join("")}</span>`:"";
  return`<button class="perk sch" data-k="${k}" style="--sc:${fc}"><u>0${i+1}</u><span class="pTag">${sc.n}</span>${art}<b>${P.n}</b><p>${d}</p>${pips}<small>${cur?`Lv.${cur} → Lv.${cur+1}`:"NEW · 新天赋"}</small></button>`}
-function levelUp(title){return new Promise(res=>{sfx("levelup");const ids=shuffle(Object.keys(PERKS).filter(k=>perk(k)<PERKS[k].max&&!(k==="rage"&&!RAGE[S.hero]))).slice(0,3);
+function levelUp(title){return new Promise(res=>{sfx("levelup");const ids=shuffle(Object.keys(PERKS).filter(k=>perk(k)<PERKS[k].max&&!(k==="rage"&&!RAGE[S.hero])&&!(PERKS[k].hero&&PERKS[k].hero!==S.hero))).slice(0,3);
  ov(`<div class="lvWrap"><div class="lvRays"></div><div class="lvSlash"></div><div class="lvUp"><i>LEVEL UP</i><b>${title||"等级提升！"}</b><small>${title?"":"<em>Lv."+S.lv+"</em>　生命 +5　"}选一个天赋，这一局一直有效</small></div><div class="perkRow">${ids.map((k,i)=>perkCard(k,i)).join("")}</div></div>`);
  sparks(640,140,"#f7c948",34);
  $$("#ov .perk").forEach(b=>b.onclick=()=>{const k=b.dataset.k;S.perks[k]=(S.perks[k]||0)+1;if(PERKS[k].f)PERKS[k].f();sfx("relic");closeOv();toast(`获得天赋 <b>${PERKS[k].n}</b>`);renderTop();saveRun();res()})})}
@@ -1659,7 +1659,7 @@ function rewardScreen(kind,extraGold,caught=[]){show("reward");setBg(actN().bgs[
  if(kind==="M"||rnd()<(kind==="E"?.6:.4))items.push({t:"pot",v:randPot()});
 caught.forEach(id=>items.push({t:"pal",v:id,done:0,auto:1}));
  if(has("r_pocket"))items[0].v=Math.round(items[0].v*.5);if(has("r_pocket"))items.push({t:"card",v:offerCards(3,"C")});items.push({t:"card",v:offerCards((has("clover")?4:3)-(asc()>=6?1:0),(kind==="E"||kind==="M"||kind==="K"||S.combats<=1)?"E":"C",0,S.combats<=1||B&&B.shinyLoot)});
- if((kind==="E"&&rnd()<.2)||(kind==="K"&&rnd()<.4)||(kind==="M"&&rnd()<.1)||S.isekaiFight)items.push({t:"relic",v:randRelic(kind==="K"?"E":"R")});S.isekaiFight=0;if(["E","B","K","M"].includes(kind)&&!S.noSave&&rnd()<.08)qzDrop(items);if(kind==="K"&&!S.lowHalf)S.lowHalf=1;if(B&&B.lootRelic)items.push({t:"relic",v:randRelic()});
+ if((kind==="E"&&rnd()<.2)||(kind==="K"&&rnd()<.4)||(kind==="M"&&rnd()<.1)||S.isekaiFight)items.push({t:"relic",v:randRelic(kind==="K"?"E":"R")});S.isekaiFight=0;if(["E","B","K","M"].includes(kind)&&!S.noSave&&rnd()<.08)qzDrop(items);if(kind==="K"&&!S.lowHalf)S.lowHalf=1;if(B&&B.lootRelic)items.push({t:"relic",v:randRelic()});if(B&&B.lootCards)B.lootCards.forEach(v=>items.push({t:"card",v}));if(B&&B.lootRelic2)items.push({t:"relic",v:randRelic()});
  S.cur=null;saveRun();
  const ST=(()=>{try{return{t:B?B.turn:0,lost:B&&B.hp0!=null?Math.max(0,B.hp0-S.hp):0,dmg:B?B.enemies.reduce((a,e)=>a+(e.max||0),0):0,cb:B?(B.maxStreak||0):0,foes:B?B.enemies.map(e=>ENEMY[e.id]&&ENEMY[e.id].img).filter(Boolean).slice(0,3):[]}}catch(e){return{t:0,lost:0,dmg:0,cb:0,foes:[]}}})();
  const draw=()=>{$("#reward").innerHTML=`<div class="rw2"><div class="rw2L"><div class="rw2Tag">${kind==="K"?"守关首领":kind==="E"?"精英":kind==="M"?"首领":"战斗"} · 胜利</div><div class="rw2Hero"><img src="${IMG(HI())}"><div class="rw2Foes">${ST.foes.map(f=>`<img src="${IMG(f)}">`).join("")}</div></div><div class="rw2St"><div><b>${ST.t}</b><small>回合</small></div><div><b>${ST.dmg}</b><small>打出伤害</small></div><div><b>${ST.lost}</b><small>掉血</small></div><div><b>${ST.cb}</b><small>最高连击</small></div></div><div class="rw2Say">${kind==="K"?"守关首领倒下了，前面的路开了。":kind==="E"?"精英被打倒了，掉了好东西。":ST.lost===0?"一滴血都没掉，漂亮。":ST.t<=2?"速战速决。":"拿上战利品，接着往上爬。"}</div></div><div class="rw2R"><div class="rw2Head">战利品</div><div class="rwList">${items.map((it,i)=>{let ic="",tx="",sm="";
