@@ -557,3 +557,32 @@ try{TMAILS.unshift({id:"m616pai",t:"奶蛙工作室的第三部作品《奶蛙�
  "【6.1.6】卡牌说明太长时字会自动缩小，不再被卡面上的小标签挡住；设置里加了「手机震动」「震屏」开关；成就「浑身是病」改成同时 6 种负面状态（8 种实测打不到）"]})}catch(e){}
 // 主页 logo 旁边的版本号跟着 VER 走（以前写死在样式里是 6.0）
 try{const s=document.createElement("style");s.textContent=`#title .logo::after{content:"VER ${VER}"!important}`;document.head.appendChild(s)}catch(e){}
+
+/* ===================== 6.1.7 =====================
+   1. 休息点（以及事件、宝箱、选牌这些「只能选一次」的地方）手速快连点会触发好几次：点了一个，其他的就锁住
+   2. 死斗场的喇叭点不动（图片被设成了不接收点击）
+   3. 无尽之塔每一轮结束，同行的伙伴没有清掉：下一轮遇不到新伙伴，专属的「？」事件也出不来 */
+// 1) 休息点：选了一项就把三项都锁住；修炼选牌时取消了，再解开
+{const _rs7=restSite;restSite=async function(){const r=await _rs7.apply(this,arguments);try{const bs=["rHeal","rUp","rTough"].map(id=>document.getElementById(id)).filter(Boolean);let lock=false;
+  const setDis=v=>bs.forEach(b=>{if(v)b.dataset.lk=1;else delete b.dataset.lk;b.style.pointerEvents=v?"none":""});
+  bs.forEach(b=>{const f=b.onclick;if(!f)return;b.onclick=async function(e){if(lock)return;lock=true;setDis(true);try{await f.call(this,e)}catch(x){console.warn(x)}
+   setTimeout(()=>{const R=document.getElementById("rest");if(R&&R.classList.contains("on")&&b.id==="rUp"&&document.getElementById("rUp")===b){lock=false;setDis(false)}},900)}})}catch(e){console.warn(e)}return r}}
+// 其他只能选一次的地方：同一组选项里，点了一个以后 0.7 秒内不再接受第二次点击；同一个按钮 1 秒内不重复触发
+{const ONE=[["#ov",".evo"],["#event",".evo"],["#ov .pickRow",".card"],["#reward .foot",".btn"],["#reward",".chestBig"]];
+ document.addEventListener("click",e=>{try{const t=e.target;if(!t||!t.closest)return;if(t.closest("#battle,#hand,#top"))return;const now=Date.now();
+  for(const [cs,is] of ONE){const it=t.closest(is);const c=it&&it.closest(cs);if(!c)continue;if(c._nwLock&&now-c._nwLock<700&&c._nwLockEl!==undefined){e.stopImmediatePropagation();e.preventDefault();return}c._nwLock=now;c._nwLockEl=it;break}
+  const b=t.closest("button,.btn");if(b&&!b.closest("#map")){if(b._nwT&&now-b._nwT<1000){e.stopImmediatePropagation();e.preventDefault();return}b._nwT=now}}catch(x){}},true)}
+// 2) 喇叭
+try{const s=document.createElement("style");s.textContent="#dqHorn{pointer-events:auto!important;cursor:pointer}";document.head.appendChild(s)}catch(e){}
+// 3) 无尽：每一轮重新遇同伴、重新出支线
+{const _en7=endlessNext;endlessNext=async function(){try{if(S){S.comp=null;S.quest=null;S.mside=null;S.postQ=[];S.compFight=null}}catch(e){}return _en7.apply(this,arguments)}}
+try{const m=TMAILS.find(x=>x.id==="m616pai");if(m)m.body.push("【6.1.7】修复：休息点等只能选一次的地方连点会触发多次；死斗场的喇叭点不动；无尽之塔每一轮的同伴没有清空、遇不到新同伴")}catch(e){}
+// 4) 鲜血盛宴：「这场战斗的生命上限」以前只在正常打赢时扣回去；中途存档重进、复活、特殊战斗结束等情况会变成永久上限。
+//    现在把吸来的上限记在这一局上，只要离开这场战斗（打赢、输了、回地图、开始下一场）就扣回去
+function feastClear(){try{if(B&&B.feastMax){S.feastTmp=Math.max(S.feastTmp||0,B.feastMax);B.feastMax=0}const v=S&&S.feastTmp||0;if(v>0){S.max=Math.max(1,S.max-v);S.hp=Math.min(S.hp,S.max);S.feastTmp=0;try{renderTop()}catch(e){}}}catch(e){}}
+try{const D=CARDS.qz_feast,f0=D.fx;D.fx=function(Bx,u,t){const b0=(Bx&&Bx.feastMax)||0;const r=f0.apply(this,arguments);try{if(!PREV&&Bx){const d=(Bx.feastMax||0)-b0;if(d>0)S.feastTmp=(S.feastTmp||0)+d}}catch(e){}return r}}catch(e){}
+{const _w7=win;win=async function(){try{if(B&&B.kind!=="Z")feastClear();else if(B&&B.zEnd)feastClear()}catch(e){}return _w7.apply(this,arguments)}}
+{const _l7=lose;lose=async function(){feastClear();return _l7.apply(this,arguments)}}
+{const _sc7=startCombat;startCombat=function(){feastClear();return _sc7.apply(this,arguments)}}
+{const _om7=openMap;openMap=function(){if(!B||B.over)feastClear();return _om7.apply(this,arguments)}}
+try{const m=TMAILS.find(x=>x.id==="m616pai");if(m)m.body.push("【6.1.7】修复：吸血鬼的「鲜血盛宴」吸来的生命上限，在某些情况下（比如战斗中途退出再进）会变成永久的；现在离开这场战斗就会扣回去")}catch(e){}
