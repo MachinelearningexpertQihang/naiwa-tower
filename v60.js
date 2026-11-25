@@ -110,7 +110,7 @@ const isGu=()=>S&&S.hero==="gushi";
 function guKinds(e){return GU_KEYS.filter(k=>(e[k]||0)>0).length}
 function guAll(e){return GU_KEYS.reduce((s,k)=>s+(e[k]||0),0)}
 // 层数上限 12（只在蛊师这一局）
-{const _ap=API.apply;API.apply=function(t,s,v){const r=_ap.apply(this,arguments);try{if(isGu()&&t!==this.p&&GU_KEYS.includes(s)&&t[s]>20)t[s]=20}catch(e){}return r}}
+{const _ap=API.apply;API.apply=function(t,s,v){const r=_ap.apply(this,arguments);try{if(isGu()&&t!==this.p&&GU_KEYS.includes(s)&&t[s]>30)t[s]=30}catch(e){}return r}}
 // 养蛊：回合结束时发作
 {const _et=endTurn;endTurn=function(){const was=B&&B.myTurn&&!B.over;const r=_et.apply(this,arguments);try{if(was&&B&&!B.myTurn&&isGu()&&!PREV){B.enemies.forEach(e=>{if(e.hp<=0)return;const n=guKinds(e);if(n>0){const per=3+(S.act||0)+(has("qz_gu_heart")?2:0);dealEnemy(e,per*n);fxSay(e,`蛊发作 ×${n}`)}});renderBattle()}}catch(e){console.warn(e)}return r}}
 
@@ -118,27 +118,27 @@ function guAll(e){return GU_KEYS.reduce((s,k)=>s+(e[k]||0),0)}
 const guT=(B,t)=>t&&t.hp>0?t:B.alive()[0];
 const GU_CARD=(o)=>Object.assign({fam:"none",img:"v_gushi",hero:"gushi"},o);
 Object.assign(CARDS,{
- gu_frost:GU_CARD({n:"寒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人冻伤 ${U(u,4,6)}、潮湿 1`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"frost",U(u,4,6));B.apply(x,"wet",1)}}}),
- gu_fire:GU_CARD({n:"火蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人烫伤 ${U(u,7,9)}。敌人潮湿的话，变成蒸汽：烫伤 ×1.5`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"burn",Math.round(U(u,7,9)*((x.wet||0)>0?1.5:1)))}}),
- gu_poison:GU_CARD({n:"毒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人中毒 ${U(u,6,8)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"poison",U(u,6,8))}}),
- gu_bleed:GU_CARD({n:"血蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人流血 ${U(u,6,8)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"bleed",U(u,6,8))}}),
+ gu_frost:GU_CARD({n:"寒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人冻伤 ${U(u,6,9)}、潮湿 2`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"frost",U(u,6,9));B.apply(x,"wet",2)}}}),
+ gu_fire:GU_CARD({n:"火蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人烫伤 ${U(u,10,13)}。敌人潮湿的话，变成蒸汽：烫伤 ×1.5`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"burn",Math.round(U(u,10,13)*((x.wet||0)>0?1.5:1)))}}),
+ gu_poison:GU_CARD({n:"毒蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人中毒 ${U(u,9,12)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"poison",U(u,9,12))}}),
+ gu_bleed:GU_CARD({n:"血蛊",cost:1,type:"skl",r:"S",tgt:1,d:u=>`敌人流血 ${U(u,9,12)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"bleed",U(u,9,12))}}),
  gu_guard:GU_CARD({n:"护身蛊",cost:1,type:"skl",r:"S",d:u=>`获得 ${U(u,8,11)} 护盾`,fx:(B,u)=>{B.block(U(u,8,11))}}),
  gu_devour:GU_CARD({n:"噬心",cost:2,type:"atk",r:"S",tgt:1,d:u=>`吃掉一个敌人身上所有的蛊，每 1 层造成 ${u?3:2} 伤害，每种不同的蛊再加 5`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const n=guKinds(x),all=guAll(x);GU_KEYS.forEach(k=>{x[k]=0});x.poisonT=0;B.hit(x,all*(u?3:2)+5*n,1,1)}}),
- gu_mud:GU_CARD({n:"泥蛊",cost:0,type:"skl",r:"C",tgt:1,d:u=>`敌人泥巴 ${U(u,3,5)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"mud",U(u,3,5))}}),
- gu_rain:GU_CARD({n:"雨蛊",cost:1,type:"skl",r:"C",d:u=>`所有敌人潮湿 ${U(u,2,3)}，抽 1 张`,fx:(B,u)=>{B.alive().forEach(e=>B.apply(e,"wet",U(u,2,3)));B.draw(1)}}),
- gu_steam:GU_CARD({n:"蒸蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人潮湿 1，再烫伤 ${U(u,6,8)}（潮湿的敌人被火烧会变蒸汽，×1.5）`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;B.apply(x,"wet",1);B.apply(x,"burn",Math.round(U(u,6,8)*1.5))}}),
- gu_icebind:GU_CARD({n:"冰缚蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人冻伤 ${U(u,3,4)}；它要是潮湿的，再冻伤 2、麻痹 ${U(u,1,2)}`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const w=(x.wet||0)>0;B.apply(x,"frost",U(u,3,4));if(w){B.apply(x,"frost",2);B.apply(x,"para",U(u,1,2))}}}),
+ gu_mud:GU_CARD({n:"泥蛊",cost:0,type:"skl",r:"C",tgt:1,d:u=>`敌人泥巴 ${U(u,5,7)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"mud",U(u,5,7))}}),
+ gu_rain:GU_CARD({n:"雨蛊",cost:1,type:"skl",r:"C",d:u=>`所有敌人潮湿 ${U(u,3,4)}，抽 1 张`,fx:(B,u)=>{B.alive().forEach(e=>B.apply(e,"wet",U(u,3,4)));B.draw(1)}}),
+ gu_steam:GU_CARD({n:"蒸蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人潮湿 2，再烫伤 ${U(u,9,12)}（潮湿的敌人被火烧会变蒸汽，×1.5）`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;B.apply(x,"wet",2);B.apply(x,"burn",Math.round(U(u,9,12)*1.5))}}),
+ gu_icebind:GU_CARD({n:"冰缚蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人冻伤 ${U(u,5,6)}；它要是潮湿的，再冻伤 3、麻痹 ${U(u,1,2)}`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const w=(x.wet||0)>0;B.apply(x,"frost",U(u,5,6));if(w){B.apply(x,"frost",3);B.apply(x,"para",U(u,1,2))}}}),
  gu_thunder:GU_CARD({n:"雷蛊",cost:2,type:"skl",r:"E",d:u=>`每个潮湿的敌人受到「潮湿层数 × ${U(u,5,6)}」伤害，然后潮湿清零`,fx:(B,u)=>{B.alive().forEach(e=>{const w=e.wet||0;if(w>0){e.wet=0;B.hit(e,w*U(u,5,6),1,1)}})}}),
- gu_night:GU_CARD({n:"魇蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人梦魇 ${U(u,2,3)}（它的攻击有几率打到自己）`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"night",U(u,2,3))}}),
- gu_numb:GU_CARD({n:"麻蛊",cost:1,type:"skl",r:"C",tgt:1,d:u=>`敌人麻痹 ${U(u,2,3)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"para",U(u,2,3))}}),
- gu_bone:GU_CARD({n:"蚀骨蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人内伤 ${U(u,3,4)}（每回合结束扣血，不会自己消失）`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"inj",U(u,3,4))}}),
- gu_soft:GU_CARD({n:"软骨蛊",cost:0,type:"skl",r:"C",tgt:1,d:u=>`敌人虚弱 2、易伤 ${U(u,1,2)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"weak",2);B.apply(x,"vuln",U(u,1,2))}}}),
+ gu_night:GU_CARD({n:"魇蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人梦魇 3（它的攻击有几率打到自己）`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"night",3)}}),
+ gu_numb:GU_CARD({n:"麻蛊",cost:1,type:"skl",r:"C",tgt:1,d:u=>`敌人麻痹 3`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"para",3)}}),
+ gu_bone:GU_CARD({n:"蚀骨蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`敌人内伤 ${U(u,5,6)}（每回合结束扣血，不会自己消失）`,fx:(B,u,t)=>{const x=guT(B,t);if(x)B.apply(x,"inj",U(u,5,6))}}),
+ gu_soft:GU_CARD({n:"软骨蛊",cost:0,type:"skl",r:"C",tgt:1,d:u=>`敌人虚弱 2、易伤 ${U(u,2,3)}`,fx:(B,u,t)=>{const x=guT(B,t);if(x){B.apply(x,"weak",2);B.apply(x,"vuln",U(u,2,3))}}}),
  gu_spread:GU_CARD({n:"引蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`把这个敌人身上每种蛊的${u?"全部":"一半"}，分给其他所有敌人`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;const o=B.alive().filter(e=>e!==x);GU_KEYS.forEach(k=>{const v=x[k]||0;if(v>0){const g=u?v:Math.ceil(v/2);o.forEach(e=>B.apply(e,k,g))}})}}),
- gu_feed:GU_CARD({n:"养蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`一个敌人身上已有的蛊，层数最多的 4 种各 +${U(u,2,3)} 层`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;GU_KEYS.filter(k=>(x[k]||0)>0).sort((a,b)=>x[b]-x[a]).slice(0,4).forEach(k=>B.apply(x,k,U(u,2,3)))}}),
+ gu_feed:GU_CARD({n:"养蛊",cost:1,type:"skl",r:"R",tgt:1,d:u=>`一个敌人身上已有的蛊，层数最多的 4 种各 +${U(u,3,5)} 层`,fx:(B,u,t)=>{const x=guT(B,t);if(!x)return;GU_KEYS.filter(k=>(x[k]||0)>0).sort((a,b)=>x[b]-x[a]).slice(0,4).forEach(k=>B.apply(x,k,U(u,3,5)))}}),
  gu_shell:GU_CARD({n:"蛊甲",cost:1,type:"skl",r:"C",d:u=>`获得护盾：所有敌人身上蛊的种类加起来 × ${U(u,4,5)}（至少 7）`,fx:(B,u)=>{const n=B.alive().reduce((s,e)=>s+guKinds(e),0);B.block(Math.max(7,n*U(u,4,5)))}}),
  gu_seek:GU_CARD({n:"寻蛊",cost:0,type:"skl",r:"C",exh:1,d:u=>`抽 ${U(u,2,3)} 张`,fx:(B,u)=>{B.draw(U(u,2,3))}}),
- gu_nest:GU_CARD({n:"蛊巢",cost:2,type:"pow",r:"E",d:u=>`每回合开始，给所有敌人随机一种蛊 ${U(u,3,4)} 层`,fx:(B,u)=>{PW(B,"gunest",U(u,3,4))}}),
- gu_all:GU_CARD({n:"万蛊归宗",cost:3,type:"skl",r:"E",exh:1,d:u=>`所有敌人烫伤、流血、泥巴、中毒、冻伤各 ${U(u,3,4)}`,fx:(B,u)=>{B.alive().forEach(e=>["burn","bleed","mud","poison","frost"].forEach(k=>B.apply(e,k,U(u,3,4))))}})});
+ gu_nest:GU_CARD({n:"蛊巢",cost:2,type:"pow",r:"E",d:u=>`每回合开始，给所有敌人随机一种蛊 ${U(u,5,6)} 层`,fx:(B,u)=>{PW(B,"gunest",U(u,5,6))}}),
+ gu_all:GU_CARD({n:"万蛊归宗",cost:3,type:"skl",r:"E",exh:1,d:u=>`所有敌人烫伤、流血、泥巴、中毒、冻伤各 ${U(u,5,7)}`,fx:(B,u)=>{B.alive().forEach(e=>["burn","bleed","mud","poison","frost"].forEach(k=>B.apply(e,k,U(u,5,7))))}})});
 POOL_HERO.push("gu_mud","gu_rain","gu_steam","gu_icebind","gu_thunder","gu_night","gu_numb","gu_bone","gu_soft","gu_spread","gu_feed","gu_shell","gu_seek","gu_nest","gu_all");
 // 蛊巢
 {const _st2=startTurn;startTurn=async function(){const r=await _st2.apply(this,arguments);try{const v=B&&B.p.pw2&&B.p.pw2.gunest;if(v&&!B.over&&!PREV){B.alive().forEach(e=>B.apply(e,pick(["burn","bleed","mud","poison","frost","wet"]),v));renderBattle()}}catch(e){}return r}}
@@ -249,14 +249,14 @@ const SS_FLAGS=["protoDone","curserDone","arenaDone","ssProto","truth","ssArena"
 
 /* ---------- 2. 蛊师奶蛙的专属遗物 ---------- */
 Object.assign(RELICS,{
- mr_gujar:{n:"蛊母罐",img:"v_gushi",r:"S",d:"蛊师熟练度奖励：每场战斗开始，所有敌人随机 2 种蛊各 3 层"},
+ mr_gujar:{n:"蛊母罐",img:"v_gushi",r:"S",d:"蛊师熟练度奖励：每场战斗开始，所有敌人随机 2 种蛊各 5 层"},
  qz_gu_heart:{n:"本命蛊",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：养蛊发作时，每种蛊多扣 2 点血"},
  qz_gu_jar:{n:"万蛊瓮",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：敌人倒下时，它身上每种蛊的一半，分给其他所有敌人"},
  qz_cicada:{n:"春秋蝉",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：倒下时满血复活，所有牌升一级；但身上所有遗物（包括它自己）都会消失"}});
 const GU_START=["burn","bleed","mud","poison","frost","wet"];
 {const _scG=startCombat;startCombat=function(kind){const r=_scG.apply(this,arguments);try{if(B&&!PREV){
-  if(has("mr_gujar")){B.alive().forEach(e=>shuffle(GU_START.slice()).slice(0,2).forEach(k=>B.apply(e,k,3)));relicPulse("mr_gujar")}
-  const gs=perk("guStart");if(gs)B.alive().forEach(e=>B.apply(e,pick(GU_START),3*gs));
+  if(has("mr_gujar")){B.alive().forEach(e=>shuffle(GU_START.slice()).slice(0,2).forEach(k=>B.apply(e,k,5)));relicPulse("mr_gujar")}
+  const gs=perk("guStart");if(gs)B.alive().forEach(e=>B.apply(e,pick(GU_START),5*gs));
   const es=perk("eggStart");for(let i=0;i<es;i++)B.layEgg({t:1,d:10,b:0,nw:1});
   if(perk("wxGo")){const ws=Object.keys(WX).filter(w=>w!=="clear"&&w!==B.wx);if(ws.length)B.setWx(pick(ws));B.wxGoE=1}
   renderBattle()}}catch(e){console.warn(e)}return r}}
@@ -281,7 +281,7 @@ Object.assign(PERKS,{
  wxGo:{n:"呼风唤雨",ic:"wind",max:1,d:"每场战斗开始随机变一次天（不会是晴天），第一回合奶力 +1"},
  wxShield:{n:"风雨无阻",ic:"shield",max:2,d:"不是晴天时，每回合开始获得 4 护盾"},
  guB:{n:"蛊毒入骨",ic:"skull",max:3,hero:"gushi",d:"养蛊发作时，每种蛊多扣 1 点血"},
- guStart:{n:"先下手",ic:"swirl",max:2,hero:"gushi",d:"每场战斗开始，每个敌人身上随机 1 种蛊 3 层"}});
+ guStart:{n:"先下手",ic:"swirl",max:2,hero:"gushi",d:"每场战斗开始，每个敌人身上随机 1 种蛊 5 层"}});
 // 看天吃饭
 {const _swP=API.setWx;API.setWx=function(w){const old=this.wx;const r=_swP.apply(this,arguments);try{const lv=perk("wxB");if(lv&&!PREV&&B&&old!==w){B.alive().forEach(e=>B.hit(e,4*lv,1,1));setTimeout(()=>{try{if(B&&!B.alive().length&&!B.over)win()}catch(e){}},50)}}catch(e){}return r}}
 // 每回合开始：呼风唤雨的奶力、暖巢、风雨无阻
@@ -525,8 +525,8 @@ try{const m=TMAILS.find(x=>x.id==="m613");if(m){m.id="m615";m.t="6.1.5 · 蛊师
    和其他主角一样，开局的蛊牌也算蛊家族 */
 FAM.gu={n:"蛊",c:"#7fae3e"};
 try{Object.values(CARDS).forEach(D=>{if(D.hero==="gushi"&&D.fam==="none")D.fam="gu"})}catch(e){console.warn(e)}
-try{FAMINFO.gu="蛊家族：蛊师奶蛙专属。三连爆发：所有敌人各加 1 种随机的蛊 3 层，你回复 3 生命。"}catch(e){}
-{const _pf=API.poolFx;API.poolFx=function(f,lv=1,n=3){const r=_pf.apply(this,arguments);try{if(f==="gu"&&!PREV&&!this.over){const k=lv||1;const ks=["burn","bleed","poison","frost","wet","mud"];this.alive().forEach(e=>this.apply(e,pick(ks),3*k));this.heal(3*k);renderBattle()}}catch(e){console.warn(e)}return r}}
+try{FAMINFO.gu="蛊家族：蛊师奶蛙专属。三连爆发：所有敌人各加 1 种随机的蛊 5 层，你回复 3 生命。"}catch(e){}
+{const _pf=API.poolFx;API.poolFx=function(f,lv=1,n=3){const r=_pf.apply(this,arguments);try{if(f==="gu"&&!PREV&&!this.over){const k=lv||1;const ks=["burn","bleed","poison","frost","wet","mud"];this.alive().forEach(e=>this.apply(e,pick(ks),5*k));this.heal(3*k);renderBattle()}}catch(e){console.warn(e)}return r}}
 
 /* ===================== 6.1.6 =====================
    1. 卡牌说明太长时字自动缩小，从上往下排，不再顶到「攻击 / 家族」小标签下面
@@ -586,3 +586,15 @@ try{const D=CARDS.qz_feast,f0=D.fx;D.fx=function(Bx,u,t){const b0=(Bx&&Bx.feastM
 {const _sc7=startCombat;startCombat=function(){feastClear();return _sc7.apply(this,arguments)}}
 {const _om7=openMap;openMap=function(){if(!B||B.over)feastClear();return _om7.apply(this,arguments)}}
 try{const m=TMAILS.find(x=>x.id==="m616pai");if(m)m.body.push("【6.1.7】修复：吸血鬼的「鲜血盛宴」吸来的生命上限，在某些情况下（比如战斗中途退出再进）会变成永久的；现在离开这场战斗就会扣回去")}catch(e){}
+
+/* ===================== 6.1.8：蛊师加强（每张牌上的层数更多）+ 两个专属遗物 =====================
+   蛊牌层数约 +50%（控制类的麻痹、梦魇只加一点），三连爆发 / 先下手 / 蛊母罐 3 层 → 5 层，层数上限 20 → 30 */
+Object.assign(RELICS,{
+ qz_gu_twin:{n:"子母蛊",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：你给敌人上的每一种蛊，都多 1 层"},
+ qz_gu_echo:{n:"蛊鸣",img:"v_gushi",r:"Q",hero:"gushi",d:"蛊师奇招：每回合养蛊发作之后，每个敌人身上层数最少的那种蛊 +3 层"}});
+// 子母蛊
+{const _apT=API.apply;API.apply=function(t,s,v){try{if(!PREV&&isGu()&&has("qz_gu_twin")&&t&&t!==this.p&&GU_KEYS.includes(s)&&v>0){arguments[2]=v+1}}catch(e){}return _apT.apply(this,arguments)}}
+// 蛊鸣
+{const _etE=endTurn;endTurn=function(){const was=B&&B.myTurn&&!B.over;const r=_etE.apply(this,arguments);try{if(was&&B&&!B.myTurn&&!B.over&&!PREV&&isGu()&&has("qz_gu_echo")){let any=0;
+  B.alive().forEach(e=>{const ks=GU_KEYS.filter(k=>(e[k]||0)>0);if(!ks.length)return;ks.sort((a,b)=>e[a]-e[b]);B.apply(e,ks[0],3);any=1});if(any){relicPulse("qz_gu_echo");renderBattle()}}}catch(e){console.warn(e)}return r}}
+try{const m=TMAILS.find(x=>x.id==="m616pai");if(m)m.body.push("【6.1.8】蛊师加强：蛊牌一次上的层数约多一半（寒蛊冻伤 6、火蛊烫伤 10、毒蛊中毒 9、血蛊流血 9……），麻蛊、魇蛊、软骨蛊小幅加强；蛊家族三连、天赋「先下手」、遗物「蛊母罐」都从 3 层变 5 层；每种蛊最多 30 层（原来 20）；新的蛊师奇招遗物「子母蛊」「蛊鸣」。")}catch(e){}
